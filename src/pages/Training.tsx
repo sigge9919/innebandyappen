@@ -1,14 +1,18 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { TrainingCard } from '@/components/training/TrainingCard';
-import { mockTrainingSessions, mockPlayers, mockDrills } from '@/data/mockData';
+import { useTrainingSessions, usePlayers, useDrills } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Calendar, Dumbbell } from 'lucide-react';
 
 export default function Training() {
+  const { sessions } = useTrainingSessions();
+  const { players } = usePlayers();
+  const { drills } = useDrills();
+
   const getPlayerNames = (playerIds: string[]) => {
     return playerIds.map(id => {
-      const player = mockPlayers.find(p => p.id === id);
+      const player = players.find(p => p.id === id);
       return player?.name ?? '';
     });
   };
@@ -21,7 +25,7 @@ export default function Training() {
           <div>
             <h1 className="section-title">Training</h1>
             <p className="text-muted-foreground mt-1">
-              {mockTrainingSessions.length} sessions planned
+              {sessions.length} sessions planned
             </p>
           </div>
           <Button className="gap-2">
@@ -39,7 +43,7 @@ export default function Training() {
             </div>
             
             <div className="grid gap-4 sm:grid-cols-2">
-              {mockTrainingSessions.map(session => (
+              {sessions.map(session => (
                 <TrainingCard
                   key={session.id}
                   session={session}
@@ -62,7 +66,7 @@ export default function Training() {
             </div>
 
             <div className="space-y-3">
-              {mockDrills.map(drill => (
+              {drills.map(drill => (
                 <div
                   key={drill.id}
                   className="stat-card p-4 cursor-pointer hover:shadow-md transition-all"

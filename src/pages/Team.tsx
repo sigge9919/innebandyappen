@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PlayerCard } from '@/components/team/PlayerCard';
-import { mockPlayers } from '@/data/mockData';
+import { usePlayers } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Users, AlertTriangle, Target } from 'lucide-react';
@@ -10,10 +10,11 @@ import { cn } from '@/lib/utils';
 type FilterType = 'all' | 'active' | 'injured' | 'focus';
 
 export default function Team() {
+  const { players } = usePlayers();
   const [filter, setFilter] = useState<FilterType>('all');
   const [search, setSearch] = useState('');
 
-  const filteredPlayers = mockPlayers.filter(player => {
+  const filteredPlayers = players.filter(player => {
     const matchesSearch = player.name.toLowerCase().includes(search.toLowerCase()) ||
                          player.position.toLowerCase().includes(search.toLowerCase());
     
@@ -30,10 +31,10 @@ export default function Team() {
   });
 
   const filterButtons: { value: FilterType; label: string; icon: React.ElementType; count: number }[] = [
-    { value: 'all', label: 'All', icon: Users, count: mockPlayers.length },
-    { value: 'active', label: 'Active', icon: Users, count: mockPlayers.filter(p => p.status === 'Active').length },
-    { value: 'injured', label: 'Injured', icon: AlertTriangle, count: mockPlayers.filter(p => p.status === 'Injured').length },
-    { value: 'focus', label: 'Focus', icon: Target, count: mockPlayers.filter(p => p.focusFlag).length },
+    { value: 'all', label: 'All', icon: Users, count: players.length },
+    { value: 'active', label: 'Active', icon: Users, count: players.filter(p => p.status === 'Active').length },
+    { value: 'injured', label: 'Injured', icon: AlertTriangle, count: players.filter(p => p.status === 'Injured').length },
+    { value: 'focus', label: 'Focus', icon: Target, count: players.filter(p => p.focusFlag).length },
   ];
 
   return (
@@ -43,7 +44,7 @@ export default function Team() {
         <div className="section-header">
           <div>
             <h1 className="section-title">Team</h1>
-            <p className="text-muted-foreground mt-1">{mockPlayers.length} players</p>
+            <p className="text-muted-foreground mt-1">{players.length} players</p>
           </div>
           <Button className="gap-2">
             <Plus className="h-4 w-4" />

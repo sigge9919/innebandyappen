@@ -5,17 +5,25 @@ import { NextTrainingCard } from '@/components/dashboard/NextTrainingCard';
 import { PlayerAlerts } from '@/components/dashboard/PlayerAlerts';
 import { WeeklyFocusCard } from '@/components/dashboard/WeeklyFocusCard';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { mockPlayers, mockGames, mockTrainingSessions, weeklyFocus, coachNotes } from '@/data/mockData';
+import { usePlayers, useGames, useTrainingSessions, useWeeklyFocus, useCoachNotes } from '@/hooks/useLocalStorage';
+import { useAuth } from '@/contexts/AuthContext';
 import { Users, Trophy, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function Dashboard() {
-  const upcomingGame = mockGames.find(g => g.status === 'Upcoming');
-  const lastPlayedGame = mockGames.filter(g => g.status === 'Played')[0];
-  const nextTraining = mockTrainingSessions[0];
+  const { user } = useAuth();
+  const { players } = usePlayers();
+  const { games } = useGames();
+  const { sessions } = useTrainingSessions();
+  const { focus } = useWeeklyFocus();
+  const { notes } = useCoachNotes();
+
+  const upcomingGame = games.find(g => g.status === 'Upcoming');
+  const lastPlayedGame = games.filter(g => g.status === 'Played')[0];
+  const nextTraining = sessions[0];
   
-  const activePlayers = mockPlayers.filter(p => p.status === 'Active').length;
-  const gamesPlayed = mockGames.filter(g => g.status === 'Played').length;
-  const gamesWon = mockGames.filter(g => g.status === 'Played' && (g.ourScore ?? 0) > (g.opponentScore ?? 0)).length;
+  const activePlayers = players.filter(p => p.status === 'Active').length;
+  const gamesPlayed = games.filter(g => g.status === 'Played').length;
+  const gamesWon = games.filter(g => g.status === 'Played' && (g.ourScore ?? 0) > (g.opponentScore ?? 0)).length;
 
   return (
     <AppLayout>
@@ -24,7 +32,7 @@ export default function Dashboard() {
         <div className="section-header">
           <div>
             <h1 className="section-title">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Welcome back, Coach</p>
+            <p className="text-muted-foreground mt-1">Welcome back, {user?.name || 'Coach'}</p>
           </div>
         </div>
 
@@ -33,7 +41,7 @@ export default function Dashboard() {
           <StatCard
             title="Active Players"
             value={activePlayers}
-            subtitle={`of ${mockPlayers.length} total`}
+            subtitle={`of ${players.length} total`}
             icon={Users}
           />
           <StatCard
@@ -50,7 +58,7 @@ export default function Dashboard() {
           />
           <StatCard
             title="Sessions"
-            value={mockTrainingSessions.length}
+            value={sessions.length}
             subtitle="upcoming"
             icon={CalendarIcon}
           />
@@ -72,12 +80,12 @@ export default function Dashboard() {
                 playerCount={nextTraining.playerIds.length}
               />
             )}
-            <WeeklyFocusCard focus={weeklyFocus} notes={coachNotes} />
+            <WeeklyFocusCard focus={focus} notes={notes} />
           </div>
 
           {/* Right Column - Alerts */}
           <div className="space-y-6">
-            <PlayerAlerts players={mockPlayers} />
+            <PlayerAlerts players={players} />
           </div>
         </div>
       </div>

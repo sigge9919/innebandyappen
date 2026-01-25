@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PlayCard } from '@/components/playbook/PlayCard';
-import { mockPlays } from '@/data/mockData';
+import { usePlays } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, BookOpen, Filter } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Plus, Search, BookOpen } from 'lucide-react';
 
 type CategoryFilter = 'all' | 'System' | 'Set Play' | 'Special Teams';
 
 export default function Playbook() {
+  const { plays } = usePlays();
   const [filter, setFilter] = useState<CategoryFilter>('all');
   const [search, setSearch] = useState('');
 
-  const filteredPlays = mockPlays.filter(play => {
+  const filteredPlays = plays.filter(play => {
     const matchesSearch = play.name.toLowerCase().includes(search.toLowerCase()) ||
                          play.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()));
     
@@ -31,7 +31,7 @@ export default function Playbook() {
           <div>
             <h1 className="section-title">Playbook</h1>
             <p className="text-muted-foreground mt-1">
-              {mockPlays.length} plays
+              {plays.length} plays
             </p>
           </div>
           <Button className="gap-2">

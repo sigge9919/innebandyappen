@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { GameCard } from '@/components/games/GameCard';
-import { mockGames } from '@/data/mockData';
+import { useGames } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Plus, Trophy, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 type FilterType = 'all' | 'upcoming' | 'played';
 
 export default function Games() {
+  const { games } = useGames();
   const [filter, setFilter] = useState<FilterType>('all');
 
-  const filteredGames = mockGames.filter(game => {
+  const filteredGames = games.filter(game => {
     switch (filter) {
       case 'upcoming':
         return game.status === 'Upcoming';
@@ -22,9 +22,9 @@ export default function Games() {
     }
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const gamesWon = mockGames.filter(g => g.status === 'Played' && (g.ourScore ?? 0) > (g.opponentScore ?? 0)).length;
-  const gamesLost = mockGames.filter(g => g.status === 'Played' && (g.ourScore ?? 0) < (g.opponentScore ?? 0)).length;
-  const gamesPlayed = mockGames.filter(g => g.status === 'Played').length;
+  const gamesWon = games.filter(g => g.status === 'Played' && (g.ourScore ?? 0) > (g.opponentScore ?? 0)).length;
+  const gamesLost = games.filter(g => g.status === 'Played' && (g.ourScore ?? 0) < (g.opponentScore ?? 0)).length;
+  const gamesPlayed = games.filter(g => g.status === 'Played').length;
 
   return (
     <AppLayout>
