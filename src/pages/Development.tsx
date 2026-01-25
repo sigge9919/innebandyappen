@@ -1,25 +1,13 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { mockPlayers } from '@/data/mockData';
+import { usePlayers, useIDPs, useTestResults } from '@/hooks/useLocalStorage';
+import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
+import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Target, TrendingUp, TrendingDown, Minus, ChevronRight, ClipboardList } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Minus, ChevronRight, ClipboardList, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-// Mock development data
-const mockIDPs = mockPlayers.slice(0, 3).map(player => ({
-  playerId: player.id,
-  focusAreas: ['Defensive positioning', 'Passing accuracy'],
-  shortTermGoals: ['Improve stick work', 'Better communication'],
-  coachNotes: 'Showing good progress in recent sessions',
-  lastUpdated: '2026-01-20',
-}));
-
-const mockTests = [
-  { id: '1', playerId: '1', testType: 'Fitness' as const, testName: 'Sprint Test', date: '2026-01-15', result: '4.2s', previousResult: '4.5s', trend: 'up' as const },
-  { id: '2', playerId: '1', testType: 'Skill' as const, testName: 'Shooting Accuracy', date: '2026-01-15', result: '85%', previousResult: '82%', trend: 'up' as const },
-  { id: '3', playerId: '2', testType: 'Fitness' as const, testName: 'Endurance Test', date: '2026-01-14', result: '12min', previousResult: '12min', trend: 'same' as const },
-  { id: '4', playerId: '3', testType: 'Skill' as const, testName: 'Passing Test', date: '2026-01-14', result: '72%', previousResult: '78%', trend: 'down' as const },
-];
+import { Player, IndividualDevelopmentPlan, TestResult } from '@/types';
 
 const TrendIcon = ({ trend }: { trend: 'up' | 'down' | 'same' }) => {
   if (trend === 'up') return <TrendingUp className="h-4 w-4 text-success" />;
@@ -28,6 +16,57 @@ const TrendIcon = ({ trend }: { trend: 'up' | 'down' | 'same' }) => {
 };
 
 export default function Development() {
+  const { players } = usePlayers();
+  const { idps, addIDP, updateIDP } = useIDPs();
+  const { tests, addTest, updateTest, deleteTest } = useTestResults();
+
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [selectedIDP, setSelectedIDP] = useState<IndividualDevelopmentPlan | null>(null);
+  const [idpDialogOpen, setIdpDialogOpen] = useState(false);
+
+  const [selectedTest, setSelectedTest] = useState<TestResult | null>(null);
+  const [testDialogOpen, setTestDialogOpen] = useState(false);
+
+  const handlePlayerClick = (player: Player) => {
+    const existingIDP = idps.find(idp => idp.playerId === player.id);
+    setSelectedPlayer(player);
+    setSelectedIDP(existingIDP || null);
+    setIdpDialogOpen(true);
+  };
+
+  const handleSaveIDP = (idp: IndividualDevelopmentPlan) => {
+    const existingIDP = idps.find(i => i.playerId === idp.playerId);
+    if (existingIDP) {
+      updateIDP(idp.playerId, idp);
+    } else {
+      addIDP(idp);
+    }
+  };
+
+  const handleAddTest = () => {
+    setSelectedTest(null);
+    setTestDialogOpen(true);
+  };
+
+  const handleTestClick = (test: TestResult) => {
+    setSelectedTest(test);
+    setTestDialogOpen(true);
+  };
+
+  const handleSaveTest = (test: TestResult) => {
+    if (selectedTest) {
+      updateTest(test.id, test);
+    } else {
+      addTest(test);
+    }
+  };
+
+  // Get players with their IDPs
+  const playersWithIDPs = players.slice(0, 6).map(player => ({
+    player,
+    idp: idps.find(idp => idp.playerId === player.id)
+  }));
+
   return (
     <AppLayout>
       <div className="page-container">
@@ -47,29 +86,29 @@ export default function Development() {
                 <Target className="h-5 w-5 text-primary" />
                 <h2 className="text-lg font-semibold text-foreground">Development Plans</h2>
               </div>
-              <Button variant="outline" size="sm">View All</Button>
             </div>
 
             <div className="space-y-4">
-              {mockIDPs.map(idp => {
-                const player = mockPlayers.find(p => p.id === idp.playerId);
-                if (!player) return null;
-
-                return (
-                  <div key={idp.playerId} className="stat-card hover:shadow-md transition-all cursor-pointer">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                          {player.jerseyNumber}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-foreground">{player.name}</h3>
-                          <p className="text-xs text-muted-foreground">{player.position}</p>
-                        </div>
+              {playersWithIDPs.map(({ player, idp }) => (
+                <div 
+                  key={player.id} 
+                  onClick={() => handlePlayerClick(player)}
+                  className="stat-card hover:shadow-md transition-all cursor-pointer"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                        {player.jerseyNumber}
                       </div>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <h3 className="font-semibold text-foreground">{player.name}</h3>
+                        <p className="text-xs text-muted-foreground">{player.position}</p>
+                      </div>
                     </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  </div>
 
+                  {idp ? (
                     <div className="space-y-3">
                       <div>
                         <p className="text-xs font-medium text-muted-foreground uppercase mb-1.5">Focus Areas</p>
@@ -85,7 +124,7 @@ export default function Development() {
                       <div>
                         <p className="text-xs font-medium text-muted-foreground uppercase mb-1.5">Goals</p>
                         <ul className="space-y-1">
-                          {idp.shortTermGoals.map((goal, i) => (
+                          {idp.shortTermGoals.slice(0, 2).map((goal, i) => (
                             <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                               {goal}
@@ -93,14 +132,16 @@ export default function Development() {
                           ))}
                         </ul>
                       </div>
-                    </div>
 
-                    <p className="text-xs text-muted-foreground mt-4">
-                      Updated: {new Date(idp.lastUpdated).toLocaleDateString()}
-                    </p>
-                  </div>
-                );
-              })}
+                      <p className="text-xs text-muted-foreground mt-4">
+                        Updated: {new Date(idp.lastUpdated).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Click to create development plan</p>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -111,20 +152,24 @@ export default function Development() {
                 <ClipboardList className="h-5 w-5 text-primary" />
                 <h2 className="text-lg font-semibold text-foreground">Recent Tests</h2>
               </div>
-              <Button variant="outline" size="sm">Add Test</Button>
+              <Button variant="outline" size="sm" onClick={handleAddTest}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Test
+              </Button>
             </div>
 
             <div className="stat-card">
               <div className="space-y-0">
-                {mockTests.map((test, index) => {
-                  const player = mockPlayers.find(p => p.id === test.playerId);
+                {tests.length > 0 ? tests.map((test, index) => {
+                  const player = players.find(p => p.id === test.playerId);
                   
                   return (
                     <div
                       key={test.id}
+                      onClick={() => handleTestClick(test)}
                       className={cn(
-                        'flex items-center gap-4 py-4',
-                        index !== mockTests.length - 1 && 'border-b border-border'
+                        'flex items-center gap-4 py-4 cursor-pointer hover:bg-muted/50 -mx-4 px-4 transition-colors',
+                        index !== tests.length - 1 && 'border-b border-border'
                       )}
                     >
                       <div className="flex-1 min-w-0">
@@ -152,12 +197,37 @@ export default function Development() {
                       </div>
                     </div>
                   );
-                })}
+                }) : (
+                  <div className="text-center py-8">
+                    <ClipboardList className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No test results yet</p>
+                    <Button variant="outline" size="sm" className="mt-3" onClick={handleAddTest}>
+                      Add first test
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <IDPFormDialog
+        open={idpDialogOpen}
+        onOpenChange={setIdpDialogOpen}
+        idp={selectedIDP}
+        player={selectedPlayer}
+        onSave={handleSaveIDP}
+      />
+
+      <TestResultFormDialog
+        open={testDialogOpen}
+        onOpenChange={setTestDialogOpen}
+        test={selectedTest}
+        players={players}
+        onSave={handleSaveTest}
+        onDelete={deleteTest}
+      />
     </AppLayout>
   );
 }

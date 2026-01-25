@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PlayerCard } from '@/components/team/PlayerCard';
+import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
 import { usePlayers } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Users, AlertTriangle, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Player } from '@/types';
 
 type FilterType = 'all' | 'active' | 'injured' | 'focus';
 
 export default function Team() {
-  const { players } = usePlayers();
+  const { players, addPlayer, updatePlayer, deletePlayer } = usePlayers();
   const [filter, setFilter] = useState<FilterType>('all');
   const [search, setSearch] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   const filteredPlayers = players.filter(player => {
     const matchesSearch = player.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -37,6 +41,24 @@ export default function Team() {
     { value: 'focus', label: 'Focus', icon: Target, count: players.filter(p => p.focusFlag).length },
   ];
 
+  const handlePlayerClick = (player: Player) => {
+    setSelectedPlayer(player);
+    setDialogOpen(true);
+  };
+
+  const handleAddPlayer = () => {
+    setSelectedPlayer(null);
+    setDialogOpen(true);
+  };
+
+  const handleSavePlayer = (player: Player) => {
+    if (selectedPlayer) {
+      updatePlayer(player.id, player);
+    } else {
+      addPlayer(player);
+    }
+  };
+
   return (
     <AppLayout>
       <div className="page-container">
@@ -46,7 +68,7 @@ export default function Team() {
             <h1 className="section-title">Team</h1>
             <p className="text-muted-foreground mt-1">{players.length} players</p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={handleAddPlayer}>
             <Plus className="h-4 w-4" />
             Add Player
           </Button>
@@ -90,7 +112,11 @@ export default function Team() {
         {/* Player List */}
         <div className="grid gap-4 md:grid-cols-2">
           {filteredPlayers.map(player => (
-            <PlayerCard key={player.id} player={player} />
+            <PlayerCard 
+              key={player.id} 
+              player={player} 
+              onClick={() => handlePlayerClick(player)}
+            />
           ))}
         </div>
 
@@ -101,6 +127,14 @@ export default function Team() {
           </div>
         )}
       </div>
+
+      <PlayerFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        player={selectedPlayer}
+        onSave={handleSavePlayer}
+        onDelete={deletePlayer}
+      />
     </AppLayout>
   );
 }

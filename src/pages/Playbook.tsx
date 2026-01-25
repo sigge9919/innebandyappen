@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PlayCard } from '@/components/playbook/PlayCard';
+import { PlayFormDialog } from '@/components/forms/PlayFormDialog';
 import { usePlays } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, BookOpen } from 'lucide-react';
+import { Play } from '@/types';
 
 type CategoryFilter = 'all' | 'System' | 'Set Play' | 'Special Teams';
 
 export default function Playbook() {
-  const { plays } = usePlays();
+  const { plays, addPlay, updatePlay, deletePlay } = usePlays();
   const [filter, setFilter] = useState<CategoryFilter>('all');
   const [search, setSearch] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPlay, setSelectedPlay] = useState<Play | null>(null);
 
   const filteredPlays = plays.filter(play => {
     const matchesSearch = play.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -22,6 +26,24 @@ export default function Playbook() {
   });
 
   const categories: CategoryFilter[] = ['all', 'System', 'Set Play', 'Special Teams'];
+
+  const handlePlayClick = (play: Play) => {
+    setSelectedPlay(play);
+    setDialogOpen(true);
+  };
+
+  const handleAddPlay = () => {
+    setSelectedPlay(null);
+    setDialogOpen(true);
+  };
+
+  const handleSavePlay = (play: Play) => {
+    if (selectedPlay) {
+      updatePlay(play.id, play);
+    } else {
+      addPlay(play);
+    }
+  };
 
   return (
     <AppLayout>
@@ -34,7 +56,7 @@ export default function Playbook() {
               {plays.length} plays
             </p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={handleAddPlay}>
             <Plus className="h-4 w-4" />
             Add Play
           </Button>
@@ -68,7 +90,11 @@ export default function Playbook() {
         {/* Plays Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredPlays.map(play => (
-            <PlayCard key={play.id} play={play} />
+            <PlayCard 
+              key={play.id} 
+              play={play}
+              onClick={() => handlePlayClick(play)}
+            />
           ))}
         </div>
 
@@ -79,6 +105,14 @@ export default function Playbook() {
           </div>
         )}
       </div>
+
+      <PlayFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        play={selectedPlay}
+        onSave={handleSavePlay}
+        onDelete={deletePlay}
+      />
     </AppLayout>
   );
 }
