@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Player, Game, TrainingSession, Drill, Play } from '@/types';
+import { Player, Game, TrainingSession, Drill, Play, IndividualDevelopmentPlan, TestResult } from '@/types';
 import * as storage from '@/lib/storage';
 
 // Initialize storage on first import
@@ -112,11 +112,21 @@ export function useDrills() {
     setDrills(storage.getDrills());
   }, []);
 
+  const updateDrill = useCallback((id: string, updates: Partial<Drill>) => {
+    storage.updateDrill(id, updates);
+    setDrills(storage.getDrills());
+  }, []);
+
+  const deleteDrill = useCallback((id: string) => {
+    storage.deleteDrill(id);
+    setDrills(storage.getDrills());
+  }, []);
+
   const refresh = useCallback(() => {
     setDrills(storage.getDrills());
   }, []);
 
-  return { drills, isLoading, addDrill, refresh };
+  return { drills, isLoading, addDrill, updateDrill, deleteDrill, refresh };
 }
 
 export function usePlays() {
@@ -133,11 +143,83 @@ export function usePlays() {
     setPlays(storage.getPlays());
   }, []);
 
+  const updatePlay = useCallback((id: string, updates: Partial<Play>) => {
+    storage.updatePlay(id, updates);
+    setPlays(storage.getPlays());
+  }, []);
+
+  const deletePlay = useCallback((id: string) => {
+    storage.deletePlay(id);
+    setPlays(storage.getPlays());
+  }, []);
+
   const refresh = useCallback(() => {
     setPlays(storage.getPlays());
   }, []);
 
-  return { plays, isLoading, addPlay, refresh };
+  return { plays, isLoading, addPlay, updatePlay, deletePlay, refresh };
+}
+
+export function useIDPs() {
+  const [idps, setIdps] = useState<IndividualDevelopmentPlan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIdps(storage.getIDPs());
+    setIsLoading(false);
+  }, []);
+
+  const addIDP = useCallback((idp: IndividualDevelopmentPlan) => {
+    storage.addIDP(idp);
+    setIdps(storage.getIDPs());
+  }, []);
+
+  const updateIDP = useCallback((playerId: string, updates: Partial<IndividualDevelopmentPlan>) => {
+    storage.updateIDP(playerId, updates);
+    setIdps(storage.getIDPs());
+  }, []);
+
+  const deleteIDP = useCallback((playerId: string) => {
+    storage.deleteIDP(playerId);
+    setIdps(storage.getIDPs());
+  }, []);
+
+  const refresh = useCallback(() => {
+    setIdps(storage.getIDPs());
+  }, []);
+
+  return { idps, isLoading, addIDP, updateIDP, deleteIDP, refresh };
+}
+
+export function useTestResults() {
+  const [tests, setTests] = useState<TestResult[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setTests(storage.getTestResults());
+    setIsLoading(false);
+  }, []);
+
+  const addTest = useCallback((test: TestResult) => {
+    storage.addTestResult(test);
+    setTests(storage.getTestResults());
+  }, []);
+
+  const updateTest = useCallback((id: string, updates: Partial<TestResult>) => {
+    storage.updateTestResult(id, updates);
+    setTests(storage.getTestResults());
+  }, []);
+
+  const deleteTest = useCallback((id: string) => {
+    storage.deleteTestResult(id);
+    setTests(storage.getTestResults());
+  }, []);
+
+  const refresh = useCallback(() => {
+    setTests(storage.getTestResults());
+  }, []);
+
+  return { tests, isLoading, addTest, updateTest, deleteTest, refresh };
 }
 
 export function useWeeklyFocus() {

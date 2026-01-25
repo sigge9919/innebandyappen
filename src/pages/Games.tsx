@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { GameCard } from '@/components/games/GameCard';
+import { GameFormDialog } from '@/components/forms/GameFormDialog';
 import { useGames } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Plus, Trophy, Calendar } from 'lucide-react';
+import { Game } from '@/types';
 
 type FilterType = 'all' | 'upcoming' | 'played';
 
 export default function Games() {
-  const { games } = useGames();
+  const { games, addGame, updateGame, deleteGame } = useGames();
   const [filter, setFilter] = useState<FilterType>('all');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
   const filteredGames = games.filter(game => {
     switch (filter) {
@@ -26,6 +30,24 @@ export default function Games() {
   const gamesLost = games.filter(g => g.status === 'Played' && (g.ourScore ?? 0) < (g.opponentScore ?? 0)).length;
   const gamesPlayed = games.filter(g => g.status === 'Played').length;
 
+  const handleGameClick = (game: Game) => {
+    setSelectedGame(game);
+    setDialogOpen(true);
+  };
+
+  const handleAddGame = () => {
+    setSelectedGame(null);
+    setDialogOpen(true);
+  };
+
+  const handleSaveGame = (game: Game) => {
+    if (selectedGame) {
+      updateGame(game.id, game);
+    } else {
+      addGame(game);
+    }
+  };
+
   return (
     <AppLayout>
       <div className="page-container">
@@ -37,7 +59,7 @@ export default function Games() {
               {gamesPlayed} played • {gamesWon}W - {gamesLost}L
             </p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={handleAddGame}>
             <Plus className="h-4 w-4" />
             Add Game
           </Button>
@@ -93,7 +115,11 @@ export default function Games() {
         {/* Games List */}
         <div className="grid gap-4 md:grid-cols-2">
           {filteredGames.map(game => (
-            <GameCard key={game.id} game={game} />
+            <GameCard 
+              key={game.id} 
+              game={game}
+              onClick={() => handleGameClick(game)}
+            />
           ))}
         </div>
 
@@ -104,6 +130,14 @@ export default function Games() {
           </div>
         )}
       </div>
+
+      <GameFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        game={selectedGame}
+        onSave={handleSaveGame}
+        onDelete={deleteGame}
+      />
     </AppLayout>
   );
 }
