@@ -59,6 +59,7 @@ export function PostGamePlayerStats({
       shotsOnGoal: 0,
       shotsOffGoal: 0,
       shotsBlocked: 0,
+      defensiveBlocks: 0,
       penalties: 0,
     };
   };
@@ -72,7 +73,7 @@ export function PostGamePlayerStats({
     return opponentBlockedShots.filter(e => e.blockedByPlayerId === playerId).length;
   };
 
-  const handleStatChange = (playerId: string, field: 'shotsOnGoal' | 'shotsOffGoal' | 'shotsBlocked', value: string) => {
+  const handleStatChange = (playerId: string, field: 'shotsOnGoal' | 'shotsOffGoal' | 'shotsBlocked' | 'defensiveBlocks', value: string) => {
     const numValue = parseInt(value) || 0;
     onUpdatePlayerStat(playerId, field, Math.max(0, numValue));
   };
@@ -115,11 +116,7 @@ export function PostGamePlayerStats({
                   Tot <Lock className="h-3 w-3" />
                 </span>
               </th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                <span className="flex items-center justify-center gap-1">
-                  Def <Lock className="h-3 w-3" />
-                </span>
-              </th>
+              <th className="py-2 px-2 text-center font-medium text-muted-foreground">Def</th>
               <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                 <span className="flex items-center justify-center gap-1">
                   PIM <Lock className="h-3 w-3" />
@@ -137,7 +134,6 @@ export function PostGamePlayerStats({
               const eventStats = getEventStats(player.id);
               const manualStats = getManualStats(player.id);
               const totalShots = manualStats.shotsOnGoal + manualStats.shotsOffGoal + manualStats.shotsBlocked;
-              const defensiveBlocks = getDefensiveBlocks(player.id);
               return (
                 <tr key={player.id} className="border-b border-border">
                   <td className="py-2 px-2">
@@ -199,14 +195,15 @@ export function PostGamePlayerStats({
                   <td className="py-2 px-2 text-center tabular-nums font-semibold">
                     {totalShots > 0 ? totalShots : <span className="text-muted-foreground">0</span>}
                   </td>
-                  <td className="py-2 px-2 text-center tabular-nums">
-                    {defensiveBlocks > 0 ? (
-                      <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">
-                        {defensiveBlocks}
-                      </Badge>
-                    ) : (
-                      <span className="text-muted-foreground">0</span>
-                    )}
+                  <td className="py-2 px-1 text-center">
+                    <Input
+                      type="number"
+                      min="0"
+                      value={manualStats.defensiveBlocks || ''}
+                      onChange={(e) => handleStatChange(player.id, 'defensiveBlocks', e.target.value)}
+                      className="w-14 h-8 text-center text-sm px-1"
+                      placeholder="0"
+                    />
                   </td>
                   <td className="py-2 px-2 text-center tabular-nums">
                     {eventStats.penaltyMinutes > 0 ? (
