@@ -1,38 +1,39 @@
-import { useState } from 'react';
 import { Player } from '@/types';
-import { PlayerGameStats, GameEvent, Period } from '@/types/game';
-import { Input } from '@/components/ui/input';
+import { GameEvent, GameLine, PenaltyEvent } from '@/types/game';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Shield } from 'lucide-react';
+import { User, Shield, Lock } from 'lucide-react';
+import { calculatePlayerStatsFromEvents, CalculatedPlayerStats } from '@/lib/gameStorage';
 
 interface PostGamePlayerStatsProps {
   squadPlayers: Player[];
-  playerStats: PlayerGameStats[];
+  events: GameEvent[];
+  penalties: PenaltyEvent[];
+  lines: GameLine[];
   blockedShotEvents: GameEvent[];
-  onUpdatePlayerStat: (playerId: string, field: keyof Omit<PlayerGameStats, 'playerId'>, value: number) => void;
   onAssignBlockedShot: (eventId: string, playerId: string) => void;
 }
 
-const PERIODS: { value: Period | 'total'; label: string }[] = [
-  { value: 'total', label: 'All' },
-  { value: '1', label: 'P1' },
-  { value: '2', label: 'P2' },
-  { value: '3', label: 'P3' },
-  { value: 'OT', label: 'OT' },
-];
+const NONE_VALUE = '_none';
 
 export function PostGamePlayerStats({
   squadPlayers,
-  playerStats,
+  events,
+  penalties,
+  lines,
   blockedShotEvents,
-  onUpdatePlayerStat,
   onAssignBlockedShot,
 }: PostGamePlayerStatsProps) {
-  const [selectedTab, setSelectedTab] = useState<'stats' | 'blocks'>('stats');
+  // Calculate all player stats from events
+  const playerStats = calculatePlayerStatsFromEvents(
+    events,
+    penalties,
+    lines,
+    squadPlayers.map(p => p.id)
+  );
 
-  const getPlayerStats = (playerId: string): PlayerGameStats => {
+  const getPlayerStats = (playerId: string): CalculatedPlayerStats => {
     return playerStats.find(ps => ps.playerId === playerId) || {
       playerId,
       goals: 0,
@@ -40,13 +41,9 @@ export function PostGamePlayerStats({
       shotsOnGoal: 0,
       shotsOffGoal: 0,
       shotsBlocked: 0,
-      penalties: 0,
+      penaltyMinutes: 0,
+      plusMinus5v5: 0,
     };
-  };
-
-  const getPlayerName = (playerId: string) => {
-    const player = squadPlayers.find(p => p.id === playerId);
-    return player ? `#${player.jerseyNumber} ${player.name}` : 'Unknown';
   };
 
   // Filter blocked shots from opponent that can be attributed to our players
@@ -54,9 +51,19 @@ export function PostGamePlayerStats({
 
   return (
     <div className="stat-card">
-      <h3 className="text-lg font-semibold mb-4">Player Statistics</h3>
+      <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+        <User className="h-5 w-5" />
+        Player Statistics
+        <Badge variant="secondary" className="ml-2 gap-1">
+          <Lock className="h-3 w-3" />
+          Auto-calculated
+        </Badge>
+      </h3>
+      <p className="text-xs text-muted-foreground mb-4">
+        Stats are derived from game events. Edit goals, penalties, and blocks to update.
+      </p>
 
-      <Tabs value={selectedTab} onValueChange={(v) => setSelectedTab(v as 'stats' | 'blocks')}>
+      <Tabs defaultValue="stats">
         <TabsList className="grid grid-cols-2 w-full mb-4">
           <TabsTrigger value="stats" className="gap-2">
             <User className="h-4 w-4" />
@@ -76,15 +83,16 @@ export function PostGamePlayerStats({
                   <th className="py-2 px-2 text-left font-medium text-muted-foreground">Player</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">G</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">A</th>
-                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">SOG</th>
-                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">Miss</th>
+                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">Pts</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">Blk</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">PIM</th>
+                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">+/−</th>
                 </tr>
               </thead>
               <tbody>
                 {squadPlayers.map(player => {
                   const stats = getPlayerStats(player.id);
+                  const points = stats.goals + stats.assists;
                   return (
                     <tr key={player.id} className="border-b border-border">
                       <td className="py-2 px-2">
@@ -92,64 +100,56 @@ export function PostGamePlayerStats({
                           <Badge variant="outline" className="text-xs">
                             #{player.jerseyNumber}
                           </Badge>
-                          <span className="font-medium truncate max-w-[80px]">
+                          <span className="font-medium truncate max-w-[100px]">
                             {player.name.split(' ')[0]}
                           </span>
                         </div>
                       </td>
-                      <td className="py-1 px-1">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={stats.goals}
-                          onChange={(e) => onUpdatePlayerStat(player.id, 'goals', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-11 text-center h-7 text-xs"
-                        />
+                      <td className="py-2 px-2 text-center tabular-nums">
+                        {stats.goals > 0 ? (
+                          <Badge variant="default" className="bg-success/20 text-success border-success/30">
+                            {stats.goals}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
                       </td>
-                      <td className="py-1 px-1">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={stats.assists}
-                          onChange={(e) => onUpdatePlayerStat(player.id, 'assists', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-11 text-center h-7 text-xs"
-                        />
+                      <td className="py-2 px-2 text-center tabular-nums">
+                        {stats.assists > 0 ? (
+                          <Badge variant="secondary">{stats.assists}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
                       </td>
-                      <td className="py-1 px-1">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={stats.shotsOnGoal}
-                          onChange={(e) => onUpdatePlayerStat(player.id, 'shotsOnGoal', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-11 text-center h-7 text-xs"
-                        />
+                      <td className="py-2 px-2 text-center tabular-nums font-semibold">
+                        {points > 0 ? points : <span className="text-muted-foreground">0</span>}
                       </td>
-                      <td className="py-1 px-1">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={stats.shotsOffGoal}
-                          onChange={(e) => onUpdatePlayerStat(player.id, 'shotsOffGoal', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-11 text-center h-7 text-xs"
-                        />
+                      <td className="py-2 px-2 text-center tabular-nums">
+                        {stats.shotsBlocked > 0 ? (
+                          <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">
+                            {stats.shotsBlocked}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
                       </td>
-                      <td className="py-1 px-1">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={stats.shotsBlocked}
-                          onChange={(e) => onUpdatePlayerStat(player.id, 'shotsBlocked', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-11 text-center h-7 text-xs"
-                        />
+                      <td className="py-2 px-2 text-center tabular-nums">
+                        {stats.penaltyMinutes > 0 ? (
+                          <Badge variant="destructive" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                            {stats.penaltyMinutes}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
                       </td>
-                      <td className="py-1 px-1">
-                        <Input
-                          type="number"
-                          min={0}
-                          value={stats.penalties}
-                          onChange={(e) => onUpdatePlayerStat(player.id, 'penalties', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-11 text-center h-7 text-xs"
-                        />
+                      <td className="py-2 px-2 text-center tabular-nums font-semibold">
+                        {stats.plusMinus5v5 > 0 ? (
+                          <span className="text-success">+{stats.plusMinus5v5}</span>
+                        ) : stats.plusMinus5v5 < 0 ? (
+                          <span className="text-destructive">{stats.plusMinus5v5}</span>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
                       </td>
                     </tr>
                   );
@@ -158,7 +158,7 @@ export function PostGamePlayerStats({
             </table>
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            G = Goals, A = Assists, SOG = Shots on Goal, Miss = Shots off Goal, Blk = Blocked Shots, PIM = Penalties (2 min)
+            G = Goals, A = Assists, Pts = Points, Blk = Blocked Shots, PIM = Penalty Minutes, +/− = Plus/Minus (5v5 only)
           </p>
         </TabsContent>
 
@@ -172,6 +172,7 @@ export function PostGamePlayerStats({
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground mb-4">
                 Assign each blocked opponent shot to the player who made the block.
+                This updates the player's blocked shots stat automatically.
               </p>
               {opponentBlockedShots.map((event, index) => (
                 <div key={event.id} className="flex items-center gap-3 p-3 border border-border rounded-lg">
@@ -179,16 +180,26 @@ export function PostGamePlayerStats({
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">P{event.period}</Badge>
                       <span className="text-sm">Blocked Shot #{index + 1}</span>
+                      {event.blockedByPlayerId && (
+                        <Badge variant="outline" className="bg-success/10 text-success border-success/30">
+                          Assigned
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <Select
-                    value={event.blockedByPlayerId || ''}
-                    onValueChange={(value) => onAssignBlockedShot(event.id, value)}
+                    value={event.blockedByPlayerId || NONE_VALUE}
+                    onValueChange={(value) => {
+                      if (value !== NONE_VALUE) {
+                        onAssignBlockedShot(event.id, value);
+                      }
+                    }}
                   >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select blocker" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value={NONE_VALUE}>Not assigned</SelectItem>
                       {squadPlayers.map(player => (
                         <SelectItem key={player.id} value={player.id}>
                           #{player.jerseyNumber} {player.name.split(' ')[0]}
