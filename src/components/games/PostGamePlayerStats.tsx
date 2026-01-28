@@ -67,6 +67,11 @@ export function PostGamePlayerStats({
   const opponentBlockedShots = blockedShotEvents.filter(e => e.team === 'opponent');
   const unassignedBlocks = opponentBlockedShots.filter(e => !e.blockedByPlayerId).length;
 
+  // Count defensive blocks per player (opponent shots they blocked)
+  const getDefensiveBlocks = (playerId: string): number => {
+    return opponentBlockedShots.filter(e => e.blockedByPlayerId === playerId).length;
+  };
+
   const handleStatChange = (playerId: string, field: 'shotsOnGoal' | 'shotsOffGoal' | 'shotsBlocked', value: string) => {
     const numValue = parseInt(value) || 0;
     onUpdatePlayerStat(playerId, field, Math.max(0, numValue));
@@ -107,6 +112,16 @@ export function PostGamePlayerStats({
               <th className="py-2 px-2 text-center font-medium text-muted-foreground">Blk</th>
               <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                 <span className="flex items-center justify-center gap-1">
+                  Tot <Lock className="h-3 w-3" />
+                </span>
+              </th>
+              <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                <span className="flex items-center justify-center gap-1">
+                  Def <Lock className="h-3 w-3" />
+                </span>
+              </th>
+              <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                <span className="flex items-center justify-center gap-1">
                   PIM <Lock className="h-3 w-3" />
                 </span>
               </th>
@@ -121,6 +136,8 @@ export function PostGamePlayerStats({
             {squadPlayers.map(player => {
               const eventStats = getEventStats(player.id);
               const manualStats = getManualStats(player.id);
+              const totalShots = manualStats.shotsOnGoal + manualStats.shotsOffGoal + manualStats.shotsBlocked;
+              const defensiveBlocks = getDefensiveBlocks(player.id);
               return (
                 <tr key={player.id} className="border-b border-border">
                   <td className="py-2 px-2">
@@ -179,6 +196,18 @@ export function PostGamePlayerStats({
                       placeholder="0"
                     />
                   </td>
+                  <td className="py-2 px-2 text-center tabular-nums font-semibold">
+                    {totalShots > 0 ? totalShots : <span className="text-muted-foreground">0</span>}
+                  </td>
+                  <td className="py-2 px-2 text-center tabular-nums">
+                    {defensiveBlocks > 0 ? (
+                      <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">
+                        {defensiveBlocks}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground">0</span>
+                    )}
+                  </td>
                   <td className="py-2 px-2 text-center tabular-nums">
                     {eventStats.penaltyMinutes > 0 ? (
                       <Badge variant="destructive" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
@@ -204,7 +233,7 @@ export function PostGamePlayerStats({
         </table>
       </div>
       <p className="text-xs text-muted-foreground mt-3">
-        G = Goals, A = Assists, SOG = Shots on Goal, Miss = Shots Off Goal, Blk = Blocked Shots, PIM = Penalty Minutes, +/− = Plus/Minus (5v5 only)
+        G = Goals, A = Assists, SOG = Shots on Goal, Miss = Missed Shots, Blk = Shots Blocked (by opponent), Tot = Total Shots, Def = Defensive Blocks, PIM = Penalty Minutes, +/− = Plus/Minus (5v5 only)
       </p>
 
       {/* Block Attribution Section */}
