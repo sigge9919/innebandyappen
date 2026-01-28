@@ -41,12 +41,12 @@ export function GoalDetailsEditor({
         Goal Details
       </h3>
       <p className="text-sm text-muted-foreground mb-4">
-        Assign goal scorers and assists (0-2 assistants per goal).
+        Assign goal scorers and assists (0-1 assistant per goal).
       </p>
       
       <div className="space-y-4">
         {homeGoals.map((event, index) => {
-          const assists = event.assistPlayerIds || [];
+          const assist = event.assistPlayerIds?.[0];
           
           return (
             <div key={event.id} className="p-4 border border-border rounded-lg space-y-3">
@@ -61,74 +61,38 @@ export function GoalDetailsEditor({
               </div>
               
               {/* Goal Scorer */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Goal Scorer</label>
-                <Select
-                  value={event.playerId || NONE_VALUE}
-                  onValueChange={(value) => {
-                    const scorerId = value === NONE_VALUE ? undefined : value;
-                    onUpdateGoalDetails(event.id, scorerId, assists);
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select scorer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE_VALUE}>No scorer assigned</SelectItem>
-                    {squadPlayers.map(player => (
-                      <SelectItem key={player.id} value={player.id}>
-                        #{player.jerseyNumber} {player.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {/* Assists */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">1st Assist</label>
+                  <label className="text-sm font-medium">Goal Scorer</label>
                   <Select
-                    value={assists[0] || NONE_VALUE}
+                    value={event.playerId || NONE_VALUE}
                     onValueChange={(value) => {
-                      const newAssists = [...assists];
-                      if (value !== NONE_VALUE) {
-                        newAssists[0] = value;
-                      } else {
-                        newAssists.splice(0, 1);
-                      }
-                      onUpdateGoalDetails(event.id, event.playerId, newAssists.filter(Boolean));
+                      const scorerId = value === NONE_VALUE ? undefined : value;
+                      onUpdateGoalDetails(event.id, scorerId, assist ? [assist] : []);
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="None" />
+                      <SelectValue placeholder="Select scorer" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>None</SelectItem>
-                      {squadPlayers
-                        .filter(p => p.id !== event.playerId && p.id !== assists[1])
-                        .map(player => (
-                          <SelectItem key={player.id} value={player.id}>
-                            #{player.jerseyNumber} {player.name.split(' ')[0]}
-                          </SelectItem>
-                        ))}
+                      <SelectItem value={NONE_VALUE}>No scorer assigned</SelectItem>
+                      {squadPlayers.map(player => (
+                        <SelectItem key={player.id} value={player.id}>
+                          #{player.jerseyNumber} {player.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
                 
+                {/* Assist */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">2nd Assist</label>
+                  <label className="text-sm font-medium">Assist</label>
                   <Select
-                    value={assists[1] || NONE_VALUE}
+                    value={assist || NONE_VALUE}
                     onValueChange={(value) => {
-                      const newAssists = [...assists];
-                      if (value !== NONE_VALUE) {
-                        if (newAssists.length === 0) newAssists.push('');
-                        newAssists[1] = value;
-                      } else if (newAssists.length > 1) {
-                        newAssists.splice(1, 1);
-                      }
-                      onUpdateGoalDetails(event.id, event.playerId, newAssists.filter(Boolean));
+                      const newAssist = value === NONE_VALUE ? [] : [value];
+                      onUpdateGoalDetails(event.id, event.playerId, newAssist);
                     }}
                   >
                     <SelectTrigger>
@@ -137,7 +101,7 @@ export function GoalDetailsEditor({
                     <SelectContent>
                       <SelectItem value={NONE_VALUE}>None</SelectItem>
                       {squadPlayers
-                        .filter(p => p.id !== event.playerId && p.id !== assists[0])
+                        .filter(p => p.id !== event.playerId)
                         .map(player => (
                           <SelectItem key={player.id} value={player.id}>
                             #{player.jerseyNumber} {player.name.split(' ')[0]}
