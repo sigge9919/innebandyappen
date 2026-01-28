@@ -22,25 +22,15 @@ export function PenaltyEditor({
 
   if (penalties.length === 0) {
     return (
-      <div className="stat-card">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <AlertOctagon className="h-5 w-5 text-amber-500" />
-          Penalty Attribution
-        </h3>
-        <div className="text-center py-8 text-muted-foreground">
-          <AlertOctagon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          <p>No penalties recorded this game</p>
-        </div>
+      <div className="text-center py-8 text-muted-foreground">
+        <AlertOctagon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <p>No penalties recorded this game</p>
       </div>
     );
   }
 
   return (
-    <div className="stat-card">
-      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <AlertOctagon className="h-5 w-5 text-amber-500" />
-        Penalty Attribution
-      </h3>
+    <div>
       <p className="text-sm text-muted-foreground mb-4">
         Assign penalties to the players who committed them.
       </p>

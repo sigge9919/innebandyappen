@@ -72,18 +72,14 @@ export function EnhancedLinePerformance({ lines, events }: EnhancedLinePerforman
 
   if (lineStats.length === 0 && selectedPeriod === 'total') {
     return (
-      <div className="stat-card">
-        <h3 className="text-lg font-semibold mb-4">Line Performance</h3>
-        <p className="text-center text-muted-foreground py-8">
-          No line statistics recorded yet
-        </p>
-      </div>
+      <p className="text-center text-muted-foreground py-8">
+        No line statistics recorded yet
+      </p>
     );
   }
 
   return (
-    <div className="stat-card">
-      <h3 className="text-lg font-semibold mb-4">Line Performance</h3>
+    <div>
 
       <Tabs value={selectedPeriod} onValueChange={(v) => setSelectedPeriod(v as Period | 'total')}>
         <TabsList className="grid grid-cols-5 w-full mb-4">

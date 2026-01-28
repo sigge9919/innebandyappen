@@ -30,9 +30,8 @@ export function PostGameNotes({ game, onUpdateNotes }: PostGameNotesProps) {
 
   if (isEditing) {
     return (
-      <div className="stat-card space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Post-Game Notes</h3>
+      <div className="space-y-4">
+        <div className="flex items-center justify-end">
           <div className="flex gap-2">
             <Button size="sm" variant="ghost" onClick={handleCancel}>
               <X className="h-4 w-4 mr-1" />
@@ -82,11 +81,9 @@ export function PostGameNotes({ game, onUpdateNotes }: PostGameNotesProps) {
       </div>
     );
   }
-
   return (
-    <div className="stat-card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold">Post-Game Notes</h3>
+    <div>
+      <div className="flex items-center justify-end mb-4">
         <Button size="sm" variant="ghost" onClick={() => setIsEditing(true)}>
           <Edit2 className="h-4 w-4 mr-1" />
           Edit
