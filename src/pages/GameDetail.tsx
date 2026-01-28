@@ -232,14 +232,16 @@ export default function GameDetail() {
               onAssignPenaltyPlayer={assignPenaltyPlayer}
             />
 
-            {/* Player Stats (Read-Only, Event-Driven) */}
+            {/* Player Stats */}
             <PostGamePlayerStats
               squadPlayers={squadPlayers}
               events={game.events}
               penalties={game.penalties || []}
               lines={game.lines}
               blockedShotEvents={blockedShotEvents}
+              playerStats={game.playerStats}
               onAssignBlockedShot={assignBlockedShot}
+              onUpdatePlayerStat={updatePlayerStat}
             />
 
             {/* Line Performance */}
