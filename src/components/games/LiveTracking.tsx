@@ -1,10 +1,11 @@
 import { Player } from '@/types';
-import { EnhancedGame, Period, EventType, Team, TeamStats } from '@/types/game';
+import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Target, XCircle, Shield, CircleDot, Undo2, Clock } from 'lucide-react';
+import { Target, XCircle, Shield, CircleDot, Undo2, Clock, AlertOctagon } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
+import { SituationControl } from './SituationControl';
 
 interface LiveTrackingProps {
   game: EnhancedGame;
@@ -14,8 +15,10 @@ interface LiveTrackingProps {
   periodHomeStats: TeamStats;
   periodOpponentStats: TeamStats;
   onRecordEvent: (type: EventType, team: Team) => void;
+  onRecordPenalty: (team: Team) => void;
   onSetPeriod: (period: Period) => void;
   onSetActiveLine: (lineId: string) => void;
+  onSetSituation: (situation: GameSituation) => void;
   onUndo: () => void;
   onEndGame: () => void;
 }
@@ -35,8 +38,10 @@ export function LiveTracking({
   periodHomeStats,
   periodOpponentStats,
   onRecordEvent,
+  onRecordPenalty,
   onSetPeriod,
   onSetActiveLine,
+  onSetSituation,
   onUndo,
   onEndGame,
 }: LiveTrackingProps) {
@@ -45,12 +50,26 @@ export function LiveTracking({
     ? squadPlayers.filter(p => activeLine.playerIds.includes(p.id))
     : [];
 
-  // Get 5v5 lines for quick selection
-  const regularLines = game.lines.filter(l => l.type === '5v5');
-  const specialLines = game.lines.filter(l => l.type !== '5v5');
+  // Get lines based on current situation
+  const getRelevantLines = () => {
+    const situation = game.currentSituation || '5v5';
+    if (situation === '5v4') {
+      return game.lines.filter(l => l.type === 'PP');
+    } else if (situation === '4v5') {
+      return game.lines.filter(l => l.type === 'PK');
+    } else if (situation === '6v5') {
+      return game.lines.filter(l => l.type === '6v5');
+    } else if (situation === '5v6') {
+      return game.lines.filter(l => l.type === '5v6');
+    }
+    return game.lines.filter(l => l.type === '5v5');
+  };
+
+  const relevantLines = getRelevantLines();
+  const otherLines = game.lines.filter(l => !relevantLines.includes(l) && l.playerIds.length > 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Live Period Stats - Always Visible */}
       <LivePeriodStats
         currentPeriod={game.currentPeriod}
@@ -89,6 +108,12 @@ export function LiveTracking({
         </div>
       </div>
 
+      {/* Situation Control - NEW */}
+      <SituationControl
+        currentSituation={game.currentSituation || '5v5'}
+        onChangeSituation={onSetSituation}
+      />
+
       {/* Active Line Selection */}
       <div className="stat-card">
         <div className="flex items-center justify-between mb-3">
@@ -100,14 +125,14 @@ export function LiveTracking({
           )}
         </div>
         
-        {/* Regular lines */}
-        <div className="flex gap-2 mb-2">
-          {regularLines.map(line => (
+        {/* Relevant lines for current situation */}
+        <div className="flex gap-2 mb-2 flex-wrap">
+          {relevantLines.map(line => (
             <Button
               key={line.id}
               variant={game.activeLineId === line.id ? 'default' : 'outline'}
               size="sm"
-              className="flex-1"
+              className="flex-1 min-w-[60px]"
               onClick={() => onSetActiveLine(line.id)}
             >
               {line.name}
@@ -115,19 +140,21 @@ export function LiveTracking({
           ))}
         </div>
         
-        {/* Special teams */}
-        <div className="flex gap-2 flex-wrap">
-          {specialLines.filter(l => l.playerIds.length > 0).map(line => (
-            <Button
-              key={line.id}
-              variant={game.activeLineId === line.id ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => onSetActiveLine(line.id)}
-            >
-              {line.name}
-            </Button>
-          ))}
-        </div>
+        {/* Other lines (collapsed) */}
+        {otherLines.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {otherLines.map(line => (
+              <Button
+                key={line.id}
+                variant={game.activeLineId === line.id ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => onSetActiveLine(line.id)}
+              >
+                {line.name}
+              </Button>
+            ))}
+          </div>
+        )}
 
         {/* Active line players */}
         {activeLinePlayers.length > 0 && (
@@ -171,6 +198,14 @@ export function LiveTracking({
             variant="muted"
             onClick={() => onRecordEvent('shot_blocked', 'home')}
           />
+          {/* Penalty Button */}
+          <button
+            onClick={() => onRecordPenalty('home')}
+            className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"
+          >
+            <AlertOctagon className="h-8 w-8" />
+            <span className="font-semibold text-sm">2 min Penalty</span>
+          </button>
         </div>
 
         {/* Opponent */}
@@ -199,6 +234,14 @@ export function LiveTracking({
             variant="muted"
             onClick={() => onRecordEvent('shot_blocked', 'opponent')}
           />
+          {/* Penalty Button */}
+          <button
+            onClick={() => onRecordPenalty('opponent')}
+            className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"
+          >
+            <AlertOctagon className="h-8 w-8" />
+            <span className="font-semibold text-sm">2 min Penalty</span>
+          </button>
         </div>
       </div>
 

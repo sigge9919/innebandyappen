@@ -12,7 +12,10 @@ import { GameStatsCard } from '@/components/games/GameStatsCard';
 import { PostGameTeamStats } from '@/components/games/PostGameTeamStats';
 import { PostGamePlayerStats } from '@/components/games/PostGamePlayerStats';
 import { EnhancedLinePerformance } from '@/components/games/EnhancedLinePerformance';
-import { Period, Team, TeamStats } from '@/types/game';
+import { GoalDetailsEditor } from '@/components/games/GoalDetailsEditor';
+import { PenaltyEditor } from '@/components/games/PenaltyEditor';
+import { SpecialTeamsSummary } from '@/components/games/SpecialTeamsSummary';
+import { Period, Team, TeamStats, GameSituation } from '@/types/game';
 import { format } from 'date-fns';
 import { ArrowLeft, Play, MapPin, Calendar, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -30,7 +33,9 @@ export default function GameDetail() {
     endGame,
     setActiveLine,
     setCurrentPeriod,
+    setCurrentSituation,
     recordEvent,
+    recordPenalty,
     undoLast,
     getHomeStats,
     getOpponentStats,
@@ -38,9 +43,12 @@ export default function GameDetail() {
     getPeriodOpponentStats,
     getPeriodStats,
     getLineStats,
+    getSpecialTeamsStats,
     updateNotes,
     updatePlayerStat,
     assignBlockedShot,
+    updateGoalDetails,
+    assignPenaltyPlayer,
     updateTeamPeriodStats,
   } = useGameDetail(gameId || '');
 
@@ -153,8 +161,10 @@ export default function GameDetail() {
             periodHomeStats={getPeriodHomeStats()}
             periodOpponentStats={getPeriodOpponentStats()}
             onRecordEvent={recordEvent}
+            onRecordPenalty={recordPenalty}
             onSetPeriod={setCurrentPeriod}
             onSetActiveLine={setActiveLine}
+            onSetSituation={setCurrentSituation}
             onUndo={undoLast}
             onEndGame={endGame}
           />
@@ -195,6 +205,31 @@ export default function GameDetail() {
               homeScore={game.ourScore}
               opponentScore={game.opponentScore}
               onUpdateStats={handleUpdateTeamStats}
+            />
+
+            {/* Special Teams Summary */}
+            {(() => {
+              const specialTeams = getSpecialTeamsStats();
+              return specialTeams.powerPlay && specialTeams.boxPlay ? (
+                <SpecialTeamsSummary
+                  powerPlay={specialTeams.powerPlay}
+                  boxPlay={specialTeams.boxPlay}
+                />
+              ) : null;
+            })()}
+
+            {/* Goal Details Editing */}
+            <GoalDetailsEditor
+              goalEvents={game.events.filter(e => e.type === 'goal')}
+              squadPlayers={squadPlayers}
+              onUpdateGoalDetails={updateGoalDetails}
+            />
+
+            {/* Penalty Attribution */}
+            <PenaltyEditor
+              penalties={game.penalties || []}
+              squadPlayers={squadPlayers}
+              onAssignPenaltyPlayer={assignPenaltyPlayer}
             />
 
             {/* Player Stats Editing */}

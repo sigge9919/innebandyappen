@@ -36,9 +36,11 @@ export function PostGamePlayerStats({
     return playerStats.find(ps => ps.playerId === playerId) || {
       playerId,
       goals: 0,
+      assists: 0,
       shotsOnGoal: 0,
       shotsOffGoal: 0,
       shotsBlocked: 0,
+      penalties: 0,
     };
   };
 
@@ -73,9 +75,11 @@ export function PostGamePlayerStats({
                 <tr className="border-b border-border">
                   <th className="py-2 px-2 text-left font-medium text-muted-foreground">Player</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">G</th>
+                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">A</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">SOG</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">Miss</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">Blk</th>
+                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">PIM</th>
                 </tr>
               </thead>
               <tbody>
@@ -88,7 +92,7 @@ export function PostGamePlayerStats({
                           <Badge variant="outline" className="text-xs">
                             #{player.jerseyNumber}
                           </Badge>
-                          <span className="font-medium truncate max-w-[100px]">
+                          <span className="font-medium truncate max-w-[80px]">
                             {player.name.split(' ')[0]}
                           </span>
                         </div>
@@ -99,7 +103,16 @@ export function PostGamePlayerStats({
                           min={0}
                           value={stats.goals}
                           onChange={(e) => onUpdatePlayerStat(player.id, 'goals', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-12 text-center h-7 text-xs"
+                          className="w-11 text-center h-7 text-xs"
+                        />
+                      </td>
+                      <td className="py-1 px-1">
+                        <Input
+                          type="number"
+                          min={0}
+                          value={stats.assists}
+                          onChange={(e) => onUpdatePlayerStat(player.id, 'assists', Math.max(0, parseInt(e.target.value) || 0))}
+                          className="w-11 text-center h-7 text-xs"
                         />
                       </td>
                       <td className="py-1 px-1">
@@ -108,7 +121,7 @@ export function PostGamePlayerStats({
                           min={0}
                           value={stats.shotsOnGoal}
                           onChange={(e) => onUpdatePlayerStat(player.id, 'shotsOnGoal', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-12 text-center h-7 text-xs"
+                          className="w-11 text-center h-7 text-xs"
                         />
                       </td>
                       <td className="py-1 px-1">
@@ -117,7 +130,7 @@ export function PostGamePlayerStats({
                           min={0}
                           value={stats.shotsOffGoal}
                           onChange={(e) => onUpdatePlayerStat(player.id, 'shotsOffGoal', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-12 text-center h-7 text-xs"
+                          className="w-11 text-center h-7 text-xs"
                         />
                       </td>
                       <td className="py-1 px-1">
@@ -126,7 +139,16 @@ export function PostGamePlayerStats({
                           min={0}
                           value={stats.shotsBlocked}
                           onChange={(e) => onUpdatePlayerStat(player.id, 'shotsBlocked', Math.max(0, parseInt(e.target.value) || 0))}
-                          className="w-12 text-center h-7 text-xs"
+                          className="w-11 text-center h-7 text-xs"
+                        />
+                      </td>
+                      <td className="py-1 px-1">
+                        <Input
+                          type="number"
+                          min={0}
+                          value={stats.penalties}
+                          onChange={(e) => onUpdatePlayerStat(player.id, 'penalties', Math.max(0, parseInt(e.target.value) || 0))}
+                          className="w-11 text-center h-7 text-xs"
                         />
                       </td>
                     </tr>
@@ -136,7 +158,7 @@ export function PostGamePlayerStats({
             </table>
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            G = Goals, SOG = Shots on Goal, Miss = Shots off Goal, Blk = Blocked Shots (defensive)
+            G = Goals, A = Assists, SOG = Shots on Goal, Miss = Shots off Goal, Blk = Blocked Shots, PIM = Penalties (2 min)
           </p>
         </TabsContent>
 
