@@ -1,17 +1,18 @@
-import { useState } from 'react';
 import { Player } from '@/types';
-import { EnhancedGame, Period, EventType, Team, TeamStats, getTotalShots } from '@/types/game';
+import { EnhancedGame, Period, EventType, Team, TeamStats } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Target, XCircle, Shield, CircleDot, Undo2, Clock } from 'lucide-react';
-import { GameStatsCard } from './GameStatsCard';
+import { LivePeriodStats } from './LivePeriodStats';
 
 interface LiveTrackingProps {
   game: EnhancedGame;
   squadPlayers: Player[];
   homeStats: TeamStats;
   opponentStats: TeamStats;
+  periodHomeStats: TeamStats;
+  periodOpponentStats: TeamStats;
   onRecordEvent: (type: EventType, team: Team) => void;
   onSetPeriod: (period: Period) => void;
   onSetActiveLine: (lineId: string) => void;
@@ -31,6 +32,8 @@ export function LiveTracking({
   squadPlayers,
   homeStats,
   opponentStats,
+  periodHomeStats,
+  periodOpponentStats,
   onRecordEvent,
   onSetPeriod,
   onSetActiveLine,
@@ -48,12 +51,15 @@ export function LiveTracking({
 
   return (
     <div className="space-y-6">
-      {/* Stats Card */}
-      <GameStatsCard
+      {/* Live Period Stats - Always Visible */}
+      <LivePeriodStats
+        currentPeriod={game.currentPeriod}
         homeTeamName="Our Team"
         opponentName={game.opponent}
-        homeStats={homeStats}
-        opponentStats={opponentStats}
+        periodHomeStats={periodHomeStats}
+        periodOpponentStats={periodOpponentStats}
+        totalHomeStats={homeStats}
+        totalOpponentStats={opponentStats}
         homeScore={game.ourScore}
         opponentScore={game.opponentScore}
       />

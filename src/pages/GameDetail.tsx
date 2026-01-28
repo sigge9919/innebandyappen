@@ -7,9 +7,12 @@ import { usePlayers } from '@/hooks/useLocalStorage';
 import { SquadSelection } from '@/components/games/SquadSelection';
 import { LineSetup } from '@/components/games/LineSetup';
 import { LiveTracking } from '@/components/games/LiveTracking';
-import { LinePerformance } from '@/components/games/LinePerformance';
 import { PostGameNotes } from '@/components/games/PostGameNotes';
 import { GameStatsCard } from '@/components/games/GameStatsCard';
+import { PostGameTeamStats } from '@/components/games/PostGameTeamStats';
+import { PostGamePlayerStats } from '@/components/games/PostGamePlayerStats';
+import { EnhancedLinePerformance } from '@/components/games/EnhancedLinePerformance';
+import { Period, Team, TeamStats } from '@/types/game';
 import { format } from 'date-fns';
 import { ArrowLeft, Play, MapPin, Calendar, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -31,9 +34,14 @@ export default function GameDetail() {
     undoLast,
     getHomeStats,
     getOpponentStats,
+    getPeriodHomeStats,
+    getPeriodOpponentStats,
     getPeriodStats,
     getLineStats,
     updateNotes,
+    updatePlayerStat,
+    assignBlockedShot,
+    updateTeamPeriodStats,
   } = useGameDetail(gameId || '');
 
   if (!game) {
@@ -59,6 +67,13 @@ export default function GameDetail() {
     'Live': 'bg-success/10 text-success border border-success',
     'Finished': 'bg-primary/10 text-primary',
   }[game.status];
+
+  const handleUpdateTeamStats = (team: Team, period: Period, stats: Partial<TeamStats>) => {
+    updateTeamPeriodStats(team, period, stats);
+  };
+
+  // Get blocked shot events for attribution
+  const blockedShotEvents = game.events.filter(e => e.type === 'shot_blocked');
 
   return (
     <AppLayout>
@@ -135,6 +150,8 @@ export default function GameDetail() {
             squadPlayers={squadPlayers}
             homeStats={getHomeStats()}
             opponentStats={getOpponentStats()}
+            periodHomeStats={getPeriodHomeStats()}
+            periodOpponentStats={getPeriodOpponentStats()}
             onRecordEvent={recordEvent}
             onSetPeriod={setCurrentPeriod}
             onSetActiveLine={setActiveLine}
@@ -169,20 +186,30 @@ export default function GameDetail() {
               </p>
             </div>
 
-            {/* Team Stats Comparison */}
-            <GameStatsCard
+            {/* Team Stats Editing */}
+            <PostGameTeamStats
               homeTeamName="Our Team"
               opponentName={game.opponent}
-              homeStats={getHomeStats()}
-              opponentStats={getOpponentStats()}
+              getHomeStats={getHomeStats}
+              getOpponentStats={getOpponentStats}
               homeScore={game.ourScore}
               opponentScore={game.opponentScore}
+              onUpdateStats={handleUpdateTeamStats}
+            />
+
+            {/* Player Stats Editing */}
+            <PostGamePlayerStats
+              squadPlayers={squadPlayers}
+              playerStats={game.playerStats || []}
+              blockedShotEvents={blockedShotEvents}
+              onUpdatePlayerStat={updatePlayerStat}
+              onAssignBlockedShot={assignBlockedShot}
             />
 
             {/* Line Performance */}
-            <LinePerformance
-              lineStats={getLineStats()}
-              periodStats={getPeriodStats()}
+            <EnhancedLinePerformance
+              lines={game.lines}
+              events={game.events}
             />
 
             {/* Post-Game Notes */}
