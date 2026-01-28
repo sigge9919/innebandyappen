@@ -20,6 +20,8 @@ export interface GameEvent {
   team: Team;
   period: Period;
   lineId?: string; // Only for home team
+  playerId?: string; // For player-level attribution
+  blockedByPlayerId?: string; // For blocked shot attribution
   timestamp: number;
 }
 
@@ -28,6 +30,14 @@ export interface TeamStats {
   shotsOffGoal: number;
   shotsBlocked: number;
   goals: number;
+}
+
+export interface PlayerGameStats {
+  playerId: string;
+  goals: number;
+  shotsOnGoal: number;
+  shotsOffGoal: number;
+  shotsBlocked: number; // Shots this player blocked (defensive)
 }
 
 export interface PeriodStats {
@@ -42,6 +52,15 @@ export interface LineStats {
   goalsFor: number;
   goalsAgainst: number;
   plusMinus: number;
+}
+
+export interface LineStatsByPeriod extends LineStats {
+  periodBreakdown: {
+    period: Period;
+    goalsFor: number;
+    goalsAgainst: number;
+    plusMinus: number;
+  }[];
 }
 
 export interface EnhancedGame {
@@ -61,6 +80,9 @@ export interface EnhancedGame {
   currentPeriod: Period;
   activeLineId?: string;
   events: GameEvent[];
+  
+  // Player stats (post-game editable)
+  playerStats?: PlayerGameStats[];
   
   // Post-game notes
   notes?: {
@@ -114,5 +136,17 @@ export function createEnhancedGame(opponent: string, date: string, location: 'Ho
     lines: createDefaultLines(),
     currentPeriod: '1',
     events: [],
+    playerStats: [],
+  };
+}
+
+// Create empty player stats
+export function createEmptyPlayerStats(playerId: string): PlayerGameStats {
+  return {
+    playerId,
+    goals: 0,
+    shotsOnGoal: 0,
+    shotsOffGoal: 0,
+    shotsBlocked: 0,
   };
 }

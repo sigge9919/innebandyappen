@@ -1,5 +1,5 @@
 // Game-specific storage utilities
-import { EnhancedGame, GameEvent, GameLine, Period, Team, EventType, createEmptyTeamStats, TeamStats, LineStats, PeriodStats } from '@/types/game';
+import { EnhancedGame, GameEvent, GameLine, Period, Team, EventType, createEmptyTeamStats, TeamStats, LineStats, PeriodStats, PlayerGameStats, createEmptyPlayerStats } from '@/types/game';
 
 const STORAGE_KEY = 'coachOS_enhancedGames';
 
@@ -141,4 +141,117 @@ export function calculateLineStats(events: GameEvent[], lines: GameLine[]): Line
 export function calculateLineStatsByPeriod(events: GameEvent[], lines: GameLine[], period: Period): LineStats[] {
   const periodEvents = events.filter(e => e.period === period);
   return calculateLineStats(periodEvents, lines);
+}
+
+// Update player stats
+export function updatePlayerStats(gameId: string, playerId: string, field: keyof Omit<PlayerGameStats, 'playerId'>, value: number): void {
+  const games = getEnhancedGames();
+  const index = games.findIndex(g => g.id === gameId);
+  if (index !== -1) {
+    const game = games[index];
+    if (!game.playerStats) {
+      game.playerStats = [];
+    }
+    
+    const playerStatIndex = game.playerStats.findIndex(ps => ps.playerId === playerId);
+    if (playerStatIndex !== -1) {
+      game.playerStats[playerStatIndex][field] = value;
+    } else {
+      const newStats = createEmptyPlayerStats(playerId);
+      newStats[field] = value;
+      game.playerStats.push(newStats);
+    }
+    
+    saveEnhancedGames(games);
+  }
+}
+
+// Assign blocked shot to player
+export function assignBlockedShot(gameId: string, eventId: string, playerId: string): void {
+  const games = getEnhancedGames();
+  const index = games.findIndex(g => g.id === gameId);
+  if (index !== -1) {
+    const eventIndex = games[index].events.findIndex(e => e.id === eventId);
+    if (eventIndex !== -1) {
+      games[index].events[eventIndex].blockedByPlayerId = playerId;
+      saveEnhancedGames(games);
+    }
+  }
+}
+
+// Update team stats for a specific period (post-game editing)
+export function updatePeriodTeamStats(
+  gameId: string, 
+  team: Team, 
+  period: Period, 
+  statType: keyof TeamStats, 
+  newValue: number
+): void {
+  const games = getEnhancedGames();
+  const index = games.findIndex(g => g.id === gameId);
+  if (index === -1) return;
+  
+  const game = games[index];
+  const currentStats = calculateTeamStats(game.events, team, period);
+  const currentValue = currentStats[statType];
+  const diff = newValue - currentValue;
+  
+  if (diff === 0) return;
+  
+  // Map stat type to event type
+  const eventTypeMap: Record<keyof TeamStats, EventType> = {
+    goals: 'goal',
+    shotsOnGoal: 'shot_on_goal',
+    shotsOffGoal: 'shot_off_goal',
+    shotsBlocked: 'shot_blocked',
+  };
+  
+  const eventType = eventTypeMap[statType];
+  
+  if (diff > 0) {
+    // Add events
+    for (let i = 0; i < diff; i++) {
+      const newEvent: GameEvent = {
+        id: crypto.randomUUID(),
+        gameId,
+        type: eventType,
+        team,
+        period,
+        timestamp: Date.now(),
+      };
+      game.events.push(newEvent);
+      
+      // Update score for goals
+      if (eventType === 'goal') {
+        if (team === 'home') {
+          game.ourScore += 1;
+        } else {
+          game.opponentScore += 1;
+        }
+      }
+    }
+  } else {
+    // Remove events
+    const eventsToRemove = game.events
+      .filter(e => e.type === eventType && e.team === team && e.period === period)
+      .slice(0, Math.abs(diff));
+    
+    for (const event of eventsToRemove) {
+      const eventIdx = game.events.findIndex(e => e.id === event.id);
+      if (eventIdx !== -1) {
+        game.events.splice(eventIdx, 1);
+        
+        // Update score for goals
+        if (eventType === 'goal') {
+          if (team === 'home') {
+            game.ourScore = Math.max(0, game.ourScore - 1);
+          } else {
+            game.opponentScore = Math.max(0, game.opponentScore - 1);
+          }
+        }
+      }
+    }
+  }
+  
+  saveEnhancedGames(games);
 }
