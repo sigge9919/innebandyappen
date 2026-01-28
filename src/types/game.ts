@@ -52,7 +52,8 @@ export interface PlayerGameStats {
   assists: number; // NEW
   shotsOnGoal: number;
   shotsOffGoal: number;
-  shotsBlocked: number; // Shots this player blocked (defensive)
+  shotsBlocked: number; // Shots this player took that got blocked by opponent
+  defensiveBlocks: number; // Opponent shots this player blocked
   penalties: number; // Number of 2-min penalties (NEW)
 }
 
@@ -179,6 +180,7 @@ export function createEmptyPlayerStats(playerId: string): PlayerGameStats {
     shotsOnGoal: 0,
     shotsOffGoal: 0,
     shotsBlocked: 0,
+    defensiveBlocks: 0,
     penalties: 0,
   };
 }
