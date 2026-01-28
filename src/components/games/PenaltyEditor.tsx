@@ -10,6 +10,8 @@ interface PenaltyEditorProps {
   onAssignPenaltyPlayer: (penaltyId: string, playerId: string) => void;
 }
 
+const NONE_VALUE = '_none';
+
 export function PenaltyEditor({
   penalties,
   squadPlayers,
@@ -17,12 +19,6 @@ export function PenaltyEditor({
 }: PenaltyEditorProps) {
   const homePenalties = penalties.filter(p => p.team === 'home');
   const opponentPenalties = penalties.filter(p => p.team === 'opponent');
-
-  const getPlayerName = (playerId?: string) => {
-    if (!playerId) return null;
-    const player = squadPlayers.find(p => p.id === playerId);
-    return player ? `#${player.jerseyNumber} ${player.name.split(' ')[0]}` : null;
-  };
 
   if (penalties.length === 0) {
     return (
@@ -69,13 +65,18 @@ export function PenaltyEditor({
                     </div>
                   </div>
                   <Select
-                    value={penalty.playerId || ''}
-                    onValueChange={(value) => onAssignPenaltyPlayer(penalty.id, value)}
+                    value={penalty.playerId || NONE_VALUE}
+                    onValueChange={(value) => {
+                      if (value !== NONE_VALUE) {
+                        onAssignPenaltyPlayer(penalty.id, value);
+                      }
+                    }}
                   >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select player" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value={NONE_VALUE}>Not assigned</SelectItem>
                       {squadPlayers.map(player => (
                         <SelectItem key={player.id} value={player.id}>
                           #{player.jerseyNumber} {player.name.split(' ')[0]}

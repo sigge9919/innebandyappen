@@ -279,6 +279,89 @@ export function calculateSpecialTeamsStats(
   return { powerPlay, boxPlay };
 }
 
+// Calculate player stats from events (event-driven, read-only)
+export interface CalculatedPlayerStats {
+  playerId: string;
+  goals: number;
+  assists: number;
+  shotsOnGoal: number;
+  shotsOffGoal: number;
+  shotsBlocked: number; // Blocks made by this player
+  penaltyMinutes: number;
+  plusMinus5v5: number; // Only from 5v5 goals
+}
+
+export function calculatePlayerStatsFromEvents(
+  events: GameEvent[],
+  penalties: PenaltyEvent[],
+  lines: GameLine[],
+  squadPlayerIds: string[]
+): CalculatedPlayerStats[] {
+  const statsMap = new Map<string, CalculatedPlayerStats>();
+  
+  // Initialize stats for all squad players
+  squadPlayerIds.forEach(playerId => {
+    statsMap.set(playerId, {
+      playerId,
+      goals: 0,
+      assists: 0,
+      shotsOnGoal: 0,
+      shotsOffGoal: 0,
+      shotsBlocked: 0,
+      penaltyMinutes: 0,
+      plusMinus5v5: 0,
+    });
+  });
+  
+  // Process goal events - count goals and assists
+  events.filter(e => e.type === 'goal' && e.team === 'home').forEach(event => {
+    // Goal scorer
+    if (event.playerId && statsMap.has(event.playerId)) {
+      statsMap.get(event.playerId)!.goals += 1;
+    }
+    
+    // Assists
+    event.assistPlayerIds?.forEach(assistId => {
+      if (statsMap.has(assistId)) {
+        statsMap.get(assistId)!.assists += 1;
+      }
+    });
+  });
+  
+  // Process blocked shots (opponent shots blocked by our players)
+  events.filter(e => e.type === 'shot_blocked' && e.team === 'opponent').forEach(event => {
+    if (event.blockedByPlayerId && statsMap.has(event.blockedByPlayerId)) {
+      statsMap.get(event.blockedByPlayerId)!.shotsBlocked += 1;
+    }
+  });
+  
+  // Process penalties
+  penalties.filter(p => p.team === 'home').forEach(penalty => {
+    if (penalty.playerId && statsMap.has(penalty.playerId)) {
+      statsMap.get(penalty.playerId)!.penaltyMinutes += penalty.duration;
+    }
+  });
+  
+  // Calculate 5v5 plus/minus
+  // For each 5v5 goal, find which line was on ice and update those players
+  events.filter(e => e.type === 'goal' && e.situation === '5v5').forEach(event => {
+    if (!event.lineId) return;
+    
+    const line = lines.find(l => l.id === event.lineId);
+    if (!line) return;
+    
+    const delta = event.team === 'home' ? 1 : -1;
+    
+    line.playerIds.forEach(playerId => {
+      if (statsMap.has(playerId)) {
+        statsMap.get(playerId)!.plusMinus5v5 += delta;
+      }
+    });
+  });
+  
+  return Array.from(statsMap.values());
+}
+
 // Update player stats
 export function updatePlayerStats(
   gameId: string, 
