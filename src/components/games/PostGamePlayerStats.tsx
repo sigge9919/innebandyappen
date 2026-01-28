@@ -79,11 +79,7 @@ export function PostGamePlayerStats({
   };
 
   return (
-    <div className="stat-card">
-      <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-        <User className="h-5 w-5" />
-        Player Statistics
-      </h3>
+    <div>
       <p className="text-xs text-muted-foreground mb-4">
         G, A, PIM, +/- are auto-calculated from events. Shots can be entered manually.
         {unassignedBlocks > 0 && (

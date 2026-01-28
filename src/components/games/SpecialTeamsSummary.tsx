@@ -21,19 +21,15 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
 
   if (!hasAnySpecialTeams) {
     return (
-      <div className="stat-card">
-        <h3 className="text-lg font-semibold mb-4">Special Teams Summary</h3>
-        <div className="text-center py-8 text-muted-foreground">
-          <Zap className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          <p>No special teams situations recorded</p>
-        </div>
+      <div className="text-center py-8 text-muted-foreground">
+        <Zap className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <p>No special teams situations recorded</p>
       </div>
     );
   }
 
   return (
-    <div className="stat-card">
-      <h3 className="text-lg font-semibold mb-4">Special Teams Summary</h3>
+    <div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Power Play (5v4) */}

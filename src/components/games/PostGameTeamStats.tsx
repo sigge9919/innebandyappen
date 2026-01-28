@@ -45,9 +45,8 @@ export function PostGameTeamStats({
   const isEditable = selectedPeriod !== 'total';
 
   return (
-    <div className="stat-card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Team Statistics</h3>
+    <div>
+      <div className="flex items-center justify-end mb-4">
         <div className="text-2xl font-bold">
           <span className={cn(homeScore > opponentScore && "text-success")}>
             {homeScore}

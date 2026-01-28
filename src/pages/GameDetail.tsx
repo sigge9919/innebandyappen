@@ -15,9 +15,10 @@ import { EnhancedLinePerformance } from '@/components/games/EnhancedLinePerforma
 import { GoalDetailsEditor } from '@/components/games/GoalDetailsEditor';
 import { PenaltyEditor } from '@/components/games/PenaltyEditor';
 import { SpecialTeamsSummary } from '@/components/games/SpecialTeamsSummary';
+import { CollapsibleSection } from '@/components/games/CollapsibleSection';
 import { Period, Team, TeamStats, GameSituation } from '@/types/game';
 import { format } from 'date-fns';
-import { ArrowLeft, Play, MapPin, Calendar, Trophy } from 'lucide-react';
+import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function GameDetail() {
@@ -197,64 +198,78 @@ export default function GameDetail() {
             </div>
 
             {/* Team Stats Editing */}
-            <PostGameTeamStats
-              homeTeamName="Our Team"
-              opponentName={game.opponent}
-              getHomeStats={getHomeStats}
-              getOpponentStats={getOpponentStats}
-              homeScore={game.ourScore}
-              opponentScore={game.opponentScore}
-              onUpdateStats={handleUpdateTeamStats}
-            />
+            <CollapsibleSection title="Team Statistics" icon={<BarChart3 className="h-5 w-5" />}>
+              <PostGameTeamStats
+                homeTeamName="Our Team"
+                opponentName={game.opponent}
+                getHomeStats={getHomeStats}
+                getOpponentStats={getOpponentStats}
+                homeScore={game.ourScore}
+                opponentScore={game.opponentScore}
+                onUpdateStats={handleUpdateTeamStats}
+              />
+            </CollapsibleSection>
 
             {/* Special Teams Summary */}
             {(() => {
               const specialTeams = getSpecialTeamsStats();
               return specialTeams.powerPlay && specialTeams.boxPlay ? (
-                <SpecialTeamsSummary
-                  powerPlay={specialTeams.powerPlay}
-                  boxPlay={specialTeams.boxPlay}
-                />
+                <CollapsibleSection title="Special Teams Summary" icon={<Zap className="h-5 w-5" />}>
+                  <SpecialTeamsSummary
+                    powerPlay={specialTeams.powerPlay}
+                    boxPlay={specialTeams.boxPlay}
+                  />
+                </CollapsibleSection>
               ) : null;
             })()}
 
             {/* Goal Details Editing */}
-            <GoalDetailsEditor
-              goalEvents={game.events.filter(e => e.type === 'goal')}
-              squadPlayers={squadPlayers}
-              onUpdateGoalDetails={updateGoalDetails}
-            />
+            <CollapsibleSection title="Goal Details" icon={<CircleDot className="h-5 w-5 text-success" />}>
+              <GoalDetailsEditor
+                goalEvents={game.events.filter(e => e.type === 'goal')}
+                squadPlayers={squadPlayers}
+                onUpdateGoalDetails={updateGoalDetails}
+              />
+            </CollapsibleSection>
 
             {/* Penalty Attribution */}
-            <PenaltyEditor
-              penalties={game.penalties || []}
-              squadPlayers={squadPlayers}
-              onAssignPenaltyPlayer={assignPenaltyPlayer}
-            />
+            <CollapsibleSection title="Penalty Attribution" icon={<AlertOctagon className="h-5 w-5 text-amber-500" />}>
+              <PenaltyEditor
+                penalties={game.penalties || []}
+                squadPlayers={squadPlayers}
+                onAssignPenaltyPlayer={assignPenaltyPlayer}
+              />
+            </CollapsibleSection>
 
             {/* Player Stats */}
-            <PostGamePlayerStats
-              squadPlayers={squadPlayers}
-              events={game.events}
-              penalties={game.penalties || []}
-              lines={game.lines}
-              blockedShotEvents={blockedShotEvents}
-              playerStats={game.playerStats}
-              onAssignBlockedShot={assignBlockedShot}
-              onUpdatePlayerStat={updatePlayerStat}
-            />
+            <CollapsibleSection title="Player Statistics" icon={<User className="h-5 w-5" />}>
+              <PostGamePlayerStats
+                squadPlayers={squadPlayers}
+                events={game.events}
+                penalties={game.penalties || []}
+                lines={game.lines}
+                blockedShotEvents={blockedShotEvents}
+                playerStats={game.playerStats}
+                onAssignBlockedShot={assignBlockedShot}
+                onUpdatePlayerStat={updatePlayerStat}
+              />
+            </CollapsibleSection>
 
             {/* Line Performance */}
-            <EnhancedLinePerformance
-              lines={game.lines}
-              events={game.events}
-            />
+            <CollapsibleSection title="Line Performance" icon={<TrendingUp className="h-5 w-5" />}>
+              <EnhancedLinePerformance
+                lines={game.lines}
+                events={game.events}
+              />
+            </CollapsibleSection>
 
             {/* Post-Game Notes */}
-            <PostGameNotes
-              game={game}
-              onUpdateNotes={updateNotes}
-            />
+            <CollapsibleSection title="Post-Game Notes" icon={<FileText className="h-5 w-5" />}>
+              <PostGameNotes
+                game={game}
+                onUpdateNotes={updateNotes}
+              />
+            </CollapsibleSection>
           </div>
         )}
       </div>
