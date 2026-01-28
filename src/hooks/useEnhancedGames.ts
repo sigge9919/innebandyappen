@@ -1,5 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
-import { EnhancedGame, GameEvent, GameLine, Period, Team, EventType, TeamStats, LineStats, PeriodStats, PlayerGameStats } from '@/types/game';
+import { 
+  EnhancedGame, 
+  GameEvent, 
+  GameLine, 
+  Period, 
+  Team, 
+  EventType, 
+  TeamStats, 
+  LineStats, 
+  PeriodStats, 
+  PlayerGameStats,
+  GameSituation,
+  PenaltyEvent,
+  SpecialTeamsStats
+} from '@/types/game';
 import {
   getEnhancedGames,
   saveEnhancedGames,
@@ -8,12 +22,16 @@ import {
   updateEnhancedGame as updateGame,
   deleteEnhancedGame as deleteGame,
   addGameEvent as addEvent,
+  addPenaltyEvent,
   undoLastEvent,
   calculateTeamStats,
   calculatePeriodStats,
   calculateLineStats,
+  calculateSpecialTeamsStats,
   updatePlayerStats as updatePlayerStatsStorage,
   assignBlockedShot as assignBlockedShotStorage,
+  updateGoalDetails as updateGoalDetailsStorage,
+  assignPenaltyPlayer as assignPenaltyPlayerStorage,
   updatePeriodTeamStats,
 } from '@/lib/gameStorage';
 
@@ -117,6 +135,7 @@ export function useGameDetail(gameId: string) {
       type,
       team,
       period: game.currentPeriod,
+      situation: game.currentSituation || '5v5',
       lineId: team === 'home' ? game.activeLineId : undefined,
     });
     refresh();
@@ -127,6 +146,22 @@ export function useGameDetail(gameId: string) {
     undoLastEvent(gameId);
     refresh();
   }, [gameId, refresh]);
+
+  // Record penalty
+  const recordPenalty = useCallback((team: Team) => {
+    if (!game) return;
+    addPenaltyEvent(gameId, {
+      team,
+      period: game.currentPeriod,
+      duration: 2,
+    });
+    refresh();
+  }, [game, gameId, refresh]);
+
+  // Set current situation
+  const setCurrentSituation = useCallback((situation: GameSituation) => {
+    updateGame({ currentSituation: situation });
+  }, [updateGame]);
 
   // Get stats - total
   const getHomeStats = useCallback((period?: Period): TeamStats => {
@@ -160,6 +195,12 @@ export function useGameDetail(gameId: string) {
     return calculateLineStats(game.events, game.lines);
   }, [game]);
 
+  // Get special teams stats
+  const getSpecialTeamsStats = useCallback(() => {
+    if (!game) return { powerPlay: null, boxPlay: null };
+    return calculateSpecialTeamsStats(game.events, game.penalties || [], 'home');
+  }, [game]);
+
   // Update post-game notes
   const updateNotes = useCallback((notes: EnhancedGame['notes']) => {
     updateGame({ notes });
@@ -173,6 +214,16 @@ export function useGameDetail(gameId: string) {
 
   const assignBlockedShot = useCallback((eventId: string, playerId: string) => {
     assignBlockedShotStorage(gameId, eventId, playerId);
+    refresh();
+  }, [gameId, refresh]);
+
+  const updateGoalDetails = useCallback((eventId: string, scorerId?: string, assistPlayerIds?: string[]) => {
+    updateGoalDetailsStorage(gameId, eventId, scorerId, assistPlayerIds);
+    refresh();
+  }, [gameId, refresh]);
+
+  const assignPenaltyPlayer = useCallback((penaltyId: string, playerId: string) => {
+    assignPenaltyPlayerStorage(gameId, penaltyId, playerId);
     refresh();
   }, [gameId, refresh]);
 
@@ -195,7 +246,9 @@ export function useGameDetail(gameId: string) {
     endGame,
     setActiveLine,
     setCurrentPeriod,
+    setCurrentSituation,
     recordEvent,
+    recordPenalty,
     undoLast,
     getHomeStats,
     getOpponentStats,
@@ -203,9 +256,12 @@ export function useGameDetail(gameId: string) {
     getPeriodOpponentStats,
     getPeriodStats,
     getLineStats,
+    getSpecialTeamsStats,
     updateNotes,
     updatePlayerStat,
     assignBlockedShot,
+    updateGoalDetails,
+    assignPenaltyPlayer,
     updateTeamPeriodStats,
   };
 }

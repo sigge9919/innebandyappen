@@ -3,8 +3,9 @@
 export type GameStatus = 'Not Started' | 'Live' | 'Finished';
 export type Period = '1' | '2' | '3' | 'OT';
 export type LineType = '5v5' | 'PP' | 'PK' | '6v5' | '5v6';
-export type EventType = 'goal' | 'shot_on_goal' | 'shot_off_goal' | 'shot_blocked';
+export type EventType = 'goal' | 'shot_on_goal' | 'shot_off_goal' | 'shot_blocked' | 'penalty';
 export type Team = 'home' | 'opponent';
+export type GameSituation = '5v5' | '5v4' | '4v5' | '6v5' | '5v6';
 
 export interface GameLine {
   id: string;
@@ -19,10 +20,23 @@ export interface GameEvent {
   type: EventType;
   team: Team;
   period: Period;
+  situation: GameSituation; // Game situation when event occurred
   lineId?: string; // Only for home team
-  playerId?: string; // For player-level attribution
+  playerId?: string; // For player-level attribution (goal scorer, penalty taker)
   blockedByPlayerId?: string; // For blocked shot attribution
+  assistPlayerIds?: string[]; // For goal assists (0-2 players)
   timestamp: number;
+}
+
+export interface PenaltyEvent {
+  id: string;
+  gameId: string;
+  team: Team;
+  period: Period;
+  playerId?: string; // Player who took the penalty
+  duration: number; // In minutes (2 for now)
+  timestamp: number;
+  endTimestamp?: number; // When penalty ends (optional for tracking)
 }
 
 export interface TeamStats {
@@ -35,9 +49,11 @@ export interface TeamStats {
 export interface PlayerGameStats {
   playerId: string;
   goals: number;
+  assists: number; // NEW
   shotsOnGoal: number;
   shotsOffGoal: number;
   shotsBlocked: number; // Shots this player blocked (defensive)
+  penalties: number; // Number of 2-min penalties (NEW)
 }
 
 export interface PeriodStats {
@@ -63,6 +79,16 @@ export interface LineStatsByPeriod extends LineStats {
   }[];
 }
 
+export interface SpecialTeamsStats {
+  situation: '5v4' | '4v5';
+  goalsFor: number;
+  goalsAgainst: number;
+  shotsOnGoal: number;
+  shotsOffGoal: number;
+  shotsBlocked: number;
+  opportunities: number; // Number of power plays or box plays
+}
+
 export interface EnhancedGame {
   id: string;
   date: string;
@@ -78,8 +104,10 @@ export interface EnhancedGame {
   
   // Live tracking
   currentPeriod: Period;
+  currentSituation: GameSituation; // NEW
   activeLineId?: string;
   events: GameEvent[];
+  penalties: PenaltyEvent[]; // NEW
   
   // Player stats (post-game editable)
   playerStats?: PlayerGameStats[];
@@ -135,7 +163,9 @@ export function createEnhancedGame(opponent: string, date: string, location: 'Ho
     squadPlayerIds: [],
     lines: createDefaultLines(),
     currentPeriod: '1',
+    currentSituation: '5v5',
     events: [],
+    penalties: [],
     playerStats: [],
   };
 }
@@ -145,8 +175,22 @@ export function createEmptyPlayerStats(playerId: string): PlayerGameStats {
   return {
     playerId,
     goals: 0,
+    assists: 0,
     shotsOnGoal: 0,
     shotsOffGoal: 0,
     shotsBlocked: 0,
+    penalties: 0,
   };
+}
+
+// Get situation label for display
+export function getSituationLabel(situation: GameSituation): string {
+  const labels: Record<GameSituation, string> = {
+    '5v5': 'Even Strength',
+    '5v4': 'Power Play',
+    '4v5': 'Box Play',
+    '6v5': '6v5 (ENG)',
+    '5v6': '5v6 (ENG)',
+  };
+  return labels[situation];
 }
