@@ -3,7 +3,7 @@ import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation } from 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Target, XCircle, Shield, CircleDot, Undo2, ChevronRight, Square, AlertOctagon } from 'lucide-react';
+import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
 import { SituationControl } from './SituationControl';
 
@@ -16,14 +16,11 @@ interface LiveTrackingProps {
   periodOpponentStats: TeamStats;
   onRecordEvent: (type: EventType, team: Team) => void;
   onRecordPenalty: (team: Team) => void;
-  onNextPeriod: () => void;
   onSetActiveLine: (lineId: string) => void;
   onSetSituation: (situation: GameSituation) => void;
   onUndo: () => void;
-  onEndGame: () => void;
 }
 
-const PERIOD_ORDER: Period[] = ['1', '2', '3', 'OT'];
 const PERIOD_LABELS: Record<Period, string> = {
   '1': 'Period 1',
   '2': 'Period 2',
@@ -40,19 +37,14 @@ export function LiveTracking({
   periodOpponentStats,
   onRecordEvent,
   onRecordPenalty,
-  onNextPeriod,
   onSetActiveLine,
   onSetSituation,
   onUndo,
-  onEndGame,
 }: LiveTrackingProps) {
   const activeLine = game.lines.find(l => l.id === game.activeLineId);
   const activeLinePlayers = activeLine 
     ? squadPlayers.filter(p => activeLine.playerIds.includes(p.id))
     : [];
-
-  const currentPeriodIndex = PERIOD_ORDER.indexOf(game.currentPeriod);
-  const isLastPeriod = currentPeriodIndex >= PERIOD_ORDER.length - 1;
 
   // Get lines based on current situation
   const getRelevantLines = () => {
@@ -74,38 +66,6 @@ export function LiveTracking({
 
   return (
     <div className="space-y-4">
-      {/* Header: Period Controls */}
-      <div className="stat-card">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Badge variant="default" className="text-base px-3 py-1">
-              {PERIOD_LABELS[game.currentPeriod]}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            {!isLastPeriod && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1"
-                onClick={onNextPeriod}
-              >
-                Next Period
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            )}
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              className="gap-1"
-              onClick={onEndGame}
-            >
-              <Square className="h-4 w-4" />
-              End Game
-            </Button>
-          </div>
-        </div>
-      </div>
 
       {/* Live Period Stats - Always Visible */}
       <LivePeriodStats

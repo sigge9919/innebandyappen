@@ -18,7 +18,7 @@ import { SpecialTeamsSummary } from '@/components/games/SpecialTeamsSummary';
 import { CollapsibleSection } from '@/components/games/CollapsibleSection';
 import { Period, Team, TeamStats, GameSituation } from '@/types/game';
 import { format } from 'date-fns';
-import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText } from 'lucide-react';
+import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText, ChevronRight, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function GameDetail() {
@@ -84,6 +84,17 @@ export default function GameDetail() {
   // Get blocked shot events for attribution
   const blockedShotEvents = game.events.filter(e => e.type === 'shot_blocked');
 
+  const PERIOD_LABELS: Record<string, string> = {
+    '1': 'Period 1',
+    '2': 'Period 2',
+    '3': 'Period 3',
+    'OT': 'Overtime',
+  };
+
+  const PERIOD_ORDER = ['1', '2', '3', 'OT'];
+  const currentPeriodIndex = PERIOD_ORDER.indexOf(game.currentPeriod);
+  const isLastPeriod = currentPeriodIndex >= PERIOD_ORDER.length - 1;
+
   return (
     <AppLayout>
       <div className="page-container max-w-4xl mx-auto">
@@ -96,6 +107,11 @@ export default function GameDetail() {
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-foreground">vs {game.opponent}</h1>
               <Badge className={statusColor}>{game.status}</Badge>
+              {game.status === 'Live' && (
+                <Badge variant="outline" className="text-base px-3 py-1">
+                  {PERIOD_LABELS[game.currentPeriod]}
+                </Badge>
+              )}
             </div>
             <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
@@ -108,6 +124,31 @@ export default function GameDetail() {
               </span>
             </div>
           </div>
+          {/* Live game controls in header */}
+          {game.status === 'Live' && (
+            <div className="flex items-center gap-2">
+              {!isLastPeriod && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-1"
+                  onClick={nextPeriod}
+                >
+                  Next Period
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              )}
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                className="gap-1"
+                onClick={endGame}
+              >
+                <Square className="h-4 w-4" />
+                End Game
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Pre-Game Setup View */}
@@ -163,11 +204,9 @@ export default function GameDetail() {
             periodOpponentStats={getPeriodOpponentStats()}
             onRecordEvent={recordEvent}
             onRecordPenalty={recordPenalty}
-            onNextPeriod={nextPeriod}
             onSetActiveLine={setActiveLine}
             onSetSituation={setCurrentSituation}
             onUndo={undoLast}
-            onEndGame={endGame}
           />
         )}
 
