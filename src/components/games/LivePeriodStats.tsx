@@ -49,65 +49,86 @@ export function LivePeriodStats({
         </div>
       </div>
 
-      {/* Current Period Stats */}
-      <div className="border border-border rounded-lg p-3 bg-primary/5">
-        <p className="text-xs font-medium text-primary mb-2 text-center">Current Period Stats</p>
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <StatRow 
-            label="Goals" 
-            home={periodHomeStats.goals} 
-            opponent={periodOpponentStats.goals}
-            highlight
-          />
-          <StatRow 
-            label="On Goal" 
-            home={periodHomeStats.shotsOnGoal} 
-            opponent={periodOpponentStats.shotsOnGoal} 
-          />
-          <StatRow 
-            label="Off Goal" 
-            home={periodHomeStats.shotsOffGoal} 
-            opponent={periodOpponentStats.shotsOffGoal} 
-          />
-          <StatRow 
-            label="Blocked" 
-            home={periodHomeStats.shotsBlocked} 
-            opponent={periodOpponentStats.shotsBlocked} 
-          />
-          <StatRow 
-            label="Total Shots" 
-            home={getTotalShots(periodHomeStats)} 
-            opponent={getTotalShots(periodOpponentStats)}
-            bold
-          />
+      {/* Stats Row: Game Totals (sides) + Current Period (center) */}
+      <div className="flex gap-2">
+        {/* Our Team Game Totals */}
+        <div className="flex-1 border border-border rounded-lg p-2 opacity-75">
+          <p className="text-xs font-medium text-muted-foreground mb-2 text-center">Game Total</p>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-xs">On Goal</span>
+              <span className="font-medium">{totalHomeStats.shotsOnGoal}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-xs">Off Goal</span>
+              <span className="font-medium">{totalHomeStats.shotsOffGoal}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-xs">Blocked</span>
+              <span className="font-medium">{totalHomeStats.shotsBlocked}</span>
+            </div>
+            <div className="flex justify-between border-t border-border pt-1">
+              <span className="text-xs font-semibold">Total</span>
+              <span className="font-bold">{getTotalShots(totalHomeStats)}</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Game Total Stats (Secondary) */}
-      <div className="border border-border rounded-lg p-3 opacity-75">
-        <p className="text-xs font-medium text-muted-foreground mb-2 text-center">Game Totals</p>
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <StatRow 
-            label="On Goal" 
-            home={totalHomeStats.shotsOnGoal} 
-            opponent={totalOpponentStats.shotsOnGoal} 
-          />
-          <StatRow 
-            label="Off Goal" 
-            home={totalHomeStats.shotsOffGoal} 
-            opponent={totalOpponentStats.shotsOffGoal} 
-          />
-          <StatRow 
-            label="Blocked" 
-            home={totalHomeStats.shotsBlocked} 
-            opponent={totalOpponentStats.shotsBlocked} 
-          />
-          <StatRow 
-            label="Total Shots" 
-            home={getTotalShots(totalHomeStats)} 
-            opponent={getTotalShots(totalOpponentStats)}
-            bold
-          />
+        {/* Current Period Stats (center) */}
+        <div className="flex-[2] border border-border rounded-lg p-3 bg-primary/5">
+          <p className="text-xs font-medium text-primary mb-2 text-center">Current Period Stats</p>
+          <div className="grid grid-cols-3 gap-2 text-sm">
+            <StatRow 
+              label="Goals" 
+              home={periodHomeStats.goals} 
+              opponent={periodOpponentStats.goals}
+              highlight
+            />
+            <StatRow 
+              label="On Goal" 
+              home={periodHomeStats.shotsOnGoal} 
+              opponent={periodOpponentStats.shotsOnGoal} 
+            />
+            <StatRow 
+              label="Off Goal" 
+              home={periodHomeStats.shotsOffGoal} 
+              opponent={periodOpponentStats.shotsOffGoal} 
+            />
+            <StatRow 
+              label="Blocked" 
+              home={periodHomeStats.shotsBlocked} 
+              opponent={periodOpponentStats.shotsBlocked} 
+            />
+            <StatRow 
+              label="Total Shots" 
+              home={getTotalShots(periodHomeStats)} 
+              opponent={getTotalShots(periodOpponentStats)}
+              bold
+            />
+          </div>
+        </div>
+
+        {/* Opponent Game Totals */}
+        <div className="flex-1 border border-border rounded-lg p-2 opacity-75">
+          <p className="text-xs font-medium text-muted-foreground mb-2 text-center">Game Total</p>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-xs">On Goal</span>
+              <span className="font-medium">{totalOpponentStats.shotsOnGoal}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-xs">Off Goal</span>
+              <span className="font-medium">{totalOpponentStats.shotsOffGoal}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-xs">Blocked</span>
+              <span className="font-medium">{totalOpponentStats.shotsBlocked}</span>
+            </div>
+            <div className="flex justify-between border-t border-border pt-1">
+              <span className="text-xs font-semibold">Total</span>
+              <span className="font-bold">{getTotalShots(totalOpponentStats)}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
