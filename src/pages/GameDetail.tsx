@@ -33,7 +33,7 @@ export default function GameDetail() {
     startGame,
     endGame,
     setActiveLine,
-    setCurrentPeriod,
+    nextPeriod,
     setCurrentSituation,
     recordEvent,
     recordPenalty,
@@ -163,7 +163,7 @@ export default function GameDetail() {
             periodOpponentStats={getPeriodOpponentStats()}
             onRecordEvent={recordEvent}
             onRecordPenalty={recordPenalty}
-            onSetPeriod={setCurrentPeriod}
+            onNextPeriod={nextPeriod}
             onSetActiveLine={setActiveLine}
             onSetSituation={setCurrentSituation}
             onUndo={undoLast}

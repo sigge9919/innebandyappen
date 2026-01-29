@@ -128,6 +128,16 @@ export function useGameDetail(gameId: string) {
     updateGame({ currentPeriod: period });
   }, [updateGame]);
 
+  // Advance to next period
+  const nextPeriod = useCallback(() => {
+    if (!game) return;
+    const periodOrder: Period[] = ['1', '2', '3', 'OT'];
+    const currentIndex = periodOrder.indexOf(game.currentPeriod);
+    if (currentIndex < periodOrder.length - 1) {
+      updateGame({ currentPeriod: periodOrder[currentIndex + 1] });
+    }
+  }, [game, updateGame]);
+
   // Record event
   const recordEvent = useCallback((type: EventType, team: Team) => {
     if (!game) return;
@@ -246,6 +256,7 @@ export function useGameDetail(gameId: string) {
     endGame,
     setActiveLine,
     setCurrentPeriod,
+    nextPeriod,
     setCurrentSituation,
     recordEvent,
     recordPenalty,
