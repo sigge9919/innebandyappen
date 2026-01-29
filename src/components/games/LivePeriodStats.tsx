@@ -83,32 +83,33 @@ export function LivePeriodStats({
         </div>
       </div>
 
-      {/* Game Total Stats (Secondary) */}
-      <div className="border border-border rounded-lg p-3 opacity-75">
-        <p className="text-xs font-medium text-muted-foreground mb-2 text-center">Game Totals</p>
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <StatRow 
-            label="On Goal" 
-            home={totalHomeStats.shotsOnGoal} 
-            opponent={totalOpponentStats.shotsOnGoal} 
-          />
-          <StatRow 
-            label="Off Goal" 
-            home={totalHomeStats.shotsOffGoal} 
-            opponent={totalOpponentStats.shotsOffGoal} 
-          />
-          <StatRow 
-            label="Blocked" 
-            home={totalHomeStats.shotsBlocked} 
-            opponent={totalOpponentStats.shotsBlocked} 
-          />
-          <StatRow 
-            label="Total Shots" 
-            home={getTotalShots(totalHomeStats)} 
-            opponent={getTotalShots(totalOpponentStats)}
-            bold
-          />
-        </div>
+      {/* Game Totals - Outside the period box */}
+      <div className="grid grid-cols-3 gap-2 text-sm px-1">
+        <StatRow 
+          label="On Goal" 
+          home={totalHomeStats.shotsOnGoal} 
+          opponent={totalOpponentStats.shotsOnGoal} 
+          muted
+        />
+        <StatRow 
+          label="Off Goal" 
+          home={totalHomeStats.shotsOffGoal} 
+          opponent={totalOpponentStats.shotsOffGoal} 
+          muted
+        />
+        <StatRow 
+          label="Blocked" 
+          home={totalHomeStats.shotsBlocked} 
+          opponent={totalOpponentStats.shotsBlocked} 
+          muted
+        />
+        <StatRow 
+          label="Total Shots" 
+          home={getTotalShots(totalHomeStats)} 
+          opponent={getTotalShots(totalOpponentStats)}
+          bold
+          muted
+        />
       </div>
     </div>
   );
@@ -119,33 +120,37 @@ function StatRow({
   home, 
   opponent, 
   highlight = false,
-  bold = false
+  bold = false,
+  muted = false
 }: { 
   label: string; 
   home: number; 
   opponent: number; 
   highlight?: boolean;
   bold?: boolean;
+  muted?: boolean;
 }) {
   return (
     <>
       <div className={cn(
         "text-right",
         highlight && "text-success font-semibold",
-        bold && "font-semibold"
+        bold && "font-semibold",
+        muted && "text-muted-foreground"
       )}>
         {home}
       </div>
       <div className={cn(
         "text-center text-muted-foreground text-xs",
-        bold && "font-medium text-foreground"
+        bold && !muted && "font-medium text-foreground"
       )}>
         {label}
       </div>
       <div className={cn(
         "text-left",
         highlight && "text-destructive font-semibold",
-        bold && "font-semibold"
+        bold && "font-semibold",
+        muted && "text-muted-foreground"
       )}>
         {opponent}
       </div>
