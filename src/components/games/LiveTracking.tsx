@@ -3,7 +3,7 @@ import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation } from 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Target, XCircle, Shield, CircleDot, Undo2, Clock, AlertOctagon } from 'lucide-react';
+import { Target, XCircle, Shield, CircleDot, Undo2, ChevronRight, Square, AlertOctagon } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
 import { SituationControl } from './SituationControl';
 
@@ -16,19 +16,20 @@ interface LiveTrackingProps {
   periodOpponentStats: TeamStats;
   onRecordEvent: (type: EventType, team: Team) => void;
   onRecordPenalty: (team: Team) => void;
-  onSetPeriod: (period: Period) => void;
+  onNextPeriod: () => void;
   onSetActiveLine: (lineId: string) => void;
   onSetSituation: (situation: GameSituation) => void;
   onUndo: () => void;
   onEndGame: () => void;
 }
 
-const PERIODS: { value: Period; label: string }[] = [
-  { value: '1', label: 'P1' },
-  { value: '2', label: 'P2' },
-  { value: '3', label: 'P3' },
-  { value: 'OT', label: 'OT' },
-];
+const PERIOD_ORDER: Period[] = ['1', '2', '3', 'OT'];
+const PERIOD_LABELS: Record<Period, string> = {
+  '1': 'Period 1',
+  '2': 'Period 2',
+  '3': 'Period 3',
+  'OT': 'Overtime',
+};
 
 export function LiveTracking({
   game,
@@ -39,7 +40,7 @@ export function LiveTracking({
   periodOpponentStats,
   onRecordEvent,
   onRecordPenalty,
-  onSetPeriod,
+  onNextPeriod,
   onSetActiveLine,
   onSetSituation,
   onUndo,
@@ -49,6 +50,9 @@ export function LiveTracking({
   const activeLinePlayers = activeLine 
     ? squadPlayers.filter(p => activeLine.playerIds.includes(p.id))
     : [];
+
+  const currentPeriodIndex = PERIOD_ORDER.indexOf(game.currentPeriod);
+  const isLastPeriod = currentPeriodIndex >= PERIOD_ORDER.length - 1;
 
   // Get lines based on current situation
   const getRelevantLines = () => {
@@ -70,6 +74,39 @@ export function LiveTracking({
 
   return (
     <div className="space-y-4">
+      {/* Header: Period Controls */}
+      <div className="stat-card">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Badge variant="default" className="text-base px-3 py-1">
+              {PERIOD_LABELS[game.currentPeriod]}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            {!isLastPeriod && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1"
+                onClick={onNextPeriod}
+              >
+                Next Period
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            )}
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              className="gap-1"
+              onClick={onEndGame}
+            >
+              <Square className="h-4 w-4" />
+              End Game
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Live Period Stats - Always Visible */}
       <LivePeriodStats
         currentPeriod={game.currentPeriod}
@@ -83,38 +120,7 @@ export function LiveTracking({
         opponentScore={game.opponentScore}
       />
 
-      {/* Period Control */}
-      <div className="stat-card">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Period</span>
-          </div>
-          <Button variant="destructive" size="sm" onClick={onEndGame}>
-            End Game
-          </Button>
-        </div>
-        <div className="flex gap-2">
-          {PERIODS.map(period => (
-            <Button
-              key={period.value}
-              variant={game.currentPeriod === period.value ? 'default' : 'outline'}
-              className="flex-1"
-              onClick={() => onSetPeriod(period.value)}
-            >
-              {period.label}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* Situation Control - NEW */}
-      <SituationControl
-        currentSituation={game.currentSituation || '5v5'}
-        onChangeSituation={onSetSituation}
-      />
-
-      {/* Active Line Selection */}
+      {/* Active Line Selection - One Tap, Always Visible */}
       <div className="stat-card">
         <div className="flex items-center justify-between mb-3">
           <span className="font-semibold">Active Line</span>
@@ -256,6 +262,12 @@ export function LiveTracking({
           Undo Last Event
         </Button>
       )}
+
+      {/* Situation Control - At Bottom */}
+      <SituationControl
+        currentSituation={game.currentSituation || '5v5'}
+        onChangeSituation={onSetSituation}
+      />
     </div>
   );
 }
