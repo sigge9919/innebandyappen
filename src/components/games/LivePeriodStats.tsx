@@ -49,106 +49,73 @@ export function LivePeriodStats({
         </div>
       </div>
 
-      {/* Current Period Stats */}
-      <div className="border border-border rounded-lg p-3 bg-primary/5">
-        <p className="text-xs font-medium text-primary mb-2 text-center">Current Period Stats</p>
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <StatRow 
-            label="Goals" 
-            home={periodHomeStats.goals} 
-            opponent={periodOpponentStats.goals}
-            highlight
-          />
-          <StatRow 
-            label="On Goal" 
-            home={periodHomeStats.shotsOnGoal} 
-            opponent={periodOpponentStats.shotsOnGoal} 
-          />
-          <StatRow 
-            label="Off Goal" 
-            home={periodHomeStats.shotsOffGoal} 
-            opponent={periodOpponentStats.shotsOffGoal} 
-          />
-          <StatRow 
-            label="Blocked" 
-            home={periodHomeStats.shotsBlocked} 
-            opponent={periodOpponentStats.shotsBlocked} 
-          />
-          <StatRow 
-            label="Total Shots" 
-            home={getTotalShots(periodHomeStats)} 
-            opponent={getTotalShots(periodOpponentStats)}
-            bold
-          />
+      {/* Stats Grid - Period and Game Totals side by side */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Current Period Stats */}
+        <div className="border border-primary/30 rounded-lg p-2 bg-primary/5">
+          <p className="text-xs font-medium text-primary mb-1.5 text-center">This Period</p>
+          <div className="space-y-1 text-sm">
+            <CompactStatRow label="Goals" home={periodHomeStats.goals} opponent={periodOpponentStats.goals} highlight />
+            <CompactStatRow label="On Goal" home={periodHomeStats.shotsOnGoal} opponent={periodOpponentStats.shotsOnGoal} />
+            <CompactStatRow label="Off/Blk" home={periodHomeStats.shotsOffGoal + periodHomeStats.shotsBlocked} opponent={periodOpponentStats.shotsOffGoal + periodOpponentStats.shotsBlocked} muted />
+            <CompactStatRow label="Total" home={getTotalShots(periodHomeStats)} opponent={getTotalShots(periodOpponentStats)} bold />
+          </div>
         </div>
-      </div>
 
-      {/* Game Total Stats (Secondary) */}
-      <div className="border border-border rounded-lg p-3 opacity-75">
-        <p className="text-xs font-medium text-muted-foreground mb-2 text-center">Game Totals</p>
-        <div className="grid grid-cols-3 gap-2 text-sm">
-          <StatRow 
-            label="On Goal" 
-            home={totalHomeStats.shotsOnGoal} 
-            opponent={totalOpponentStats.shotsOnGoal} 
-          />
-          <StatRow 
-            label="Off Goal" 
-            home={totalHomeStats.shotsOffGoal} 
-            opponent={totalOpponentStats.shotsOffGoal} 
-          />
-          <StatRow 
-            label="Blocked" 
-            home={totalHomeStats.shotsBlocked} 
-            opponent={totalOpponentStats.shotsBlocked} 
-          />
-          <StatRow 
-            label="Total Shots" 
-            home={getTotalShots(totalHomeStats)} 
-            opponent={getTotalShots(totalOpponentStats)}
-            bold
-          />
+        {/* Game Totals */}
+        <div className="border border-border rounded-lg p-2">
+          <p className="text-xs font-medium text-muted-foreground mb-1.5 text-center">Game Total</p>
+          <div className="space-y-1 text-sm">
+            <CompactStatRow label="Goals" home={homeScore} opponent={opponentScore} highlight />
+            <CompactStatRow label="On Goal" home={totalHomeStats.shotsOnGoal} opponent={totalOpponentStats.shotsOnGoal} />
+            <CompactStatRow label="Off/Blk" home={totalHomeStats.shotsOffGoal + totalHomeStats.shotsBlocked} opponent={totalOpponentStats.shotsOffGoal + totalOpponentStats.shotsBlocked} muted />
+            <CompactStatRow label="Total" home={getTotalShots(totalHomeStats)} opponent={getTotalShots(totalOpponentStats)} bold />
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function StatRow({ 
+function CompactStatRow({ 
   label, 
   home, 
   opponent, 
   highlight = false,
-  bold = false
+  bold = false,
+  muted = false
 }: { 
   label: string; 
   home: number; 
   opponent: number; 
   highlight?: boolean;
   bold?: boolean;
+  muted?: boolean;
 }) {
   return (
-    <>
-      <div className={cn(
-        "text-right",
+    <div className="flex justify-between items-center">
+      <span className={cn(
+        "w-8 text-right",
         highlight && "text-success font-semibold",
-        bold && "font-semibold"
+        bold && "font-semibold",
+        muted && "text-muted-foreground"
       )}>
         {home}
-      </div>
-      <div className={cn(
-        "text-center text-muted-foreground text-xs",
+      </span>
+      <span className={cn(
+        "text-xs text-muted-foreground",
         bold && "font-medium text-foreground"
       )}>
         {label}
-      </div>
-      <div className={cn(
-        "text-left",
+      </span>
+      <span className={cn(
+        "w-8 text-left",
         highlight && "text-destructive font-semibold",
-        bold && "font-semibold"
+        bold && "font-semibold",
+        muted && "text-muted-foreground"
       )}>
         {opponent}
-      </div>
-    </>
+      </span>
+    </div>
   );
 }
