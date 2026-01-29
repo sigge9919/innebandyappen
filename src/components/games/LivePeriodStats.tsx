@@ -49,85 +49,57 @@ export function LivePeriodStats({
         </div>
       </div>
 
-      {/* Stats Row: Game Totals (sides) + Current Period (center) */}
-      <div className="flex gap-2">
-        {/* Our Team Game Totals */}
-        <div className="flex-1 border border-border rounded-lg p-2 opacity-75">
-          <p className="text-xs font-medium text-muted-foreground mb-2 text-center">Game Total</p>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground text-xs">On Goal</span>
-              <span className="font-medium">{totalHomeStats.shotsOnGoal}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground text-xs">Off Goal</span>
-              <span className="font-medium">{totalHomeStats.shotsOffGoal}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground text-xs">Blocked</span>
-              <span className="font-medium">{totalHomeStats.shotsBlocked}</span>
-            </div>
-            <div className="flex justify-between border-t border-border pt-1">
-              <span className="text-xs font-semibold">Total</span>
-              <span className="font-bold">{getTotalShots(totalHomeStats)}</span>
-            </div>
-          </div>
+      {/* Unified Stats Box */}
+      <div className="border border-border rounded-lg p-3 bg-primary/5">
+        {/* Column Headers */}
+        <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground mb-2">
+          <div className="text-center">Game</div>
+          <div className="text-center text-primary font-medium">Period</div>
+          <div></div>
+          <div className="text-center text-primary font-medium">Period</div>
+          <div className="text-center">Game</div>
         </div>
-
-        {/* Current Period Stats (center) */}
-        <div className="flex-[2] border border-border rounded-lg p-3 bg-primary/5">
-          <p className="text-xs font-medium text-primary mb-2 text-center">Current Period Stats</p>
-          <div className="grid grid-cols-3 gap-2 text-sm">
-            <StatRow 
-              label="Goals" 
-              home={periodHomeStats.goals} 
-              opponent={periodOpponentStats.goals}
-              highlight
-            />
-            <StatRow 
-              label="On Goal" 
-              home={periodHomeStats.shotsOnGoal} 
-              opponent={periodOpponentStats.shotsOnGoal} 
-            />
-            <StatRow 
-              label="Off Goal" 
-              home={periodHomeStats.shotsOffGoal} 
-              opponent={periodOpponentStats.shotsOffGoal} 
-            />
-            <StatRow 
-              label="Blocked" 
-              home={periodHomeStats.shotsBlocked} 
-              opponent={periodOpponentStats.shotsBlocked} 
-            />
-            <StatRow 
+        
+        {/* Stats Rows */}
+        <div className="space-y-1.5">
+          <UnifiedStatRow 
+            label="Goals" 
+            homePeriod={periodHomeStats.goals} 
+            homeTotal={totalHomeStats.goals}
+            opponentPeriod={periodOpponentStats.goals}
+            opponentTotal={totalOpponentStats.goals}
+            highlight
+          />
+          <UnifiedStatRow 
+            label="On Goal" 
+            homePeriod={periodHomeStats.shotsOnGoal} 
+            homeTotal={totalHomeStats.shotsOnGoal}
+            opponentPeriod={periodOpponentStats.shotsOnGoal}
+            opponentTotal={totalOpponentStats.shotsOnGoal}
+          />
+          <UnifiedStatRow 
+            label="Off Goal" 
+            homePeriod={periodHomeStats.shotsOffGoal} 
+            homeTotal={totalHomeStats.shotsOffGoal}
+            opponentPeriod={periodOpponentStats.shotsOffGoal}
+            opponentTotal={totalOpponentStats.shotsOffGoal}
+          />
+          <UnifiedStatRow 
+            label="Blocked" 
+            homePeriod={periodHomeStats.shotsBlocked} 
+            homeTotal={totalHomeStats.shotsBlocked}
+            opponentPeriod={periodOpponentStats.shotsBlocked}
+            opponentTotal={totalOpponentStats.shotsBlocked}
+          />
+          <div className="border-t border-border pt-1.5">
+            <UnifiedStatRow 
               label="Total Shots" 
-              home={getTotalShots(periodHomeStats)} 
-              opponent={getTotalShots(periodOpponentStats)}
+              homePeriod={getTotalShots(periodHomeStats)} 
+              homeTotal={getTotalShots(totalHomeStats)}
+              opponentPeriod={getTotalShots(periodOpponentStats)}
+              opponentTotal={getTotalShots(totalOpponentStats)}
               bold
             />
-          </div>
-        </div>
-
-        {/* Opponent Game Totals */}
-        <div className="flex-1 border border-border rounded-lg p-2 opacity-75">
-          <p className="text-xs font-medium text-muted-foreground mb-2 text-center">Game Total</p>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground text-xs">On Goal</span>
-              <span className="font-medium">{totalOpponentStats.shotsOnGoal}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground text-xs">Off Goal</span>
-              <span className="font-medium">{totalOpponentStats.shotsOffGoal}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground text-xs">Blocked</span>
-              <span className="font-medium">{totalOpponentStats.shotsBlocked}</span>
-            </div>
-            <div className="flex justify-between border-t border-border pt-1">
-              <span className="text-xs font-semibold">Total</span>
-              <span className="font-bold">{getTotalShots(totalOpponentStats)}</span>
-            </div>
           </div>
         </div>
       </div>
@@ -135,41 +107,57 @@ export function LivePeriodStats({
   );
 }
 
-function StatRow({ 
+function UnifiedStatRow({ 
   label, 
-  home, 
-  opponent, 
+  homePeriod,
+  homeTotal,
+  opponentPeriod,
+  opponentTotal,
   highlight = false,
   bold = false
 }: { 
   label: string; 
-  home: number; 
-  opponent: number; 
+  homePeriod: number;
+  homeTotal: number;
+  opponentPeriod: number;
+  opponentTotal: number;
   highlight?: boolean;
   bold?: boolean;
 }) {
   return (
-    <>
+    <div className="grid grid-cols-5 gap-2 text-sm items-center">
       <div className={cn(
-        "text-right",
-        highlight && "text-success font-semibold",
-        bold && "font-semibold"
+        "text-center text-muted-foreground",
+        bold && "font-semibold text-foreground"
       )}>
-        {home}
+        {homeTotal}
+      </div>
+      <div className={cn(
+        "text-center font-medium",
+        highlight && "text-success font-bold",
+        bold && "font-bold"
+      )}>
+        {homePeriod}
       </div>
       <div className={cn(
         "text-center text-muted-foreground text-xs",
-        bold && "font-medium text-foreground"
+        bold && "font-semibold text-foreground"
       )}>
         {label}
       </div>
       <div className={cn(
-        "text-left",
-        highlight && "text-destructive font-semibold",
-        bold && "font-semibold"
+        "text-center font-medium",
+        highlight && "text-destructive font-bold",
+        bold && "font-bold"
       )}>
-        {opponent}
+        {opponentPeriod}
       </div>
-    </>
+      <div className={cn(
+        "text-center text-muted-foreground",
+        bold && "font-semibold text-foreground"
+      )}>
+        {opponentTotal}
+      </div>
+    </div>
   );
 }
