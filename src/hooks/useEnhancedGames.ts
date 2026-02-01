@@ -110,12 +110,27 @@ export function useGameDetail(gameId: string) {
 
   // Start game
   const startGame = useCallback(() => {
-    updateGame({ status: 'Live', currentPeriod: '1' });
-  }, [updateGame]);
+    if (!game) return;
+    updateGame({ 
+      status: 'Live', 
+      currentPeriod: '1',
+      activeGoalieId: game.startingGoalieId, // Set active goalie to starting goalie
+    });
+  }, [game, updateGame]);
 
   // End game
   const endGame = useCallback(() => {
     updateGame({ status: 'Finished' });
+  }, [updateGame]);
+
+  // Set starting goalie (pre-game)
+  const setStartingGoalie = useCallback((goalieId: string | undefined) => {
+    updateGame({ startingGoalieId: goalieId });
+  }, [updateGame]);
+
+  // Set active goalie (during game)
+  const setActiveGoalie = useCallback((goalieId: string | undefined) => {
+    updateGame({ activeGoalieId: goalieId });
   }, [updateGame]);
 
   // Set active line
@@ -254,6 +269,8 @@ export function useGameDetail(gameId: string) {
     updateLine,
     startGame,
     endGame,
+    setStartingGoalie,
+    setActiveGoalie,
     setActiveLine,
     setCurrentPeriod,
     nextPeriod,
