@@ -4,14 +4,18 @@ import { GameLine, LineType } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { Users, Edit2, Check, X } from 'lucide-react';
+import { Users, Edit2, Check, X, Shield } from 'lucide-react';
 
 interface LineSetupProps {
   lines: GameLine[];
   squadPlayers: Player[];
   onUpdateLine: (lineId: string, updates: Partial<GameLine>) => void;
   disabled?: boolean;
+  goalies?: Player[];
+  selectedGoalieId?: string;
+  onSelectGoalie?: (goalieId: string | undefined) => void;
 }
 
 const LINE_TYPE_LABELS: Record<LineType, string> = {
@@ -22,16 +26,45 @@ const LINE_TYPE_LABELS: Record<LineType, string> = {
   '5v6': '5v6 (Defending Empty Net)',
 };
 
+const NONE_VALUE = '_none';
+
 export function LineSetup({
   lines,
   squadPlayers,
   onUpdateLine,
   disabled = false,
+  goalies = [],
+  selectedGoalieId,
+  onSelectGoalie,
 }: LineSetupProps) {
   const lineTypes: LineType[] = ['5v5', 'PP', 'PK', '6v5', '5v6'];
 
   return (
     <div className="space-y-6">
+      {/* Goalie Selection */}
+      {goalies.length > 0 && onSelectGoalie && (
+        <div className="flex items-center gap-3 pb-4 border-b border-border">
+          <Shield className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Active Goalie:</span>
+          <Select
+            value={selectedGoalieId || NONE_VALUE}
+            onValueChange={(value) => onSelectGoalie(value === NONE_VALUE ? undefined : value)}
+          >
+            <SelectTrigger className="w-[180px] h-9">
+              <SelectValue placeholder="Select goalie" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={NONE_VALUE}>Not selected</SelectItem>
+              {goalies.map(goalie => (
+                <SelectItem key={goalie.id} value={goalie.id}>
+                  #{goalie.jerseyNumber} {goalie.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {lineTypes.map(type => {
         const typeLines = lines.filter(l => l.type === type);
         if (typeLines.length === 0) return null;
