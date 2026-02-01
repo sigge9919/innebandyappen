@@ -181,12 +181,13 @@ export function useGameDetail(gameId: string) {
   }, [gameId, refresh]);
 
   // Record penalty
-  const recordPenalty = useCallback((team: Team) => {
+  const recordPenalty = useCallback((team: Team, playerId?: string) => {
     if (!game) return;
     addPenaltyEvent(gameId, {
       team,
       period: game.currentPeriod,
       duration: 2,
+      playerId,
     });
     refresh();
   }, [game, gameId, refresh]);
