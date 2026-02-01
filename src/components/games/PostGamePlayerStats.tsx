@@ -1,32 +1,31 @@
 import { Player } from '@/types';
-import { GameEvent, GameLine, PenaltyEvent, PlayerGameStats } from '@/types/game';
+import { GameEvent, GameLine, PenaltyEvent, PlayerGameStats, TeamStats } from '@/types/game';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Lock } from 'lucide-react';
+import { Lock, AlertTriangle, Shield } from 'lucide-react';
 import { calculatePlayerStatsFromEvents, CalculatedPlayerStats } from '@/lib/gameStorage';
 
 interface PostGamePlayerStatsProps {
   squadPlayers: Player[];
+  goalies?: Player[];
   events: GameEvent[];
   penalties: PenaltyEvent[];
   lines: GameLine[];
-  blockedShotEvents: GameEvent[];
   playerStats?: PlayerGameStats[];
-  onAssignBlockedShot: (eventId: string, playerId: string) => void;
+  teamStats: TeamStats;
+  activeGoalieId?: string;
   onUpdatePlayerStat: (playerId: string, field: keyof Omit<PlayerGameStats, 'playerId'>, value: number) => void;
 }
 
-const NONE_VALUE = '_none';
-
 export function PostGamePlayerStats({
   squadPlayers,
+  goalies = [],
   events,
   penalties,
   lines,
-  blockedShotEvents,
   playerStats = [],
-  onAssignBlockedShot,
+  teamStats,
+  activeGoalieId,
   onUpdatePlayerStat,
 }: PostGamePlayerStatsProps) {
   // Calculate event-driven stats (goals, assists, PIM, +/-)
@@ -64,68 +63,92 @@ export function PostGamePlayerStats({
     };
   };
 
-  // Filter blocked shots from opponent that can be attributed to our players
-  const opponentBlockedShots = blockedShotEvents.filter(e => e.team === 'opponent');
-  const unassignedBlocks = opponentBlockedShots.filter(e => !e.blockedByPlayerId).length;
+  // Calculate totals from player stats
+  const totalSOG = playerStats.reduce((sum, ps) => sum + (ps.shotsOnGoal || 0), 0);
+  const totalMiss = playerStats.reduce((sum, ps) => sum + (ps.shotsOffGoal || 0), 0);
+  const totalBlk = playerStats.reduce((sum, ps) => sum + (ps.shotsBlocked || 0), 0);
+  const totalDef = playerStats.reduce((sum, ps) => sum + (ps.defensiveBlocks || 0), 0);
 
-  // Count defensive blocks per player (opponent shots they blocked)
-  const getDefensiveBlocks = (playerId: string): number => {
-    return opponentBlockedShots.filter(e => e.blockedByPlayerId === playerId).length;
-  };
+  // Check mismatches with team stats
+  const sogMismatch = totalSOG !== teamStats.shotsOnGoal;
+  const missMismatch = totalMiss !== teamStats.shotsOffGoal;
+  const blkMismatch = totalBlk !== teamStats.shotsBlocked;
+
+  // Calculate goalie stats
+  const opponentShotsOnGoal = events.filter(
+    e => e.team === 'opponent' && (e.type === 'shot_on_goal' || e.type === 'goal')
+  ).length;
+  const opponentGoals = events.filter(
+    e => e.team === 'opponent' && e.type === 'goal'
+  ).length;
 
   const handleStatChange = (playerId: string, field: 'shotsOnGoal' | 'shotsOffGoal' | 'shotsBlocked' | 'defensiveBlocks', value: string) => {
     const numValue = parseInt(value) || 0;
     onUpdatePlayerStat(playerId, field, Math.max(0, numValue));
   };
 
-  return (
-    <div>
-      <p className="text-xs text-muted-foreground mb-4">
-        G, A, PIM, +/- are auto-calculated from events. Shots can be entered manually.
-        {unassignedBlocks > 0 && (
-          <span className="text-amber-600 ml-1">
-            ({unassignedBlocks} blocked shot{unassignedBlocks > 1 ? 's' : ''} unassigned below)
-          </span>
-        )}
-      </p>
+  const MismatchWarning = ({ current, expected }: { current: number; expected: number }) => (
+    <span className="text-amber-500 text-xs ml-1" title={`Player total: ${current}, Team stats: ${expected}`}>
+      <AlertTriangle className="h-3 w-3 inline" />
+    </span>
+  );
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border">
-              <th className="py-2 px-2 text-left font-medium text-muted-foreground">Player</th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                <span className="flex items-center justify-center gap-1">
-                  G <Lock className="h-3 w-3" />
-                </span>
-              </th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                <span className="flex items-center justify-center gap-1">
-                  A <Lock className="h-3 w-3" />
-                </span>
-              </th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">SOG</th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">Miss</th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">Blk</th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                <span className="flex items-center justify-center gap-1">
-                  Tot <Lock className="h-3 w-3" />
-                </span>
-              </th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">Def</th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                <span className="flex items-center justify-center gap-1">
-                  PIM <Lock className="h-3 w-3" />
-                </span>
-              </th>
-              <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                <span className="flex items-center justify-center gap-1">
-                  +/− <Lock className="h-3 w-3" />
-                </span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs text-muted-foreground mb-4">
+          G, A, PIM, +/- are auto-calculated from events. Shots can be entered manually.
+        </p>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="py-2 px-2 text-left font-medium text-muted-foreground">Player</th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    G <Lock className="h-3 w-3" />
+                  </span>
+                </th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    A <Lock className="h-3 w-3" />
+                  </span>
+                </th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    SOG {sogMismatch && <MismatchWarning current={totalSOG} expected={teamStats.shotsOnGoal} />}
+                  </span>
+                </th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    Miss {missMismatch && <MismatchWarning current={totalMiss} expected={teamStats.shotsOffGoal} />}
+                  </span>
+                </th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    Blk {blkMismatch && <MismatchWarning current={totalBlk} expected={teamStats.shotsBlocked} />}
+                  </span>
+                </th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    Tot <Lock className="h-3 w-3" />
+                  </span>
+                </th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">Def</th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    PIM <Lock className="h-3 w-3" />
+                  </span>
+                </th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    +/− <Lock className="h-3 w-3" />
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
             {squadPlayers.map(player => {
               const eventStats = getEventStats(player.id);
               const manualStats = getManualStats(player.id);
@@ -228,48 +251,94 @@ export function PostGamePlayerStats({
       <p className="text-xs text-muted-foreground mt-3">
         G = Goals, A = Assists, SOG = Shots on Goal, Miss = Missed Shots, Blk = Shots Blocked (by opponent), Tot = Total Shots, Def = Defensive Blocks, PIM = Penalty Minutes, +/− = Plus/Minus (5v5 only)
       </p>
+      </div>
 
-      {/* Block Attribution Section */}
-      {opponentBlockedShots.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-border">
-          <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-            Assign Blocked Shots (Opponent's shots we blocked)
-            {unassignedBlocks > 0 && (
-              <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
-                {unassignedBlocks} remaining
-              </Badge>
-            )}
+      {/* Goaltender Statistics */}
+      {goalies.length > 0 && (
+        <div className="pt-4 border-t border-border">
+          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2 mb-4">
+            <Shield className="h-4 w-4" />
+            Goaltender Statistics
           </h4>
-          <div className="grid gap-2">
-            {opponentBlockedShots.map((event, index) => (
-              <div key={event.id} className="flex items-center gap-3 p-2 bg-muted/30 rounded-lg">
-                <div className="flex items-center gap-2 flex-1">
-                  <Badge variant="secondary" className="text-xs">P{event.period}</Badge>
-                  <span className="text-sm text-muted-foreground">Block #{index + 1}</span>
-                </div>
-                <Select
-                  value={event.blockedByPlayerId || NONE_VALUE}
-                  onValueChange={(value) => {
-                    if (value !== NONE_VALUE) {
-                      onAssignBlockedShot(event.id, value);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-[160px] h-8 text-xs">
-                    <SelectValue placeholder="Assign player" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE_VALUE}>Not assigned</SelectItem>
-                    {squadPlayers.map(player => (
-                      <SelectItem key={player.id} value={player.id}>
-                        #{player.jerseyNumber} {player.name.split(' ')[0]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            ))}
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="py-2 px-2 text-left font-medium text-muted-foreground">Goalie</th>
+                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">GA</th>
+                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">SA</th>
+                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">SV</th>
+                  <th className="py-2 px-2 text-center font-medium text-muted-foreground">SV%</th>
+                </tr>
+              </thead>
+              <tbody>
+                {goalies.map(goalie => {
+                  const isActive = goalie.id === activeGoalieId;
+                  const goalsAgainst = isActive ? opponentGoals : 0;
+                  const shotsAgainst = isActive ? opponentShotsOnGoal : 0;
+                  const saves = shotsAgainst - goalsAgainst;
+                  const savePercentage = shotsAgainst > 0 
+                    ? (saves / shotsAgainst) * 100 
+                    : 0;
+
+                  return (
+                    <tr key={goalie.id} className="border-b border-border">
+                      <td className="py-3 px-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={isActive ? 'default' : 'outline'} className="text-xs">
+                            #{goalie.jerseyNumber}
+                          </Badge>
+                          <span className="font-medium">
+                            {goalie.name}
+                          </span>
+                          {isActive && (
+                            <Badge variant="secondary" className="text-xs">
+                              Active
+                            </Badge>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 px-2 text-center tabular-nums">
+                        {goalsAgainst > 0 ? (
+                          <Badge variant="destructive" className="bg-destructive/10 text-destructive border-destructive/30">
+                            {goalsAgainst}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-2 text-center tabular-nums font-medium">
+                        {shotsAgainst > 0 ? shotsAgainst : <span className="text-muted-foreground">0</span>}
+                      </td>
+                      <td className="py-3 px-2 text-center tabular-nums">
+                        {saves > 0 ? (
+                          <Badge variant="secondary" className="bg-success/10 text-success border-success/30">
+                            {saves}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-2 text-center tabular-nums font-bold">
+                        {shotsAgainst > 0 ? (
+                          <span className={savePercentage >= 90 ? 'text-success' : savePercentage >= 85 ? 'text-foreground' : 'text-destructive'}>
+                            {savePercentage.toFixed(1)}%
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
+
+          <p className="text-xs text-muted-foreground mt-3">
+            GA = Goals Against, SA = Shots Against, SV = Saves, SV% = Save Percentage
+          </p>
         </div>
       )}
     </div>
