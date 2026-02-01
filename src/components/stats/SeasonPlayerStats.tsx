@@ -21,7 +21,21 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
   
   const skaterStats = aggregatePlayerStats(games, skaters);
   const goalieStats = aggregateGoalieStats(games, goalies);
-
+  
+  // Also show goalies who haven't played but are in the roster
+  const allGoalieStats = goalies.map(goalie => {
+    const existing = goalieStats.find(g => g.playerId === goalie.id);
+    if (existing) return existing;
+    return {
+      playerId: goalie.id,
+      playerName: goalie.name,
+      jerseyNumber: goalie.jerseyNumber,
+      gamesPlayed: 0,
+      goalsAgainst: 0,
+      shotsAgainst: 0,
+      savePercentage: 0,
+    };
+  }).sort((a, b) => b.gamesPlayed - a.gamesPlayed || b.savePercentage - a.savePercentage);
   return (
     <div className="space-y-6">
       {/* Skater Stats */}
@@ -86,7 +100,7 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
       </div>
 
       {/* Goalie Stats */}
-      {goalieStats.length > 0 && (
+      {allGoalieStats.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mb-3">Goaltender Statistics</h3>
           <div className="rounded-lg border overflow-x-auto">
@@ -102,18 +116,26 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {goalieStats.map(stat => (
-                  <TableRow key={stat.playerId}>
-                    <TableCell className="font-medium">{stat.jerseyNumber}</TableCell>
-                    <TableCell>{stat.playerName}</TableCell>
-                    <TableCell className="text-center">{stat.gamesPlayed}</TableCell>
-                    <TableCell className="text-center">{stat.goalsAgainst}</TableCell>
-                    <TableCell className="text-center">{stat.shotsAgainst}</TableCell>
-                    <TableCell className="text-center font-semibold">
-                      {stat.savePercentage.toFixed(1)}%
+                {allGoalieStats.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      No goaltender statistics available
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  allGoalieStats.map(stat => (
+                    <TableRow key={stat.playerId}>
+                      <TableCell className="font-medium">{stat.jerseyNumber}</TableCell>
+                      <TableCell>{stat.playerName}</TableCell>
+                      <TableCell className="text-center">{stat.gamesPlayed}</TableCell>
+                      <TableCell className="text-center">{stat.goalsAgainst}</TableCell>
+                      <TableCell className="text-center">{stat.shotsAgainst}</TableCell>
+                      <TableCell className="text-center font-semibold">
+                        {stat.gamesPlayed > 0 ? `${stat.savePercentage.toFixed(1)}%` : '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
