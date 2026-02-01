@@ -1,4 +1,5 @@
 import { Period, LineStats, GameLine, GameEvent } from '@/types/game';
+import { Player } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -8,6 +9,7 @@ import { useState } from 'react';
 interface EnhancedLinePerformanceProps {
   lines: GameLine[];
   events: GameEvent[];
+  squadPlayers: Player[];
 }
 
 const PERIODS: { value: Period | 'total'; label: string }[] = [
@@ -18,7 +20,7 @@ const PERIODS: { value: Period | 'total'; label: string }[] = [
   { value: 'OT', label: 'OT' },
 ];
 
-export function EnhancedLinePerformance({ lines, events }: EnhancedLinePerformanceProps) {
+export function EnhancedLinePerformance({ lines, events, squadPlayers }: EnhancedLinePerformanceProps) {
   const [selectedPeriod, setSelectedPeriod] = useState<Period | 'total'>('total');
 
   const calculateLineStats = (lineId: string, period?: Period): LineStats => {
@@ -97,49 +99,63 @@ export function EnhancedLinePerformance({ lines, events }: EnhancedLinePerforman
                 No goals in this period
               </p>
             ) : (
-              lineStats.map(({ line, stats, periodBreakdown }) => (
-                <div key={line.id} className="border border-border rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{line.name}</span>
-                      <Badge variant="outline" className="text-xs">
-                        {line.type}
-                      </Badge>
+              lineStats.map(({ line, stats, periodBreakdown }) => {
+                const linePlayers = squadPlayers.filter(p => line.playerIds.includes(p.id));
+                return (
+                  <div key={line.id} className="border border-border rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">{line.name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {line.type}
+                        </Badge>
+                      </div>
+                      <PlusMinusBadge value={stats.plusMinus} />
                     </div>
-                    <PlusMinusBadge value={stats.plusMinus} />
-                  </div>
 
-                  {/* Stats row */}
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-1">
-                      <span className="text-muted-foreground">GF:</span>
-                      <span className="font-medium text-success">{stats.goalsFor}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-muted-foreground">GA:</span>
-                      <span className="font-medium text-destructive">{stats.goalsAgainst}</span>
-                    </div>
-                  </div>
+                    {/* Players in line */}
+                    {linePlayers.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {linePlayers.map(player => (
+                          <Badge key={player.id} variant="secondary" className="text-xs">
+                            #{player.jerseyNumber} {player.name.split(' ')[0]}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
 
-                  {/* Period breakdown (only in total view) */}
-                  {selectedPeriod === 'total' && periodBreakdown.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-border flex flex-wrap gap-2">
-                      {periodBreakdown.map(({ period, stats: pStats }) => (
-                        <div key={period} className="flex items-center gap-1 text-xs">
-                          <Badge variant="secondary" className="text-xs">P{period}</Badge>
-                          <span className={cn(
-                            "font-medium",
-                            pStats.plusMinus > 0 && "text-success",
-                            pStats.plusMinus < 0 && "text-destructive"
-                          )}>
-                            {pStats.plusMinus > 0 ? '+' : ''}{pStats.plusMinus}
-                          </span>
-                        </div>
-                      ))}
+                    {/* Stats row */}
+                    <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground">GF:</span>
+                        <span className="font-medium text-success">{stats.goalsFor}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground">GA:</span>
+                        <span className="font-medium text-destructive">{stats.goalsAgainst}</span>
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))
+
+                    {/* Period breakdown (only in total view) */}
+                    {selectedPeriod === 'total' && periodBreakdown.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-border flex flex-wrap gap-2">
+                        {periodBreakdown.map(({ period, stats: pStats }) => (
+                          <div key={period} className="flex items-center gap-1 text-xs">
+                            <Badge variant="secondary" className="text-xs">P{period}</Badge>
+                            <span className={cn(
+                              "font-medium",
+                              pStats.plusMinus > 0 && "text-success",
+                              pStats.plusMinus < 0 && "text-destructive"
+                            )}>
+                              {pStats.plusMinus > 0 ? '+' : ''}{pStats.plusMinus}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
         </TabsContent>

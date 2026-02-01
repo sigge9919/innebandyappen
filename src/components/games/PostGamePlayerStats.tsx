@@ -69,10 +69,14 @@ export function PostGamePlayerStats({
   const totalBlk = playerStats.reduce((sum, ps) => sum + (ps.shotsBlocked || 0), 0);
   const totalDef = playerStats.reduce((sum, ps) => sum + (ps.defensiveBlocks || 0), 0);
 
+  // Get opponent's blocked shots from team stats for Def comparison
+  const opponentBlockedShots = events.filter(e => e.team === 'opponent' && e.type === 'shot_blocked').length;
+
   // Check mismatches with team stats
   const sogMismatch = totalSOG !== teamStats.shotsOnGoal;
   const missMismatch = totalMiss !== teamStats.shotsOffGoal;
   const blkMismatch = totalBlk !== teamStats.shotsBlocked;
+  const defMismatch = totalDef !== opponentBlockedShots;
 
   // Calculate goalie stats
   const opponentShotsOnGoal = events.filter(
@@ -135,7 +139,11 @@ export function PostGamePlayerStats({
                     Tot <Lock className="h-3 w-3" />
                   </span>
                 </th>
-                <th className="py-2 px-2 text-center font-medium text-muted-foreground">Def</th>
+                <th className="py-2 px-2 text-center font-medium text-muted-foreground">
+                  <span className="flex items-center justify-center gap-1">
+                    Def {defMismatch && <MismatchWarning current={totalDef} expected={opponentBlockedShots} />}
+                  </span>
+                </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
                     PIM <Lock className="h-3 w-3" />
