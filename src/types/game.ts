@@ -102,13 +102,15 @@ export interface EnhancedGame {
   // Pre-game setup
   squadPlayerIds: string[];
   lines: GameLine[];
+  startingGoalieId?: string; // Starting goalie
   
   // Live tracking
   currentPeriod: Period;
-  currentSituation: GameSituation; // NEW
+  currentSituation: GameSituation;
   activeLineId?: string;
+  activeGoalieId?: string; // Current goalie (can change during game)
   events: GameEvent[];
-  penalties: PenaltyEvent[]; // NEW
+  penalties: PenaltyEvent[];
   
   // Player stats (post-game editable)
   playerStats?: PlayerGameStats[];
@@ -163,8 +165,11 @@ export function createEnhancedGame(opponent: string, date: string, location: 'Ho
     opponentScore: 0,
     squadPlayerIds: [],
     lines: createDefaultLines(),
+    startingGoalieId: undefined,
     currentPeriod: '1',
     currentSituation: '5v5',
+    activeLineId: undefined,
+    activeGoalieId: undefined,
     events: [],
     penalties: [],
     playerStats: [],

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -16,12 +17,15 @@ import { GoalDetailsEditor } from '@/components/games/GoalDetailsEditor';
 import { PenaltyEditor } from '@/components/games/PenaltyEditor';
 import { SpecialTeamsSummary } from '@/components/games/SpecialTeamsSummary';
 import { CollapsibleSection } from '@/components/games/CollapsibleSection';
+import { GoalieSelector } from '@/components/games/GoalieSelector';
+import { GoalieStats } from '@/components/games/GoalieStats';
 import { Period, Team, TeamStats, GameSituation } from '@/types/game';
 import { format } from 'date-fns';
-import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText, ChevronRight, Square } from 'lucide-react';
+import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText, ChevronRight, Square, Shield, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function GameDetail() {
+  const [showLiveLineEdit, setShowLiveLineEdit] = useState(false);
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const { players } = usePlayers();
@@ -32,6 +36,8 @@ export default function GameDetail() {
     updateLine,
     startGame,
     endGame,
+    setStartingGoalie,
+    setActiveGoalie,
     setActiveLine,
     nextPeriod,
     setCurrentSituation,
@@ -69,6 +75,7 @@ export default function GameDetail() {
   }
 
   const squadPlayers = players.filter(p => game.squadPlayerIds.includes(p.id));
+  const squadGoalies = squadPlayers.filter(p => p.position === 'Goalkeeper');
   const canStartGame = game.squadPlayerIds.length > 0;
 
   const statusColor = {
@@ -163,6 +170,22 @@ export default function GameDetail() {
               />
             </div>
 
+            {/* Goalie Selection */}
+            {squadGoalies.length > 0 && (
+              <div className="stat-card">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Starting Goalie
+                </h3>
+                <GoalieSelector
+                  goalies={squadGoalies}
+                  selectedGoalieId={game.startingGoalieId}
+                  onSelectGoalie={setStartingGoalie}
+                  label="Select Starting Goalie"
+                />
+              </div>
+            )}
+
             {/* Line Setup */}
             {game.squadPlayerIds.length > 0 && (
               <div className="stat-card">
@@ -195,19 +218,56 @@ export default function GameDetail() {
 
         {/* Live Game View */}
         {game.status === 'Live' && (
-          <LiveTracking
-            game={game}
-            squadPlayers={squadPlayers}
-            homeStats={getHomeStats()}
-            opponentStats={getOpponentStats()}
-            periodHomeStats={getPeriodHomeStats()}
-            periodOpponentStats={getPeriodOpponentStats()}
-            onRecordEvent={recordEvent}
-            onRecordPenalty={recordPenalty}
-            onSetActiveLine={setActiveLine}
-            onSetSituation={setCurrentSituation}
-            onUndo={undoLast}
-          />
+          <div className="space-y-4">
+            {/* Quick Settings Row */}
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              {/* Active Goalie */}
+              <GoalieSelector
+                goalies={squadGoalies}
+                selectedGoalieId={game.activeGoalieId}
+                onSelectGoalie={setActiveGoalie}
+                label="Goalie"
+                compact
+              />
+              {/* Edit Lines Button */}
+              <Button
+                variant={showLiveLineEdit ? 'secondary' : 'outline'}
+                size="sm"
+                className="gap-1"
+                onClick={() => setShowLiveLineEdit(!showLiveLineEdit)}
+              >
+                <Settings className="h-4 w-4" />
+                {showLiveLineEdit ? 'Hide Lines' : 'Edit Lines'}
+              </Button>
+            </div>
+
+            {/* Line Edit Panel (Collapsible) */}
+            {showLiveLineEdit && (
+              <div className="stat-card">
+                <h3 className="text-sm font-semibold mb-3">Edit Lines</h3>
+                <LineSetup
+                  lines={game.lines}
+                  squadPlayers={squadPlayers}
+                  onUpdateLine={updateLine}
+                />
+              </div>
+            )}
+
+            {/* Main Live Tracking */}
+            <LiveTracking
+              game={game}
+              squadPlayers={squadPlayers}
+              homeStats={getHomeStats()}
+              opponentStats={getOpponentStats()}
+              periodHomeStats={getPeriodHomeStats()}
+              periodOpponentStats={getPeriodOpponentStats()}
+              onRecordEvent={recordEvent}
+              onRecordPenalty={recordPenalty}
+              onSetActiveLine={setActiveLine}
+              onSetSituation={setCurrentSituation}
+              onUndo={undoLast}
+            />
+          </div>
         )}
 
         {/* Post-Game View */}
@@ -280,10 +340,21 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
+            {/* Goalie Statistics */}
+            {squadGoalies.length > 0 && (
+              <CollapsibleSection title="Goaltender Statistics" icon={<Shield className="h-5 w-5" />}>
+                <GoalieStats
+                  goalies={squadGoalies}
+                  events={game.events}
+                  activeGoalieId={game.activeGoalieId || game.startingGoalieId}
+                />
+              </CollapsibleSection>
+            )}
+
             {/* Player Stats */}
             <CollapsibleSection title="Player Statistics" icon={<User className="h-5 w-5" />}>
               <PostGamePlayerStats
-                squadPlayers={squadPlayers}
+                squadPlayers={squadPlayers.filter(p => p.position !== 'Goalkeeper')}
                 events={game.events}
                 penalties={game.penalties || []}
                 lines={game.lines}
