@@ -46,8 +46,19 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
   const gamesPlayed = games.length;
   const wins = games.filter(g => g.ourScore > g.opponentScore).length;
   const losses = games.filter(g => g.ourScore < g.opponentScore).length;
-  const draws = games.filter(g => g.ourScore === g.opponentScore).length;
   const winRate = gamesPlayed > 0 ? (wins / gamesPlayed) * 100 : 0;
+
+  // Calculate PP and BP efficiency
+  const ppStats = situationStats.find(s => s.situation === '5v4');
+  const bpStats = situationStats.find(s => s.situation === '4v5');
+  
+  const ppOpportunities = ppStats?.opportunities || 0;
+  const ppGoals = ppStats?.home.goals || 0;
+  const ppEfficiency = ppOpportunities > 0 ? (ppGoals / ppOpportunities) * 100 : 0;
+  
+  const bpOpportunities = bpStats?.opportunities || 0;
+  const bpGoalsAgainst = bpStats?.opponent.goals || 0;
+  const bpKillRate = bpOpportunities > 0 ? ((bpOpportunities - bpGoalsAgainst) / bpOpportunities) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -68,6 +79,30 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
         <div className="stat-card text-center">
           <p className="metric-label">Win Rate</p>
           <p className="metric-value">{winRate.toFixed(0)}%</p>
+        </div>
+      </div>
+
+      {/* Special Teams Summary */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-2">
+            <p className="metric-label">Power Play (PP)</p>
+            <span className="text-xs text-muted-foreground">{ppGoals}/{ppOpportunities}</span>
+          </div>
+          <p className="metric-value text-2xl">
+            {ppOpportunities > 0 ? `${ppEfficiency.toFixed(1)}%` : '-'}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">Goals per opportunity</p>
+        </div>
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-2">
+            <p className="metric-label">Box Play (BP)</p>
+            <span className="text-xs text-muted-foreground">{bpOpportunities - bpGoalsAgainst}/{bpOpportunities}</span>
+          </div>
+          <p className="metric-value text-2xl">
+            {bpOpportunities > 0 ? `${bpKillRate.toFixed(1)}%` : '-'}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">Penalty kills</p>
         </div>
       </div>
 
