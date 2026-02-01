@@ -161,7 +161,8 @@ export function useGameDetail(gameId: string) {
       team,
       period: game.currentPeriod,
       situation: game.currentSituation || '5v5',
-      lineId: team === 'home' ? game.activeLineId : undefined,
+      // Always record which of our lines was on ice - needed for +/- calculation
+      lineId: game.activeLineId,
     });
     refresh();
   }, [game, gameId, refresh]);

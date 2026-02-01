@@ -1,11 +1,11 @@
 import { Player } from '@/types';
-import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation, getSituationLabel } from '@/types/game';
+import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation, getSituationLabel, LineStats } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon } from 'lucide-react';
+import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
-
+import { calculateLineStats } from '@/lib/gameStorage';
 interface LiveTrackingProps {
   game: EnhancedGame;
   squadPlayers: Player[];
@@ -18,6 +18,22 @@ interface LiveTrackingProps {
   onSetActiveLine: (lineId: string) => void;
   onSetSituation: (situation: GameSituation) => void;
   onUndo: () => void;
+}
+
+function LiveLinePlusMinus({ value }: { value: number }) {
+  const Icon = value > 0 ? TrendingUp : value < 0 ? TrendingDown : Minus;
+  
+  return (
+    <span className={cn(
+      "inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-bold",
+      value > 0 && "bg-success/10 text-success",
+      value < 0 && "bg-destructive/10 text-destructive",
+      value === 0 && "bg-muted text-muted-foreground"
+    )}>
+      <Icon className="h-3 w-3" />
+      {value > 0 ? '+' : ''}{value}
+    </span>
+  );
 }
 
 const PERIOD_LABELS: Record<Period, string> = {
@@ -44,6 +60,11 @@ export function LiveTracking({
   const activeLinePlayers = activeLine 
     ? squadPlayers.filter(p => activeLine.playerIds.includes(p.id))
     : [];
+
+  // Calculate live line stats
+  const lineStats = calculateLineStats(game.events, game.lines);
+  const getLineStats = (lineId: string): LineStats | undefined => 
+    lineStats.find(ls => ls.lineId === lineId);
 
   // Get lines based on current situation
   const getRelevantLines = () => {
@@ -103,28 +124,36 @@ export function LiveTracking({
         </div>
         
         <div className="flex gap-1.5 flex-wrap">
-          {relevantLines.map(line => (
-            <Button
-              key={line.id}
-              variant={game.activeLineId === line.id ? 'default' : 'outline'}
-              size="sm"
-              className="h-8 px-3 text-xs"
-              onClick={() => onSetActiveLine(line.id)}
-            >
-              {line.name}
-            </Button>
-          ))}
-          {otherLines.map(line => (
-            <Button
-              key={line.id}
-              variant={game.activeLineId === line.id ? 'secondary' : 'ghost'}
-              size="sm"
-              className="h-8 px-3 text-xs"
-              onClick={() => onSetActiveLine(line.id)}
-            >
-              {line.name}
-            </Button>
-          ))}
+          {relevantLines.map(line => {
+            const stats = getLineStats(line.id);
+            return (
+              <Button
+                key={line.id}
+                variant={game.activeLineId === line.id ? 'default' : 'outline'}
+                size="sm"
+                className="h-8 px-3 text-xs gap-1.5"
+                onClick={() => onSetActiveLine(line.id)}
+              >
+                {line.name}
+                {stats && <LiveLinePlusMinus value={stats.plusMinus} />}
+              </Button>
+            );
+          })}
+          {otherLines.map(line => {
+            const stats = getLineStats(line.id);
+            return (
+              <Button
+                key={line.id}
+                variant={game.activeLineId === line.id ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-8 px-3 text-xs gap-1.5"
+                onClick={() => onSetActiveLine(line.id)}
+              >
+                {line.name}
+                {stats && <LiveLinePlusMinus value={stats.plusMinus} />}
+              </Button>
+            );
+          })}
         </div>
 
         {/* Situation Selection */}
