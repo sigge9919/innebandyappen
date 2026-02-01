@@ -1,11 +1,10 @@
 import { Player } from '@/types';
-import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation } from '@/types/game';
+import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation, getSituationLabel } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
-import { SituationControl } from './SituationControl';
 
 interface LiveTrackingProps {
   game: EnhancedGame;
@@ -80,60 +79,82 @@ export function LiveTracking({
         opponentScore={game.opponentScore}
       />
 
-      {/* Active Line Selection - One Tap, Always Visible */}
-      <div className="stat-card">
-        <div className="flex items-center justify-between mb-3">
-          <span className="font-semibold">Active Line</span>
-          {activeLine && (
-            <Badge variant="default" className="text-sm">
-              {activeLine.name}
-            </Badge>
-          )}
+      {/* Active Line & Situation - Combined Section */}
+      <div className="space-y-3">
+        {/* Line Selection */}
+        <div className="flex items-center justify-between">
+          <span className="font-semibold text-sm">Active Line</span>
+          <div className="flex items-center gap-2">
+            {activeLine && (
+              <Badge variant="default" className="text-xs">
+                {activeLine.name}
+              </Badge>
+            )}
+            {activeLinePlayers.length > 0 && (
+              <div className="flex gap-1">
+                {activeLinePlayers.map(player => (
+                  <Badge key={player.id} variant="secondary" className="text-xs">
+                    #{player.jerseyNumber}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         
-        {/* Relevant lines for current situation */}
-        <div className="flex gap-2 mb-2 flex-wrap">
+        <div className="flex gap-1.5 flex-wrap">
           {relevantLines.map(line => (
             <Button
               key={line.id}
               variant={game.activeLineId === line.id ? 'default' : 'outline'}
               size="sm"
-              className="flex-1 min-w-[60px]"
+              className="h-8 px-3 text-xs"
+              onClick={() => onSetActiveLine(line.id)}
+            >
+              {line.name}
+            </Button>
+          ))}
+          {otherLines.map(line => (
+            <Button
+              key={line.id}
+              variant={game.activeLineId === line.id ? 'secondary' : 'ghost'}
+              size="sm"
+              className="h-8 px-3 text-xs"
               onClick={() => onSetActiveLine(line.id)}
             >
               {line.name}
             </Button>
           ))}
         </div>
-        
-        {/* Other lines (collapsed) */}
-        {otherLines.length > 0 && (
-          <div className="flex gap-2 flex-wrap">
-            {otherLines.map(line => (
-              <Button
-                key={line.id}
-                variant={game.activeLineId === line.id ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => onSetActiveLine(line.id)}
-              >
-                {line.name}
-              </Button>
-            ))}
-          </div>
-        )}
 
-        {/* Active line players */}
-        {activeLinePlayers.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-border">
-            <div className="flex flex-wrap gap-1.5">
-              {activeLinePlayers.map(player => (
-                <Badge key={player.id} variant="secondary">
-                  #{player.jerseyNumber} {player.name.split(' ')[0]}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Situation Selection */}
+        <div className="flex items-center justify-between">
+          <span className="font-semibold text-sm">Situation</span>
+          <Badge 
+            variant={game.currentSituation === '5v4' ? 'default' : game.currentSituation === '4v5' ? 'destructive' : 'secondary'}
+            className="text-xs"
+          >
+            {getSituationLabel(game.currentSituation || '5v5')}
+          </Badge>
+        </div>
+        
+        <div className="flex gap-1.5">
+          {(['5v5', '5v4', '4v5', '6v5', '5v6'] as GameSituation[]).map(situation => (
+            <Button
+              key={situation}
+              variant={(game.currentSituation || '5v5') === situation ? 'default' : 'outline'}
+              size="sm"
+              className={cn(
+                'flex-1 h-8 text-xs font-semibold',
+                (game.currentSituation || '5v5') === situation && situation === '5v4' && 'bg-success hover:bg-success/90 text-success-foreground',
+                (game.currentSituation || '5v5') === situation && situation === '4v5' && 'bg-destructive hover:bg-destructive/90'
+              )}
+              onClick={() => onSetSituation(situation)}
+            >
+              {situation}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Event Buttons - Two columns: Our Team / Opponent */}
@@ -223,11 +244,6 @@ export function LiveTracking({
         </Button>
       )}
 
-      {/* Situation Control - At Bottom */}
-      <SituationControl
-        currentSituation={game.currentSituation || '5v5'}
-        onChangeSituation={onSetSituation}
-      />
     </div>
   );
 }
