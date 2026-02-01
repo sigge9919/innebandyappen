@@ -3,6 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { useGameDetail } from '@/hooks/useEnhancedGames';
 import { usePlayers } from '@/hooks/useLocalStorage';
 import { SquadSelection } from '@/components/games/SquadSelection';
@@ -150,15 +161,31 @@ export default function GameDetail() {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               )}
-              <Button 
-                variant="destructive" 
-                size="sm" 
-                className="gap-1"
-                onClick={endGame}
-              >
-                <Square className="h-4 w-4" />
-                End Game
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    className="gap-1"
+                  >
+                    <Square className="h-4 w-4" />
+                    End Game
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>End this game?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will finish the game and lock the score at {game.ourScore} - {game.opponentScore}. 
+                      You can still edit player stats and notes after ending the game.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={endGame}>End Game</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           )}
         </div>
@@ -346,6 +373,7 @@ export default function GameDetail() {
               <EnhancedLinePerformance
                 lines={game.lines}
                 events={game.events}
+                squadPlayers={squadPlayers}
               />
             </CollapsibleSection>
 
