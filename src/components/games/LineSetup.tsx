@@ -105,28 +105,26 @@ function LineCard({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(line.name);
-  const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>(line.playerIds);
 
-  const handleSave = () => {
-    onUpdateLine(line.id, { 
-      name: editName, 
-      playerIds: selectedPlayerIds 
-    });
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEditName(line.name);
-    setSelectedPlayerIds(line.playerIds);
-    setIsEditing(false);
-  };
-
+  // Toggle player and immediately save
   const togglePlayer = (playerId: string) => {
-    if (selectedPlayerIds.includes(playerId)) {
-      setSelectedPlayerIds(selectedPlayerIds.filter(id => id !== playerId));
-    } else {
-      setSelectedPlayerIds([...selectedPlayerIds, playerId]);
+    const newPlayerIds = line.playerIds.includes(playerId)
+      ? line.playerIds.filter(id => id !== playerId)
+      : [...line.playerIds, playerId];
+    
+    onUpdateLine(line.id, { playerIds: newPlayerIds });
+  };
+
+  const handleSaveName = () => {
+    if (editName.trim() && editName !== line.name) {
+      onUpdateLine(line.id, { name: editName.trim() });
     }
+    setIsEditing(false);
+  };
+
+  const handleCancelName = () => {
+    setEditName(line.name);
+    setIsEditing(false);
   };
 
   const linePlayers = squadPlayers.filter(p => line.playerIds.includes(p.id));
@@ -140,11 +138,16 @@ function LineCard({
             onChange={(e) => setEditName(e.target.value)}
             className="flex-1"
             placeholder="Line name"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSaveName();
+              if (e.key === 'Escape') handleCancelName();
+            }}
+            autoFocus
           />
-          <Button size="icon" variant="ghost" onClick={handleSave}>
+          <Button size="icon" variant="ghost" onClick={handleSaveName}>
             <Check className="h-4 w-4 text-success" />
           </Button>
-          <Button size="icon" variant="ghost" onClick={handleCancel}>
+          <Button size="icon" variant="ghost" onClick={handleCancelName}>
             <X className="h-4 w-4 text-destructive" />
           </Button>
         </div>
@@ -155,7 +158,7 @@ function LineCard({
               onClick={() => togglePlayer(player.id)}
               className={cn(
                 'text-left px-2 py-1.5 rounded text-sm transition-colors',
-                selectedPlayerIds.includes(player.id)
+                line.playerIds.includes(player.id)
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-muted hover:bg-muted/80'
               )}

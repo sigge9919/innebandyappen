@@ -83,13 +83,14 @@ export function deleteEnhancedGame(id: string): void {
 export function addGameEvent(
   gameId: string, 
   event: Omit<GameEvent, 'id' | 'gameId' | 'timestamp'>
-): void {
+): string | undefined {
   const games = getEnhancedGames();
   const index = games.findIndex(g => g.id === gameId);
   if (index !== -1) {
+    const eventId = crypto.randomUUID();
     const newEvent: GameEvent = {
       ...event,
-      id: crypto.randomUUID(),
+      id: eventId,
       gameId,
       timestamp: Date.now(),
       situation: event.situation || games[index].currentSituation || '5v5',
@@ -106,7 +107,9 @@ export function addGameEvent(
     }
     
     saveEnhancedGames(games);
+    return eventId;
   }
+  return undefined;
 }
 
 // Add a penalty event

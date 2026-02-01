@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Player } from '@/types';
 import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation, getSituationLabel, LineStats } from '@/types/game';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
 import { calculateLineStats } from '@/lib/gameStorage';
+import { GoalConfirmDialog, GoalConfirmData } from './GoalConfirmDialog';
+
 interface LiveTrackingProps {
   game: EnhancedGame;
   squadPlayers: Player[];
@@ -13,7 +16,7 @@ interface LiveTrackingProps {
   opponentStats: TeamStats;
   periodHomeStats: TeamStats;
   periodOpponentStats: TeamStats;
-  onRecordEvent: (type: EventType, team: Team) => void;
+  onRecordEvent: (type: EventType, team: Team, goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string }) => void;
   onRecordPenalty: (team: Team) => void;
   onSetActiveLine: (lineId: string) => void;
   onSetSituation: (situation: GameSituation) => void;
@@ -56,6 +59,8 @@ export function LiveTracking({
   onSetSituation,
   onUndo,
 }: LiveTrackingProps) {
+  const [pendingGoal, setPendingGoal] = useState<{ team: Team } | null>(null);
+
   const activeLine = game.lines.find(l => l.id === game.activeLineId);
   const activeLinePlayers = activeLine 
     ? squadPlayers.filter(p => activeLine.playerIds.includes(p.id))
@@ -84,8 +89,37 @@ export function LiveTracking({
   const relevantLines = getRelevantLines();
   const otherLines = game.lines.filter(l => !relevantLines.includes(l) && l.playerIds.length > 0);
 
+  // Handle goal button click - open dialog
+  const handleGoalClick = (team: Team) => {
+    setPendingGoal({ team });
+  };
+
+  // Handle goal confirmation from dialog
+  const handleGoalConfirm = (data: GoalConfirmData) => {
+    if (!pendingGoal) return;
+    
+    onRecordEvent('goal', pendingGoal.team, {
+      scorerId: data.scorerId,
+      assistPlayerIds: data.assistPlayerIds,
+      lineId: data.lineId,
+    });
+    
+    setPendingGoal(null);
+  };
+
   return (
     <div className="space-y-4">
+      {/* Goal Confirmation Dialog */}
+      <GoalConfirmDialog
+        open={pendingGoal !== null}
+        onClose={() => setPendingGoal(null)}
+        onConfirm={handleGoalConfirm}
+        team={pendingGoal?.team || 'home'}
+        squadPlayers={squadPlayers}
+        lines={game.lines}
+        activeLineId={game.activeLineId}
+        opponentName={game.opponent}
+      />
 
       {/* Live Period Stats - Always Visible */}
       <LivePeriodStats
@@ -195,7 +229,7 @@ export function LiveTracking({
             icon={CircleDot}
             label="Goal"
             variant="success"
-            onClick={() => onRecordEvent('goal', 'home')}
+            onClick={() => handleGoalClick('home')}
           />
           <EventButton
             icon={Target}
@@ -231,7 +265,7 @@ export function LiveTracking({
             icon={CircleDot}
             label="Goal"
             variant="destructive"
-            onClick={() => onRecordEvent('goal', 'opponent')}
+            onClick={() => handleGoalClick('opponent')}
           />
           <EventButton
             icon={Target}

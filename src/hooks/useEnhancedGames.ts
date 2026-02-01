@@ -153,16 +153,23 @@ export function useGameDetail(gameId: string) {
     }
   }, [game, updateGame]);
 
-  // Record event
-  const recordEvent = useCallback((type: EventType, team: Team) => {
+  // Record event with optional goal details
+  const recordEvent = useCallback((
+    type: EventType, 
+    team: Team, 
+    goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string }
+  ) => {
     if (!game) return;
     addEvent(gameId, {
       type,
       team,
       period: game.currentPeriod,
       situation: game.currentSituation || '5v5',
-      // Always record which of our lines was on ice - needed for +/- calculation
-      lineId: game.activeLineId,
+      // Use provided lineId for goals, otherwise use active line
+      lineId: goalDetails?.lineId || game.activeLineId,
+      // Include scorer and assists for goal events
+      playerId: goalDetails?.scorerId,
+      assistPlayerIds: goalDetails?.assistPlayerIds,
     });
     refresh();
   }, [game, gameId, refresh]);
