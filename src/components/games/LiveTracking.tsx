@@ -8,7 +8,7 @@ import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon, TrendingUp, Tr
 import { LivePeriodStats } from './LivePeriodStats';
 import { calculateLineStats } from '@/lib/gameStorage';
 import { GoalConfirmDialog, GoalConfirmData } from './GoalConfirmDialog';
-
+import { PenaltyConfirmDialog } from './PenaltyConfirmDialog';
 interface LiveTrackingProps {
   game: EnhancedGame;
   squadPlayers: Player[];
@@ -17,7 +17,7 @@ interface LiveTrackingProps {
   periodHomeStats: TeamStats;
   periodOpponentStats: TeamStats;
   onRecordEvent: (type: EventType, team: Team, goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string }) => void;
-  onRecordPenalty: (team: Team) => void;
+  onRecordPenalty: (team: Team, playerId?: string) => void;
   onSetActiveLine: (lineId: string) => void;
   onSetSituation: (situation: GameSituation) => void;
   onUndo: () => void;
@@ -60,6 +60,7 @@ export function LiveTracking({
   onUndo,
 }: LiveTrackingProps) {
   const [pendingGoal, setPendingGoal] = useState<{ team: Team } | null>(null);
+  const [showPenaltyDialog, setShowPenaltyDialog] = useState(false);
 
   const activeLine = game.lines.find(l => l.id === game.activeLineId);
   const activeLinePlayers = activeLine 
@@ -107,6 +108,17 @@ export function LiveTracking({
     setPendingGoal(null);
   };
 
+  // Handle home team penalty button click - open dialog
+  const handleHomePenaltyClick = () => {
+    setShowPenaltyDialog(true);
+  };
+
+  // Handle penalty confirmation from dialog
+  const handlePenaltyConfirm = (playerId?: string) => {
+    onRecordPenalty('home', playerId);
+    setShowPenaltyDialog(false);
+  };
+
   return (
     <div className="space-y-4">
       {/* Goal Confirmation Dialog */}
@@ -119,6 +131,14 @@ export function LiveTracking({
         lines={game.lines}
         activeLineId={game.activeLineId}
         opponentName={game.opponent}
+      />
+
+      {/* Penalty Confirmation Dialog (Home Team Only) */}
+      <PenaltyConfirmDialog
+        open={showPenaltyDialog}
+        onClose={() => setShowPenaltyDialog(false)}
+        onConfirm={handlePenaltyConfirm}
+        squadPlayers={squadPlayers}
       />
 
       {/* Live Period Stats - Always Visible */}
@@ -250,7 +270,7 @@ export function LiveTracking({
           />
           {/* Penalty Button */}
           <button
-            onClick={() => onRecordPenalty('home')}
+            onClick={handleHomePenaltyClick}
             className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"
           >
             <AlertOctagon className="h-8 w-8" />
@@ -284,7 +304,7 @@ export function LiveTracking({
             variant="muted"
             onClick={() => onRecordEvent('shot_blocked', 'opponent')}
           />
-          {/* Penalty Button */}
+          {/* Penalty Button - Opponent (no dialog needed) */}
           <button
             onClick={() => onRecordPenalty('opponent')}
             className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"

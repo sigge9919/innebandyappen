@@ -335,24 +335,6 @@ export default function GameDetail() {
               ) : null;
             })()}
 
-            {/* Goal Details Editing */}
-            <CollapsibleSection title="Goal Details" icon={<CircleDot className="h-5 w-5 text-success" />}>
-              <GoalDetailsEditor
-                goalEvents={game.events.filter(e => e.type === 'goal')}
-                squadPlayers={squadPlayers}
-                onUpdateGoalDetails={updateGoalDetails}
-              />
-            </CollapsibleSection>
-
-            {/* Penalty Attribution */}
-            <CollapsibleSection title="Penalty Attribution" icon={<AlertOctagon className="h-5 w-5 text-amber-500" />}>
-              <PenaltyEditor
-                penalties={game.penalties || []}
-                squadPlayers={squadPlayers}
-                onAssignPenaltyPlayer={assignPenaltyPlayer}
-              />
-            </CollapsibleSection>
-
             {/* Player Stats */}
             <CollapsibleSection title="Player Statistics" icon={<User className="h-5 w-5" />}>
               <PostGamePlayerStats
@@ -382,6 +364,24 @@ export default function GameDetail() {
               <PostGameNotes
                 game={game}
                 onUpdateNotes={updateNotes}
+              />
+            </CollapsibleSection>
+
+            {/* Goal Details Editing - at bottom, minimized by default */}
+            <CollapsibleSection title="Goal Details" icon={<CircleDot className="h-5 w-5 text-success" />} defaultOpen={false}>
+              <GoalDetailsEditor
+                goalEvents={game.events.filter(e => e.type === 'goal')}
+                squadPlayers={squadPlayers}
+                onUpdateGoalDetails={updateGoalDetails}
+              />
+            </CollapsibleSection>
+
+            {/* Penalty Attribution - at bottom, minimized by default */}
+            <CollapsibleSection title="Penalty Attribution" icon={<AlertOctagon className="h-5 w-5 text-amber-500" />} defaultOpen={false}>
+              <PenaltyEditor
+                penalties={game.penalties || []}
+                squadPlayers={squadPlayers}
+                onAssignPenaltyPlayer={assignPenaltyPlayer}
               />
             </CollapsibleSection>
           </div>
