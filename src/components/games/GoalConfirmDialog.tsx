@@ -89,8 +89,8 @@ export function GoalConfirmDialog({
     setSelectedAssists(selectedAssists.filter(id => id !== playerId));
   };
 
-  // Filter lines to only show 5v5 lines
-  const availableLines = lines.filter(l => l.type === '5v5' && l.playerIds.length > 0);
+  // Show all lines that have players assigned
+  const availableLines = lines.filter(l => l.playerIds.length > 0);
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && handleCancel()}>
