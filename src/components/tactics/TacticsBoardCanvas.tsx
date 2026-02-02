@@ -94,25 +94,51 @@ export function TacticsBoardCanvas() {
     ctx.fillStyle = primaryColor;
     ctx.fill();
     
-    // Goal areas - positioned INSIDE the rink with rectangular crease
-    const goalWidth = 20;
-    const goalHeight = 50;
-    const creaseWidth = 50;
-    const creaseHeight = 90;
+    // Goal areas - positioned well INSIDE the rink with rectangular crease
+    const goalWidth = 25;
+    const goalHeight = 60;
+    const creaseWidth = 70;
+    const creaseHeight = 120;
+    const goalInset = 40; // How far inside the rink the goals are
     
     // Left goal crease (larger rectangle) - inside rink
     ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
-    ctx.strokeRect(padding, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
+    ctx.strokeRect(padding + goalInset, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
     
     // Left goal (smaller rectangle inside crease)
-    ctx.strokeRect(padding + 10, height / 2 - goalHeight / 2, goalWidth, goalHeight);
+    ctx.strokeRect(padding + goalInset + 15, height / 2 - goalHeight / 2, goalWidth, goalHeight);
     
     // Right goal crease (larger rectangle) - inside rink
-    ctx.strokeRect(width - padding - creaseWidth, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
+    ctx.strokeRect(width - padding - goalInset - creaseWidth, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
     
     // Right goal (smaller rectangle inside crease)
-    ctx.strokeRect(width - padding - creaseWidth + 20, height / 2 - goalHeight / 2, goalWidth, goalHeight);
+    ctx.strokeRect(width - padding - goalInset - creaseWidth + 30, height / 2 - goalHeight / 2, goalWidth, goalHeight);
+    
+    // Corner markers (+)
+    const markerSize = 10;
+    const cornerInset = 35;
+    
+    const drawCornerMarker = (cx: number, cy: number) => {
+      ctx.beginPath();
+      ctx.moveTo(cx - markerSize, cy);
+      ctx.lineTo(cx + markerSize, cy);
+      ctx.moveTo(cx, cy - markerSize);
+      ctx.lineTo(cx, cy + markerSize);
+      ctx.stroke();
+    };
+    
+    ctx.strokeStyle = primaryColor;
+    ctx.lineWidth = 2;
+    
+    // Top-left corner
+    drawCornerMarker(padding + cornerInset, padding + cornerInset);
+    // Top-right corner
+    drawCornerMarker(width - padding - cornerInset, padding + cornerInset);
+    // Bottom-left corner
+    drawCornerMarker(padding + cornerInset, height - padding - cornerInset);
+    // Bottom-right corner
+    drawCornerMarker(width - padding - cornerInset, height - padding - cornerInset);
     
   }, []);
 
