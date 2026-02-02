@@ -101,7 +101,7 @@ export function TacticsBoardCanvas() {
     const creaseHeight = 90;
     
     // Left goal crease (larger rectangle)
-    ctx.strokeStyle = borderColor;
+    ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
     ctx.strokeRect(padding - creaseWidth, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
     
