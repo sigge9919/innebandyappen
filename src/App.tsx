@@ -13,6 +13,7 @@ import GameDetail from "./pages/GameDetail";
 import Training from "./pages/Training";
 import Playbook from "./pages/Playbook";
 import Development from "./pages/Development";
+import TacticsBoard from "./pages/TacticsBoard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/training" element={<ProtectedRoute><Training /></ProtectedRoute>} />
             <Route path="/playbook" element={<ProtectedRoute><Playbook /></ProtectedRoute>} />
             <Route path="/development" element={<ProtectedRoute><Development /></ProtectedRoute>} />
+            <Route path="/tactics" element={<ProtectedRoute><TacticsBoard /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

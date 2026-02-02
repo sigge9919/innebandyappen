@@ -6,6 +6,7 @@ import {
   Calendar,
   BookOpen,
   TrendingUp,
+  PenTool,
   Menu,
   LogOut,
 } from 'lucide-react';
@@ -22,6 +23,7 @@ const navItems = [
   { to: '/training', icon: Calendar, label: 'Training' },
   { to: '/playbook', icon: BookOpen, label: 'Playbook' },
   { to: '/development', icon: TrendingUp, label: 'Development' },
+  { to: '/tactics', icon: PenTool, label: 'Tactics Board' },
 ];
 
 function NavItem({ to, icon: Icon, label, onClick }: { to: string; icon: React.ElementType; label: string; onClick?: () => void }) {
