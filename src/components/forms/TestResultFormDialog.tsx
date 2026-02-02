@@ -14,6 +14,7 @@ interface TestResultFormDialogProps {
   players: Player[];
   onSave: (test: TestResult) => void;
   onDelete?: (id: string) => void;
+  defaultPlayerId?: string;
 }
 
 export function TestResultFormDialog({ 
@@ -22,7 +23,8 @@ export function TestResultFormDialog({
   test, 
   players, 
   onSave, 
-  onDelete 
+  onDelete,
+  defaultPlayerId
 }: TestResultFormDialogProps) {
   const [formData, setFormData] = useState({
     playerId: '',
@@ -47,7 +49,7 @@ export function TestResultFormDialog({
       });
     } else {
       setFormData({
-        playerId: players[0]?.id || '',
+        playerId: defaultPlayerId || players[0]?.id || '',
         testType: 'Fitness',
         testName: '',
         date: format(new Date(), 'yyyy-MM-dd'),
@@ -56,7 +58,7 @@ export function TestResultFormDialog({
         trend: 'same',
       });
     }
-  }, [test, players, open]);
+  }, [test, players, open, defaultPlayerId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PlayerCard } from '@/components/team/PlayerCard';
 import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
@@ -12,6 +13,7 @@ import { Player } from '@/types';
 type FilterType = 'all' | 'active' | 'injured' | 'focus';
 
 export default function Team() {
+  const navigate = useNavigate();
   const { players, addPlayer, updatePlayer, deletePlayer } = usePlayers();
   const [filter, setFilter] = useState<FilterType>('all');
   const [search, setSearch] = useState('');
@@ -42,8 +44,7 @@ export default function Team() {
   ];
 
   const handlePlayerClick = (player: Player) => {
-    setSelectedPlayer(player);
-    setDialogOpen(true);
+    navigate(`/team/${player.id}`);
   };
 
   const handleAddPlayer = () => {
