@@ -1,8 +1,20 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Users, UserMinus, Pencil, Eraser, Trash2, RotateCcw } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { 
+  Users, UserMinus, Pencil, Eraser, Trash2, RotateCcw, 
+  Save, FolderOpen, X 
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 interface PlayerMarker {
   id: string;
@@ -12,12 +24,38 @@ interface PlayerMarker {
   number?: number;
 }
 
+interface TacticsLayout {
+  id: string;
+  name: string;
+  players: PlayerMarker[];
+  drawingData: string; // Base64 of drawing canvas
+  homePlayerCount: number;
+  opponentPlayerCount: number;
+  createdAt: string;
+}
+
 type Tool = 'select' | 'addHome' | 'addOpponent' | 'draw' | 'erase';
+
+const STORAGE_KEY = 'tactics-layouts';
 
 // Helper to get computed CSS color from CSS variable
 const getCssColor = (varName: string): string => {
   const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
   return value ? `hsl(${value})` : '#000';
+};
+
+// Storage helpers
+const getSavedLayouts = (): TacticsLayout[] => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveLayoutToStorage = (layouts: TacticsLayout[]) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(layouts));
 };
 
 export function TacticsBoardCanvas() {
@@ -32,6 +70,17 @@ export function TacticsBoardCanvas() {
   const [homePlayerCount, setHomePlayerCount] = useState(1);
   const [opponentPlayerCount, setOpponentPlayerCount] = useState(1);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+  
+  // Save/Load state
+  const [savedLayouts, setSavedLayouts] = useState<TacticsLayout[]>([]);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+  const [layoutName, setLayoutName] = useState('');
+
+  // Load saved layouts on mount
+  useEffect(() => {
+    setSavedLayouts(getSavedLayouts());
+  }, []);
 
   // Draw the floorball rink
   const drawRink = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
@@ -321,6 +370,66 @@ export function TacticsBoardCanvas() {
     clearPlayers();
   };
 
+  // Save current layout
+  const handleSaveLayout = () => {
+    if (!layoutName.trim()) {
+      toast.error('Please enter a name for the layout');
+      return;
+    }
+
+    const drawingCanvas = drawingCanvasRef.current;
+    const drawingData = drawingCanvas ? drawingCanvas.toDataURL() : '';
+
+    const newLayout: TacticsLayout = {
+      id: `layout-${Date.now()}`,
+      name: layoutName.trim(),
+      players,
+      drawingData,
+      homePlayerCount,
+      opponentPlayerCount,
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedLayouts = [...savedLayouts, newLayout];
+    saveLayoutToStorage(updatedLayouts);
+    setSavedLayouts(updatedLayouts);
+    setLayoutName('');
+    setSaveDialogOpen(false);
+    toast.success(`Layout "${newLayout.name}" saved`);
+  };
+
+  // Load a saved layout
+  const handleLoadLayout = (layout: TacticsLayout) => {
+    setPlayers(layout.players);
+    setHomePlayerCount(layout.homePlayerCount);
+    setOpponentPlayerCount(layout.opponentPlayerCount);
+
+    // Restore drawing
+    if (layout.drawingData) {
+      const drawCtx = drawingCanvasRef.current?.getContext('2d');
+      if (drawCtx) {
+        const img = new Image();
+        img.onload = () => {
+          drawCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+          drawCtx.drawImage(img, 0, 0);
+        };
+        img.src = layout.drawingData;
+      }
+    }
+
+    setLoadDialogOpen(false);
+    toast.success(`Layout "${layout.name}" loaded`);
+  };
+
+  // Delete a saved layout
+  const handleDeleteLayout = (layoutId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updatedLayouts = savedLayouts.filter((l) => l.id !== layoutId);
+    saveLayoutToStorage(updatedLayouts);
+    setSavedLayouts(updatedLayouts);
+    toast.success('Layout deleted');
+  };
+
   return (
     <div className="space-y-4">
       {/* Toolbar */}
@@ -386,6 +495,78 @@ export function TacticsBoardCanvas() {
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset All
           </Button>
+          
+          <div className="w-px h-8 bg-border mx-1" />
+          
+          {/* Save Dialog */}
+          <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Save className="h-4 w-4 mr-2" />
+                Save
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Save Layout</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <Input
+                  placeholder="Layout name (e.g., Power Play Setup 1)"
+                  value={layoutName}
+                  onChange={(e) => setLayoutName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSaveLayout()}
+                />
+                <Button onClick={handleSaveLayout} className="w-full">
+                  Save Layout
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+          {/* Load Dialog */}
+          <Dialog open={loadDialogOpen} onOpenChange={setLoadDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Load
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Load Layout</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-2 pt-4 max-h-80 overflow-y-auto">
+                {savedLayouts.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4">
+                    No saved layouts yet
+                  </p>
+                ) : (
+                  savedLayouts.map((layout) => (
+                    <div
+                      key={layout.id}
+                      onClick={() => handleLoadLayout(layout)}
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted cursor-pointer"
+                    >
+                      <div>
+                        <p className="font-medium">{layout.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {layout.players.length} players • {new Date(layout.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => handleDeleteLayout(layout.id, e)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </Card>
 
@@ -425,6 +606,7 @@ export function TacticsBoardCanvas() {
           <li>• <strong>Select/Move:</strong> Drag players to reposition them</li>
           <li>• <strong>Draw:</strong> Draw arrows, lines, or annotations</li>
           <li>• <strong>Erase:</strong> Remove parts of your drawing</li>
+          <li>• <strong>Save/Load:</strong> Save your layouts for later use</li>
         </ul>
       </Card>
     </div>
