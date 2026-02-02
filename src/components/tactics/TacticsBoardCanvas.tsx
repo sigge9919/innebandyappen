@@ -14,6 +14,12 @@ interface PlayerMarker {
 
 type Tool = 'select' | 'addHome' | 'addOpponent' | 'draw' | 'erase';
 
+// Helper to get computed CSS color from CSS variable
+const getCssColor = (varName: string): string => {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  return value ? `hsl(${value})` : '#000';
+};
+
 export function TacticsBoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,8 +37,15 @@ export function TacticsBoardCanvas() {
   const drawRink = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
     ctx.clearRect(0, 0, width, height);
     
+    // Get theme colors
+    const mutedColor = getCssColor('--muted');
+    const bgColor = getCssColor('--background');
+    const borderColor = getCssColor('--border');
+    const primaryColor = getCssColor('--primary');
+    const destructiveColor = getCssColor('--destructive');
+    
     // Rink background
-    ctx.fillStyle = 'hsl(var(--muted))';
+    ctx.fillStyle = mutedColor;
     ctx.fillRect(0, 0, width, height);
     
     const padding = 20;
@@ -53,9 +66,9 @@ export function TacticsBoardCanvas() {
     ctx.arcTo(padding, padding, padding + cornerRadius, padding, cornerRadius);
     ctx.closePath();
     
-    ctx.fillStyle = 'hsl(var(--background))';
+    ctx.fillStyle = bgColor;
     ctx.fill();
-    ctx.strokeStyle = 'hsl(var(--border))';
+    ctx.strokeStyle = borderColor;
     ctx.lineWidth = 3;
     ctx.stroke();
     
@@ -64,21 +77,21 @@ export function TacticsBoardCanvas() {
     ctx.beginPath();
     ctx.moveTo(centerX, padding);
     ctx.lineTo(centerX, height - padding);
-    ctx.strokeStyle = 'hsl(var(--primary))';
+    ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
     ctx.stroke();
     
     // Center circle
     ctx.beginPath();
     ctx.arc(centerX, height / 2, 50, 0, Math.PI * 2);
-    ctx.strokeStyle = 'hsl(var(--primary))';
+    ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
     ctx.stroke();
     
     // Center dot
     ctx.beginPath();
     ctx.arc(centerX, height / 2, 5, 0, Math.PI * 2);
-    ctx.fillStyle = 'hsl(var(--primary))';
+    ctx.fillStyle = primaryColor;
     ctx.fill();
     
     // Goal areas
@@ -86,7 +99,7 @@ export function TacticsBoardCanvas() {
     const goalHeight = 100;
     
     // Left goal
-    ctx.strokeStyle = 'hsl(var(--destructive))';
+    ctx.strokeStyle = destructiveColor;
     ctx.lineWidth = 2;
     ctx.strokeRect(padding, height / 2 - goalHeight / 2, goalWidth, goalHeight);
     
@@ -94,36 +107,43 @@ export function TacticsBoardCanvas() {
     ctx.strokeRect(width - padding - goalWidth, height / 2 - goalHeight / 2, goalWidth, goalHeight);
     
     // Goal creases (semi-circles)
+    ctx.globalAlpha = 0.5;
     ctx.beginPath();
     ctx.arc(padding + goalWidth, height / 2, 40, -Math.PI / 2, Math.PI / 2);
-    ctx.strokeStyle = 'hsl(var(--destructive) / 0.5)';
+    ctx.strokeStyle = destructiveColor;
     ctx.stroke();
     
     ctx.beginPath();
     ctx.arc(width - padding - goalWidth, height / 2, 40, Math.PI / 2, -Math.PI / 2);
     ctx.stroke();
+    ctx.globalAlpha = 1;
     
   }, []);
 
   // Draw players on canvas
   const drawPlayers = useCallback((ctx: CanvasRenderingContext2D) => {
+    const primaryColor = getCssColor('--primary');
+    const destructiveColor = getCssColor('--destructive');
+    const bgColor = getCssColor('--background');
+    const fgColor = getCssColor('--primary-foreground');
+    
     players.forEach((player) => {
       ctx.beginPath();
       ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
       
       if (player.type === 'home') {
-        ctx.fillStyle = 'hsl(var(--primary))';
+        ctx.fillStyle = primaryColor;
       } else {
-        ctx.fillStyle = 'hsl(var(--destructive))';
+        ctx.fillStyle = destructiveColor;
       }
       ctx.fill();
       
-      ctx.strokeStyle = 'hsl(var(--background))';
+      ctx.strokeStyle = bgColor;
       ctx.lineWidth = 2;
       ctx.stroke();
       
       // Player number
-      ctx.fillStyle = 'hsl(var(--primary-foreground))';
+      ctx.fillStyle = fgColor;
       ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -235,7 +255,7 @@ export function TacticsBoardCanvas() {
       const drawCtx = drawingCanvasRef.current?.getContext('2d');
       if (drawCtx) {
         if (selectedTool === 'draw') {
-          drawCtx.strokeStyle = 'hsl(var(--accent))';
+          drawCtx.strokeStyle = getCssColor('--accent');
           drawCtx.lineWidth = 3;
           drawCtx.lineCap = 'round';
           drawCtx.lineJoin = 'round';
