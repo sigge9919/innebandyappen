@@ -94,27 +94,27 @@ export function TacticsBoardCanvas() {
     ctx.fillStyle = primaryColor;
     ctx.fill();
     
-    // Goal areas
-    const goalWidth = 60;
-    const goalHeight = 100;
+    // Goal areas - positioned OUTSIDE the rink
+    const goalWidth = 30;
+    const goalHeight = 80;
     
-    // Left goal
-    ctx.strokeStyle = destructiveColor;
+    // Left goal (outside left edge)
+    ctx.strokeStyle = borderColor;
     ctx.lineWidth = 2;
-    ctx.strokeRect(padding, height / 2 - goalHeight / 2, goalWidth, goalHeight);
+    ctx.strokeRect(padding - goalWidth, height / 2 - goalHeight / 2, goalWidth, goalHeight);
     
-    // Right goal
-    ctx.strokeRect(width - padding - goalWidth, height / 2 - goalHeight / 2, goalWidth, goalHeight);
+    // Right goal (outside right edge)
+    ctx.strokeRect(width - padding, height / 2 - goalHeight / 2, goalWidth, goalHeight);
     
-    // Goal creases (semi-circles)
+    // Goal creases (semi-circles inside the rink)
     ctx.globalAlpha = 0.5;
     ctx.beginPath();
-    ctx.arc(padding + goalWidth, height / 2, 40, -Math.PI / 2, Math.PI / 2);
+    ctx.arc(padding, height / 2, 40, -Math.PI / 2, Math.PI / 2);
     ctx.strokeStyle = destructiveColor;
     ctx.stroke();
     
     ctx.beginPath();
-    ctx.arc(width - padding - goalWidth, height / 2, 40, Math.PI / 2, -Math.PI / 2);
+    ctx.arc(width - padding, height / 2, 40, Math.PI / 2, -Math.PI / 2);
     ctx.stroke();
     ctx.globalAlpha = 1;
     
