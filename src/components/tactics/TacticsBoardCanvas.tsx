@@ -94,25 +94,25 @@ export function TacticsBoardCanvas() {
     ctx.fillStyle = primaryColor;
     ctx.fill();
     
-    // Goal areas - positioned OUTSIDE the rink with rectangular crease
+    // Goal areas - positioned INSIDE the rink with rectangular crease
     const goalWidth = 20;
     const goalHeight = 50;
     const creaseWidth = 50;
     const creaseHeight = 90;
     
-    // Left goal crease (larger rectangle)
+    // Left goal crease (larger rectangle) - inside rink
     ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
-    ctx.strokeRect(padding - creaseWidth, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
+    ctx.strokeRect(padding, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
     
     // Left goal (smaller rectangle inside crease)
-    ctx.strokeRect(padding - creaseWidth + 10, height / 2 - goalHeight / 2, goalWidth, goalHeight);
+    ctx.strokeRect(padding + 10, height / 2 - goalHeight / 2, goalWidth, goalHeight);
     
-    // Right goal crease (larger rectangle)
-    ctx.strokeRect(width - padding, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
+    // Right goal crease (larger rectangle) - inside rink
+    ctx.strokeRect(width - padding - creaseWidth, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
     
     // Right goal (smaller rectangle inside crease)
-    ctx.strokeRect(width - padding + creaseWidth - 30, height / 2 - goalHeight / 2, goalWidth, goalHeight);
+    ctx.strokeRect(width - padding - creaseWidth + 20, height / 2 - goalHeight / 2, goalWidth, goalHeight);
     
   }, []);
 
