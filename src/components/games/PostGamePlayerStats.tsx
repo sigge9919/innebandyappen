@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Player } from '@/types';
 import { GameEvent, GameLine, PenaltyEvent, PlayerGameStats, TeamStats } from '@/types/game';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +29,7 @@ export function PostGamePlayerStats({
   activeGoalieId,
   onUpdatePlayerStat,
 }: PostGamePlayerStatsProps) {
+  const navigate = useNavigate();
   // Calculate event-driven stats (goals, assists, PIM, +/-)
   const eventDrivenStats = calculatePlayerStatsFromEvents(
     events,
@@ -164,7 +166,10 @@ export function PostGamePlayerStats({
               return (
                 <tr key={player.id} className="border-b border-border">
                   <td className="py-2 px-2">
-                    <div className="flex items-center gap-2">
+                    <div 
+                      className="flex items-center gap-2 cursor-pointer hover:underline"
+                      onClick={() => navigate(`/team/${player.id}`)}
+                    >
                       <Badge variant="outline" className="text-xs">
                         #{player.jerseyNumber}
                       </Badge>
@@ -293,7 +298,10 @@ export function PostGamePlayerStats({
                   return (
                     <tr key={goalie.id} className="border-b border-border">
                       <td className="py-3 px-2">
-                        <div className="flex items-center gap-2">
+                        <div 
+                          className="flex items-center gap-2 cursor-pointer hover:underline"
+                          onClick={() => navigate(`/team/${goalie.id}`)}
+                        >
                           <Badge variant={isActive ? 'default' : 'outline'} className="text-xs">
                             #{goalie.jerseyNumber}
                           </Badge>
