@@ -48,9 +48,9 @@ export default function PlayerDetail() {
     return (
       <AppLayout>
         <div className="page-container">
-          <Button variant="ghost" onClick={() => navigate('/team')} className="mb-6">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Team
+            Back
           </Button>
           <div className="text-center py-12">
             <p className="text-muted-foreground">Player not found</p>
@@ -92,9 +92,9 @@ export default function PlayerDetail() {
       <div className="page-container">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Button variant="ghost" onClick={() => navigate('/team')}>
+          <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Team
+            Back
           </Button>
           <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
             <Edit className="h-4 w-4 mr-2" />
