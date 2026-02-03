@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Player } from '@/types';
 import { EnhancedGame } from '@/types/game';
 import { aggregatePlayerStats, aggregateGoalieStats } from '@/lib/seasonStats';
@@ -16,6 +17,7 @@ interface SeasonPlayerStatsProps {
 }
 
 export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
+  const navigate = useNavigate();
   const skaters = players.filter(p => p.position !== 'Goalkeeper');
   const goalies = players.filter(p => p.position === 'Goalkeeper');
   
@@ -69,8 +71,12 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
                   </TableCell>
                 </TableRow>
               ) : (
-                skaterStats.map(stat => (
-                  <TableRow key={stat.playerId}>
+              skaterStats.map(stat => (
+                  <TableRow 
+                    key={stat.playerId}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => navigate(`/team/${stat.playerId}`)}
+                  >
                     <TableCell className="font-medium">{stat.jerseyNumber}</TableCell>
                     <TableCell>{stat.playerName}</TableCell>
                     <TableCell className="text-center">{stat.gamesPlayed}</TableCell>
@@ -123,8 +129,12 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  allGoalieStats.map(stat => (
-                    <TableRow key={stat.playerId}>
+                allGoalieStats.map(stat => (
+                    <TableRow 
+                      key={stat.playerId}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => navigate(`/team/${stat.playerId}`)}
+                    >
                       <TableCell className="font-medium">{stat.jerseyNumber}</TableCell>
                       <TableCell>{stat.playerName}</TableCell>
                       <TableCell className="text-center">{stat.gamesPlayed}</TableCell>

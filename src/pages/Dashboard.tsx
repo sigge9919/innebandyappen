@@ -101,7 +101,7 @@ export default function Dashboard() {
 
           {/* Right Column - Alerts */}
           <div className="space-y-6">
-            <PlayerAlerts players={players} onPlayerClick={(player) => navigate('/team')} />
+            <PlayerAlerts players={players} onPlayerClick={(player) => navigate(`/team/${player.id}`)} />
           </div>
         </div>
       </div>

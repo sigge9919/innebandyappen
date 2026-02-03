@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { usePlayers, useIDPs, useTestResults } from '@/hooks/useLocalStorage';
 import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
@@ -16,6 +17,7 @@ const TrendIcon = ({ trend }: { trend: 'up' | 'down' | 'same' }) => {
 };
 
 export default function Development() {
+  const navigate = useNavigate();
   const { players } = usePlayers();
   const { idps, addIDP, updateIDP } = useIDPs();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
@@ -28,10 +30,7 @@ export default function Development() {
   const [testDialogOpen, setTestDialogOpen] = useState(false);
 
   const handlePlayerClick = (player: Player) => {
-    const existingIDP = idps.find(idp => idp.playerId === player.id);
-    setSelectedPlayer(player);
-    setSelectedIDP(existingIDP || null);
-    setIdpDialogOpen(true);
+    navigate(`/team/${player.id}`);
   };
 
   const handleSaveIDP = (idp: IndividualDevelopmentPlan) => {
