@@ -101,7 +101,7 @@ export default function Development() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground">{player.name}</h3>
-                        <p className="text-xs text-muted-foreground">{player.position}</p>
+                        <p className="text-xs text-muted-foreground">{player.positions?.join(' / ') || 'Forward'}</p>
                       </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground" />

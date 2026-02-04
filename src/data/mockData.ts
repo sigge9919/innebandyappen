@@ -4,7 +4,7 @@ export const mockPlayers: Player[] = [
   {
     id: '1',
     name: 'Erik Lindström',
-    position: 'Forward',
+    positions: ['Forward'],
     stickSide: 'Right',
     jerseyNumber: 7,
     status: 'Active',
@@ -14,7 +14,7 @@ export const mockPlayers: Player[] = [
   {
     id: '2',
     name: 'Oscar Nilsson',
-    position: 'Forward',
+    positions: ['Forward', 'Center'],
     stickSide: 'Left',
     jerseyNumber: 11,
     status: 'Active',
@@ -24,7 +24,7 @@ export const mockPlayers: Player[] = [
   {
     id: '3',
     name: 'Marcus Svensson',
-    position: 'Defender',
+    positions: ['Defender'],
     stickSide: 'Right',
     jerseyNumber: 4,
     status: 'Injured',
@@ -34,7 +34,7 @@ export const mockPlayers: Player[] = [
   {
     id: '4',
     name: 'Johan Andersson',
-    position: 'Goalkeeper',
+    positions: ['Goalkeeper'],
     stickSide: 'Left',
     jerseyNumber: 1,
     status: 'Active',
@@ -44,7 +44,7 @@ export const mockPlayers: Player[] = [
   {
     id: '5',
     name: 'Viktor Holm',
-    position: 'Defender',
+    positions: ['Defender', 'Forward'],
     stickSide: 'Left',
     jerseyNumber: 21,
     status: 'Active',

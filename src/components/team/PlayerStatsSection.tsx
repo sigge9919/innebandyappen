@@ -18,7 +18,7 @@ interface PlayerStatsSectionProps {
 
 export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
   const finishedGames = getFinishedGames(games);
-  const isGoalie = player.position === 'Goalkeeper';
+  const isGoalie = player.positions?.includes('Goalkeeper');
   
   if (isGoalie) {
     const goalieStats = aggregateGoalieStats(finishedGames, [player]);

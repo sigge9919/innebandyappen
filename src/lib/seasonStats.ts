@@ -64,7 +64,7 @@ export function aggregatePlayerStats(
       playerId: player.id,
       playerName: player.name,
       jerseyNumber: player.jerseyNumber,
-      position: player.position,
+      position: player.positions?.join('/') || 'Unknown',
       gamesPlayed: 0,
       goals: 0,
       assists: 0,

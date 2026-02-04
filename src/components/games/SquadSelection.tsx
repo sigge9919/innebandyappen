@@ -135,7 +135,7 @@ function PlayerCheckItem({
           #{player.jerseyNumber} {player.name}
         </p>
         <p className="text-xs text-muted-foreground">
-          {player.position} • {player.stickSide}
+          {player.positions?.join('/') || (player as any).position || 'Forward'} • {player.stickSide}
         </p>
       </div>
     </button>
