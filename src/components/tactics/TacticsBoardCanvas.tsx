@@ -2,9 +2,11 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import { 
   Users, UserMinus, Pencil, Eraser, Trash2, RotateCcw, 
-  Save, FolderOpen, X 
+  Save, FolderOpen, X, Play, Pause, Circle, Square, 
+  ChevronLeft, ChevronRight, Film
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -14,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 interface PlayerMarker {
@@ -24,17 +27,28 @@ interface PlayerMarker {
   number?: number;
 }
 
+interface AnimationKeyframe {
+  id: string;
+  timestamp: number; // 0-100 representing % of animation
+  players: PlayerMarker[];
+  drawingData?: string;
+}
+
 interface TacticsLayout {
   id: string;
   name: string;
   players: PlayerMarker[];
-  drawingData: string; // Base64 of drawing canvas
+  drawingData: string;
   homePlayerCount: number;
   opponentPlayerCount: number;
   createdAt: string;
+  // Animation data
+  keyframes?: AnimationKeyframe[];
+  isAnimation?: boolean;
 }
 
 type Tool = 'select' | 'addHome' | 'addOpponent' | 'draw' | 'erase';
+type Mode = 'edit' | 'animate';
 
 const STORAGE_KEY = 'tactics-layouts';
 
@@ -58,10 +72,14 @@ const saveLayoutToStorage = (layouts: TacticsLayout[]) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(layouts));
 };
 
+// Linear interpolation helper
+const lerp = (start: number, end: number, t: number) => start + (end - start) * t;
+
 export function TacticsBoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number | null>(null);
   
   const [players, setPlayers] = useState<PlayerMarker[]>([]);
   const [selectedTool, setSelectedTool] = useState<Tool>('select');
@@ -70,6 +88,14 @@ export function TacticsBoardCanvas() {
   const [homePlayerCount, setHomePlayerCount] = useState(1);
   const [opponentPlayerCount, setOpponentPlayerCount] = useState(1);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+  
+  // Animation state
+  const [mode, setMode] = useState<Mode>('edit');
+  const [keyframes, setKeyframes] = useState<AnimationKeyframe[]>([]);
+  const [currentKeyframeIndex, setCurrentKeyframeIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackPosition, setPlaybackPosition] = useState(0);
+  const [animationSpeed, setAnimationSpeed] = useState(1);
   
   // Save/Load state
   const [savedLayouts, setSavedLayouts] = useState<TacticsLayout[]>([]);
@@ -86,14 +112,11 @@ export function TacticsBoardCanvas() {
   const drawRink = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
     ctx.clearRect(0, 0, width, height);
     
-    // Get theme colors
     const mutedColor = getCssColor('--muted');
     const bgColor = getCssColor('--background');
     const borderColor = getCssColor('--border');
     const primaryColor = getCssColor('--primary');
-    const destructiveColor = getCssColor('--destructive');
     
-    // Rink background
     ctx.fillStyle = mutedColor;
     ctx.fillRect(0, 0, width, height);
     
@@ -102,7 +125,6 @@ export function TacticsBoardCanvas() {
     const rinkHeight = height - padding * 2;
     const cornerRadius = 40;
     
-    // Main rink outline with rounded corners
     ctx.beginPath();
     ctx.moveTo(padding + cornerRadius, padding);
     ctx.lineTo(padding + rinkWidth - cornerRadius, padding);
@@ -121,7 +143,6 @@ export function TacticsBoardCanvas() {
     ctx.lineWidth = 3;
     ctx.stroke();
     
-    // Center line
     const centerX = width / 2;
     ctx.beginPath();
     ctx.moveTo(centerX, padding);
@@ -130,41 +151,30 @@ export function TacticsBoardCanvas() {
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Center circle
     ctx.beginPath();
     ctx.arc(centerX, height / 2, 50, 0, Math.PI * 2);
     ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Center dot
     ctx.beginPath();
     ctx.arc(centerX, height / 2, 5, 0, Math.PI * 2);
     ctx.fillStyle = primaryColor;
     ctx.fill();
     
-    // Goal areas - positioned well INSIDE the rink with rectangular crease
-    const goalWidth = 25;
     const goalHeight = 60;
     const creaseWidth = 70;
     const creaseHeight = 120;
-    const goalInset = 40; // How far inside the rink the goals are
+    const goalInset = 40;
+    const goalWidth = 25;
     
-    // Left goal crease (larger rectangle) - inside rink
     ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
     ctx.strokeRect(padding + goalInset, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
-    
-    // Left goal (smaller rectangle inside crease)
     ctx.strokeRect(padding + goalInset + 15, height / 2 - goalHeight / 2, goalWidth, goalHeight);
-    
-    // Right goal crease (larger rectangle) - inside rink
     ctx.strokeRect(width - padding - goalInset - creaseWidth, height / 2 - creaseHeight / 2, creaseWidth, creaseHeight);
-    
-    // Right goal (smaller rectangle inside crease)
     ctx.strokeRect(width - padding - goalInset - creaseWidth + 30, height / 2 - goalHeight / 2, goalWidth, goalHeight);
     
-    // Corner markers (+)
     const markerSize = 10;
     const cornerInset = 35;
     
@@ -179,48 +189,69 @@ export function TacticsBoardCanvas() {
     
     ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
-    
-    // Top-left corner
     drawCornerMarker(padding + cornerInset, padding + cornerInset);
-    // Top-right corner
     drawCornerMarker(width - padding - cornerInset, padding + cornerInset);
-    // Bottom-left corner
     drawCornerMarker(padding + cornerInset, height - padding - cornerInset);
-    // Bottom-right corner
     drawCornerMarker(width - padding - cornerInset, height - padding - cornerInset);
-    
   }, []);
 
-  // Draw players on canvas
-  const drawPlayers = useCallback((ctx: CanvasRenderingContext2D) => {
+  // Draw players on canvas (with optional movement trails)
+  const drawPlayers = useCallback((ctx: CanvasRenderingContext2D, playersToRender: PlayerMarker[], showTrails = false, prevPlayers?: PlayerMarker[]) => {
     const primaryColor = getCssColor('--primary');
     const destructiveColor = getCssColor('--destructive');
     const bgColor = getCssColor('--background');
     const fgColor = getCssColor('--primary-foreground');
+    const accentColor = getCssColor('--accent');
     
-    players.forEach((player) => {
+    // Draw movement trails if in animation mode
+    if (showTrails && prevPlayers && prevPlayers.length > 0) {
+      playersToRender.forEach((player) => {
+        const prevPlayer = prevPlayers.find(p => p.id === player.id);
+        if (prevPlayer && (prevPlayer.x !== player.x || prevPlayer.y !== player.y)) {
+          ctx.beginPath();
+          ctx.moveTo(prevPlayer.x, prevPlayer.y);
+          ctx.lineTo(player.x, player.y);
+          ctx.strokeStyle = player.type === 'home' ? primaryColor : destructiveColor;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 5]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          
+          // Arrow head
+          const angle = Math.atan2(player.y - prevPlayer.y, player.x - prevPlayer.x);
+          const arrowSize = 10;
+          ctx.beginPath();
+          ctx.moveTo(player.x - 20 * Math.cos(angle), player.y - 20 * Math.sin(angle));
+          ctx.lineTo(
+            player.x - 20 * Math.cos(angle) - arrowSize * Math.cos(angle - Math.PI / 6),
+            player.y - 20 * Math.sin(angle) - arrowSize * Math.sin(angle - Math.PI / 6)
+          );
+          ctx.moveTo(player.x - 20 * Math.cos(angle), player.y - 20 * Math.sin(angle));
+          ctx.lineTo(
+            player.x - 20 * Math.cos(angle) - arrowSize * Math.cos(angle + Math.PI / 6),
+            player.y - 20 * Math.sin(angle) - arrowSize * Math.sin(angle + Math.PI / 6)
+          );
+          ctx.stroke();
+        }
+      });
+    }
+    
+    playersToRender.forEach((player) => {
       ctx.beginPath();
       ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
-      
-      if (player.type === 'home') {
-        ctx.fillStyle = primaryColor;
-      } else {
-        ctx.fillStyle = destructiveColor;
-      }
+      ctx.fillStyle = player.type === 'home' ? primaryColor : destructiveColor;
       ctx.fill();
-      
       ctx.strokeStyle = bgColor;
       ctx.lineWidth = 2;
       ctx.stroke();
       
-      // Player number
       ctx.fillStyle = fgColor;
       ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(player.number?.toString() || '', player.x, player.y);
     });
-  }, [players]);
+  }, []);
 
   // Initialize and resize canvas
   useEffect(() => {
@@ -247,8 +278,96 @@ export function TacticsBoardCanvas() {
     if (!ctx) return;
     
     drawRink(ctx, canvasSize.width, canvasSize.height);
-    drawPlayers(ctx);
-  }, [canvasSize, players, drawRink, drawPlayers]);
+    
+    // Show trails in animation mode when not playing
+    if (mode === 'animate' && !isPlaying && keyframes.length > 1 && currentKeyframeIndex > 0) {
+      const prevKeyframe = keyframes[currentKeyframeIndex - 1];
+      drawPlayers(ctx, players, true, prevKeyframe.players);
+    } else {
+      drawPlayers(ctx, players);
+    }
+  }, [canvasSize, players, drawRink, drawPlayers, mode, isPlaying, keyframes, currentKeyframeIndex]);
+
+  // Animation playback loop
+  useEffect(() => {
+    if (!isPlaying || keyframes.length < 2) {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      return;
+    }
+
+    let lastTime = performance.now();
+    const duration = 3000 / animationSpeed; // 3 seconds base duration
+    
+    const animate = (currentTime: number) => {
+      const delta = currentTime - lastTime;
+      lastTime = currentTime;
+      
+      setPlaybackPosition(prev => {
+        const newPos = prev + (delta / duration) * 100;
+        if (newPos >= 100) {
+          setIsPlaying(false);
+          return 100;
+        }
+        return newPos;
+      });
+      
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    
+    animationRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPlaying, keyframes.length, animationSpeed]);
+
+  // Interpolate player positions during playback
+  useEffect(() => {
+    if (!isPlaying || keyframes.length < 2) return;
+    
+    // Find the two keyframes we're between
+    let prevKeyframe: AnimationKeyframe | null = null;
+    let nextKeyframe: AnimationKeyframe | null = null;
+    
+    for (let i = 0; i < keyframes.length - 1; i++) {
+      if (playbackPosition >= keyframes[i].timestamp && playbackPosition <= keyframes[i + 1].timestamp) {
+        prevKeyframe = keyframes[i];
+        nextKeyframe = keyframes[i + 1];
+        break;
+      }
+    }
+    
+    if (!prevKeyframe || !nextKeyframe) {
+      // At the end, show last keyframe
+      if (keyframes.length > 0) {
+        setPlayers(keyframes[keyframes.length - 1].players);
+      }
+      return;
+    }
+    
+    // Calculate interpolation factor
+    const range = nextKeyframe.timestamp - prevKeyframe.timestamp;
+    const t = range > 0 ? (playbackPosition - prevKeyframe.timestamp) / range : 0;
+    
+    // Interpolate each player position
+    const interpolatedPlayers = prevKeyframe.players.map(prevPlayer => {
+      const nextPlayer = nextKeyframe!.players.find(p => p.id === prevPlayer.id);
+      if (!nextPlayer) return prevPlayer;
+      
+      return {
+        ...prevPlayer,
+        x: lerp(prevPlayer.x, nextPlayer.x, t),
+        y: lerp(prevPlayer.y, nextPlayer.y, t),
+      };
+    });
+    
+    setPlayers(interpolatedPlayers);
+  }, [playbackPosition, isPlaying, keyframes]);
 
   const getCanvasCoords = (e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current;
@@ -280,32 +399,38 @@ export function TacticsBoardCanvas() {
   };
 
   const handleCanvasClick = (e: React.MouseEvent) => {
+    if (mode === 'animate' && isPlaying) return;
+    
     const { x, y } = getCanvasCoords(e);
     
-    if (selectedTool === 'addHome') {
-      setPlayers((prev) => [
-        ...prev,
-        { id: `home-${Date.now()}`, x, y, type: 'home', number: homePlayerCount },
-      ]);
-      setHomePlayerCount((c) => c + 1);
-    } else if (selectedTool === 'addOpponent') {
-      setPlayers((prev) => [
-        ...prev,
-        { id: `opponent-${Date.now()}`, x, y, type: 'opponent', number: opponentPlayerCount },
-      ]);
-      setOpponentPlayerCount((c) => c + 1);
+    if (mode === 'edit') {
+      if (selectedTool === 'addHome') {
+        setPlayers((prev) => [
+          ...prev,
+          { id: `home-${Date.now()}`, x, y, type: 'home', number: homePlayerCount },
+        ]);
+        setHomePlayerCount((c) => c + 1);
+      } else if (selectedTool === 'addOpponent') {
+        setPlayers((prev) => [
+          ...prev,
+          { id: `opponent-${Date.now()}`, x, y, type: 'opponent', number: opponentPlayerCount },
+        ]);
+        setOpponentPlayerCount((c) => c + 1);
+      }
     }
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (mode === 'animate' && isPlaying) return;
+    
     const { x, y } = getCanvasCoords(e);
     
-    if (selectedTool === 'select') {
+    if (selectedTool === 'select' || mode === 'animate') {
       const player = findPlayerAtPosition(x, y);
       if (player) {
         setDraggedPlayer(player.id);
       }
-    } else if (selectedTool === 'draw' || selectedTool === 'erase') {
+    } else if ((selectedTool === 'draw' || selectedTool === 'erase') && mode === 'edit') {
       setIsDrawing(true);
       const drawCtx = drawingCanvasRef.current?.getContext('2d');
       if (drawCtx) {
@@ -316,13 +441,15 @@ export function TacticsBoardCanvas() {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (mode === 'animate' && isPlaying) return;
+    
     const { x, y } = getCanvasCoords(e);
     
-    if (draggedPlayer && selectedTool === 'select') {
+    if (draggedPlayer) {
       setPlayers((prev) =>
         prev.map((p) => (p.id === draggedPlayer ? { ...p, x, y } : p))
       );
-    } else if (isDrawing) {
+    } else if (isDrawing && mode === 'edit') {
       const drawCtx = drawingCanvasRef.current?.getContext('2d');
       if (drawCtx) {
         if (selectedTool === 'draw') {
@@ -368,6 +495,114 @@ export function TacticsBoardCanvas() {
   const resetAll = () => {
     clearDrawing();
     clearPlayers();
+    setKeyframes([]);
+    setCurrentKeyframeIndex(0);
+    setPlaybackPosition(0);
+    setIsPlaying(false);
+  };
+
+  // Animation functions
+  const addKeyframe = () => {
+    const drawingCanvas = drawingCanvasRef.current;
+    const drawingData = drawingCanvas ? drawingCanvas.toDataURL() : '';
+    
+    // Calculate timestamp based on position
+    const timestamp = keyframes.length === 0 ? 0 : 
+      keyframes.length === 1 ? 100 :
+      Math.min(100, keyframes[keyframes.length - 1].timestamp + 25);
+    
+    const newKeyframe: AnimationKeyframe = {
+      id: `keyframe-${Date.now()}`,
+      timestamp,
+      players: [...players],
+      drawingData,
+    };
+    
+    const newKeyframes = [...keyframes, newKeyframe].sort((a, b) => a.timestamp - b.timestamp);
+    setKeyframes(newKeyframes);
+    setCurrentKeyframeIndex(newKeyframes.length - 1);
+    toast.success(`Keyframe ${newKeyframes.length} added`);
+  };
+
+  const updateCurrentKeyframe = () => {
+    if (keyframes.length === 0) return;
+    
+    const drawingCanvas = drawingCanvasRef.current;
+    const drawingData = drawingCanvas ? drawingCanvas.toDataURL() : '';
+    
+    const updatedKeyframes = keyframes.map((kf, index) => 
+      index === currentKeyframeIndex 
+        ? { ...kf, players: [...players], drawingData }
+        : kf
+    );
+    setKeyframes(updatedKeyframes);
+    toast.success('Keyframe updated');
+  };
+
+  const deleteCurrentKeyframe = () => {
+    if (keyframes.length === 0) return;
+    
+    const newKeyframes = keyframes.filter((_, i) => i !== currentKeyframeIndex);
+    setKeyframes(newKeyframes);
+    setCurrentKeyframeIndex(Math.max(0, currentKeyframeIndex - 1));
+    
+    if (newKeyframes.length > 0) {
+      setPlayers(newKeyframes[Math.max(0, currentKeyframeIndex - 1)].players);
+    }
+    toast.success('Keyframe deleted');
+  };
+
+  const goToKeyframe = (index: number) => {
+    if (index < 0 || index >= keyframes.length) return;
+    
+    setCurrentKeyframeIndex(index);
+    setPlayers(keyframes[index].players);
+    setPlaybackPosition(keyframes[index].timestamp);
+    
+    // Restore drawing
+    if (keyframes[index].drawingData) {
+      const drawCtx = drawingCanvasRef.current?.getContext('2d');
+      if (drawCtx) {
+        const img = new Image();
+        img.onload = () => {
+          drawCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
+          drawCtx.drawImage(img, 0, 0);
+        };
+        img.src = keyframes[index].drawingData;
+      }
+    }
+  };
+
+  const playAnimation = () => {
+    if (keyframes.length < 2) {
+      toast.error('Add at least 2 keyframes to play animation');
+      return;
+    }
+    setPlaybackPosition(0);
+    setPlayers(keyframes[0].players);
+    setIsPlaying(true);
+  };
+
+  const stopAnimation = () => {
+    setIsPlaying(false);
+    // Return to current keyframe
+    if (keyframes.length > 0) {
+      goToKeyframe(currentKeyframeIndex);
+    }
+  };
+
+  // Toggle between edit and animate modes
+  const toggleMode = () => {
+    if (mode === 'edit') {
+      // Entering animation mode - create first keyframe if none exist
+      if (keyframes.length === 0 && players.length > 0) {
+        addKeyframe();
+      }
+      setMode('animate');
+    } else {
+      setIsPlaying(false);
+      setMode('edit');
+    }
   };
 
   // Save current layout
@@ -388,6 +623,8 @@ export function TacticsBoardCanvas() {
       homePlayerCount,
       opponentPlayerCount,
       createdAt: new Date().toISOString(),
+      keyframes: keyframes.length > 0 ? keyframes : undefined,
+      isAnimation: keyframes.length > 1,
     };
 
     const updatedLayouts = [...savedLayouts, newLayout];
@@ -395,7 +632,7 @@ export function TacticsBoardCanvas() {
     setSavedLayouts(updatedLayouts);
     setLayoutName('');
     setSaveDialogOpen(false);
-    toast.success(`Layout "${newLayout.name}" saved`);
+    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Layout'} "${newLayout.name}" saved`);
   };
 
   // Load a saved layout
@@ -417,8 +654,19 @@ export function TacticsBoardCanvas() {
       }
     }
 
+    // Restore animation keyframes
+    if (layout.keyframes && layout.keyframes.length > 0) {
+      setKeyframes(layout.keyframes);
+      setCurrentKeyframeIndex(0);
+      setMode('animate');
+    } else {
+      setKeyframes([]);
+      setCurrentKeyframeIndex(0);
+      setMode('edit');
+    }
+
     setLoadDialogOpen(false);
-    toast.success(`Layout "${layout.name}" loaded`);
+    toast.success(`${layout.isAnimation ? 'Animation' : 'Layout'} "${layout.name}" loaded`);
   };
 
   // Delete a saved layout
@@ -432,73 +680,36 @@ export function TacticsBoardCanvas() {
 
   return (
     <div className="space-y-4">
-      {/* Toolbar */}
+      {/* Mode Toggle */}
       <Card className="p-3">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant={selectedTool === 'select' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedTool('select')}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            Select/Move
-          </Button>
-          <Button
-            variant={selectedTool === 'addHome' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedTool('addHome')}
-            className={cn(selectedTool !== 'addHome' && 'border-primary text-primary hover:bg-primary/10')}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            Add Home
-          </Button>
-          <Button
-            variant={selectedTool === 'addOpponent' ? 'destructive' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedTool('addOpponent')}
-            className={cn(selectedTool !== 'addOpponent' && 'border-destructive text-destructive hover:bg-destructive/10')}
-          >
-            <UserMinus className="h-4 w-4 mr-2" />
-            Add Opponent
-          </Button>
+        <div className="flex items-center gap-4">
+          <div className="flex gap-2">
+            <Button
+              variant={mode === 'edit' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setMode('edit')}
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit Mode
+            </Button>
+            <Button
+              variant={mode === 'animate' ? 'default' : 'outline'}
+              size="sm"
+              onClick={toggleMode}
+            >
+              <Film className="h-4 w-4 mr-2" />
+              Animation Mode
+              {keyframes.length > 0 && (
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  {keyframes.length}
+                </Badge>
+              )}
+            </Button>
+          </div>
           
-          <div className="w-px h-8 bg-border mx-1" />
+          <div className="flex-1" />
           
-          <Button
-            variant={selectedTool === 'draw' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedTool('draw')}
-          >
-            <Pencil className="h-4 w-4 mr-2" />
-            Draw
-          </Button>
-          <Button
-            variant={selectedTool === 'erase' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedTool('erase')}
-          >
-            <Eraser className="h-4 w-4 mr-2" />
-            Erase
-          </Button>
-          
-          <div className="w-px h-8 bg-border mx-1" />
-          
-          <Button variant="outline" size="sm" onClick={clearDrawing}>
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear Drawing
-          </Button>
-          <Button variant="outline" size="sm" onClick={clearPlayers}>
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear Players
-          </Button>
-          <Button variant="outline" size="sm" onClick={resetAll}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Reset All
-          </Button>
-          
-          <div className="w-px h-8 bg-border mx-1" />
-          
-          {/* Save Dialog */}
+          {/* Save/Load */}
           <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
@@ -508,23 +719,29 @@ export function TacticsBoardCanvas() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Save Layout</DialogTitle>
+                <DialogTitle>
+                  Save {keyframes.length > 1 ? 'Animation' : 'Layout'}
+                </DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <Input
-                  placeholder="Layout name (e.g., Power Play Setup 1)"
+                  placeholder="Name (e.g., Power Play Setup 1)"
                   value={layoutName}
                   onChange={(e) => setLayoutName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSaveLayout()}
                 />
+                {keyframes.length > 1 && (
+                  <p className="text-sm text-muted-foreground">
+                    This will save the animation with {keyframes.length} keyframes.
+                  </p>
+                )}
                 <Button onClick={handleSaveLayout} className="w-full">
-                  Save Layout
+                  Save {keyframes.length > 1 ? 'Animation' : 'Layout'}
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
           
-          {/* Load Dialog */}
           <Dialog open={loadDialogOpen} onOpenChange={setLoadDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
@@ -534,7 +751,7 @@ export function TacticsBoardCanvas() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Load Layout</DialogTitle>
+                <DialogTitle>Load Layout / Animation</DialogTitle>
               </DialogHeader>
               <div className="space-y-2 pt-4 max-h-80 overflow-y-auto">
                 {savedLayouts.length === 0 ? (
@@ -548,11 +765,19 @@ export function TacticsBoardCanvas() {
                       onClick={() => handleLoadLayout(layout)}
                       className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted cursor-pointer"
                     >
-                      <div>
-                        <p className="font-medium">{layout.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {layout.players.length} players • {new Date(layout.createdAt).toLocaleDateString()}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        {layout.isAnimation && (
+                          <Film className="h-4 w-4 text-primary" />
+                        )}
+                        <div>
+                          <p className="font-medium">{layout.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {layout.players.length} players
+                            {layout.isAnimation && ` • ${layout.keyframes?.length} keyframes`}
+                            {' • '}
+                            {new Date(layout.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
                       <Button
                         variant="ghost"
@@ -569,6 +794,213 @@ export function TacticsBoardCanvas() {
           </Dialog>
         </div>
       </Card>
+
+      {/* Edit Mode Toolbar */}
+      {mode === 'edit' && (
+        <Card className="p-3">
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={selectedTool === 'select' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedTool('select')}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Select/Move
+            </Button>
+            <Button
+              variant={selectedTool === 'addHome' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedTool('addHome')}
+              className={cn(selectedTool !== 'addHome' && 'border-primary text-primary hover:bg-primary/10')}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Add Home
+            </Button>
+            <Button
+              variant={selectedTool === 'addOpponent' ? 'destructive' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedTool('addOpponent')}
+              className={cn(selectedTool !== 'addOpponent' && 'border-destructive text-destructive hover:bg-destructive/10')}
+            >
+              <UserMinus className="h-4 w-4 mr-2" />
+              Add Opponent
+            </Button>
+            
+            <div className="w-px h-8 bg-border mx-1" />
+            
+            <Button
+              variant={selectedTool === 'draw' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedTool('draw')}
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              Draw
+            </Button>
+            <Button
+              variant={selectedTool === 'erase' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedTool('erase')}
+            >
+              <Eraser className="h-4 w-4 mr-2" />
+              Erase
+            </Button>
+            
+            <div className="w-px h-8 bg-border mx-1" />
+            
+            <Button variant="outline" size="sm" onClick={clearDrawing}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Drawing
+            </Button>
+            <Button variant="outline" size="sm" onClick={clearPlayers}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Players
+            </Button>
+            <Button variant="outline" size="sm" onClick={resetAll}>
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset All
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Animation Mode Toolbar */}
+      {mode === 'animate' && (
+        <Card className="p-3 space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Playback controls */}
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => goToKeyframe(currentKeyframeIndex - 1)}
+                disabled={currentKeyframeIndex === 0 || isPlaying}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              {isPlaying ? (
+                <Button variant="default" size="sm" onClick={stopAnimation}>
+                  <Pause className="h-4 w-4 mr-2" />
+                  Stop
+                </Button>
+              ) : (
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={playAnimation}
+                  disabled={keyframes.length < 2}
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  Play
+                </Button>
+              )}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => goToKeyframe(currentKeyframeIndex + 1)}
+                disabled={currentKeyframeIndex >= keyframes.length - 1 || isPlaying}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="w-px h-8 bg-border mx-1" />
+            
+            {/* Keyframe controls */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addKeyframe}
+              disabled={isPlaying}
+            >
+              <Circle className="h-4 w-4 mr-2" />
+              Add Keyframe
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={updateCurrentKeyframe}
+              disabled={keyframes.length === 0 || isPlaying}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Update Keyframe
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={deleteCurrentKeyframe}
+              disabled={keyframes.length === 0 || isPlaying}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Keyframe
+            </Button>
+            
+            <div className="flex-1" />
+            
+            {/* Speed control */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Speed:</span>
+              <Slider
+                value={[animationSpeed]}
+                onValueChange={([val]) => setAnimationSpeed(val)}
+                min={0.25}
+                max={2}
+                step={0.25}
+                className="w-24"
+              />
+              <span className="text-sm font-medium w-8">{animationSpeed}x</span>
+            </div>
+          </div>
+          
+          {/* Keyframe timeline */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">
+                Keyframe {keyframes.length > 0 ? currentKeyframeIndex + 1 : 0} of {keyframes.length}
+              </span>
+              <span className="text-muted-foreground">
+                {isPlaying ? `Playing: ${Math.round(playbackPosition)}%` : 'Stopped'}
+              </span>
+            </div>
+            
+            {/* Visual timeline */}
+            <div className="relative h-8 bg-muted rounded-lg overflow-hidden">
+              {/* Progress bar during playback */}
+              {isPlaying && (
+                <div 
+                  className="absolute top-0 left-0 h-full bg-primary/20"
+                  style={{ width: `${playbackPosition}%` }}
+                />
+              )}
+              
+              {/* Keyframe markers */}
+              {keyframes.map((kf, index) => (
+                <button
+                  key={kf.id}
+                  className={cn(
+                    'absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 transition-all',
+                    index === currentKeyframeIndex
+                      ? 'bg-primary border-primary scale-125'
+                      : 'bg-background border-muted-foreground hover:border-primary'
+                  )}
+                  style={{ left: `calc(${kf.timestamp}% - 8px)` }}
+                  onClick={() => !isPlaying && goToKeyframe(index)}
+                  disabled={isPlaying}
+                />
+              ))}
+              
+              {/* Playback position indicator */}
+              {isPlaying && (
+                <div
+                  className="absolute top-0 h-full w-0.5 bg-primary"
+                  style={{ left: `${playbackPosition}%` }}
+                />
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Canvas */}
       <Card className="overflow-hidden">
@@ -587,7 +1019,13 @@ export function TacticsBoardCanvas() {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            style={{ cursor: selectedTool === 'select' ? 'grab' : 'crosshair' }}
+            style={{ 
+              cursor: isPlaying 
+                ? 'default' 
+                : (selectedTool === 'select' || mode === 'animate') 
+                  ? 'grab' 
+                  : 'crosshair' 
+            }}
           />
           <canvas
             ref={drawingCanvasRef}
@@ -601,13 +1039,22 @@ export function TacticsBoardCanvas() {
       {/* Instructions */}
       <Card className="p-4 bg-muted/50">
         <h3 className="font-semibold mb-2">How to use</h3>
-        <ul className="text-sm text-muted-foreground space-y-1">
-          <li>• <strong>Add Home/Opponent:</strong> Click on the rink to place players</li>
-          <li>• <strong>Select/Move:</strong> Drag players to reposition them</li>
-          <li>• <strong>Draw:</strong> Draw arrows, lines, or annotations</li>
-          <li>• <strong>Erase:</strong> Remove parts of your drawing</li>
-          <li>• <strong>Save/Load:</strong> Save your layouts for later use</li>
-        </ul>
+        {mode === 'edit' ? (
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• <strong>Add Home/Opponent:</strong> Click on the rink to place players</li>
+            <li>• <strong>Select/Move:</strong> Drag players to reposition them</li>
+            <li>• <strong>Draw:</strong> Draw arrows, lines, or annotations</li>
+            <li>• <strong>Animation Mode:</strong> Switch to create movement animations</li>
+          </ul>
+        ) : (
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• <strong>Add Keyframe:</strong> Record current player positions as a keyframe</li>
+            <li>• <strong>Move Players:</strong> Drag players to new positions between keyframes</li>
+            <li>• <strong>Play:</strong> Watch players animate between keyframes</li>
+            <li>• <strong>Save:</strong> Save your animation for later use</li>
+            <li>• <strong>Tip:</strong> Add at least 2 keyframes to create an animation</li>
+          </ul>
+        )}
       </Card>
     </div>
   );
