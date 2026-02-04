@@ -85,7 +85,7 @@ export default function GameDetail() {
   }
 
   const squadPlayers = players.filter(p => game.squadPlayerIds.includes(p.id));
-  const squadGoalies = squadPlayers.filter(p => p.position === 'Goalkeeper');
+  const squadGoalies = squadPlayers.filter(p => p.positions?.includes('Goalkeeper'));
   const canStartGame = game.squadPlayerIds.length > 0;
 
   const statusColor = {
@@ -338,7 +338,7 @@ export default function GameDetail() {
             {/* Player Stats */}
             <CollapsibleSection title="Player Statistics" icon={<User className="h-5 w-5" />}>
               <PostGamePlayerStats
-                squadPlayers={squadPlayers.filter(p => p.position !== 'Goalkeeper')}
+                squadPlayers={squadPlayers.filter(p => !p.positions?.includes('Goalkeeper'))}
                 goalies={squadGoalies}
                 events={game.events}
                 penalties={game.penalties || []}

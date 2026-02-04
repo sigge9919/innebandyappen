@@ -18,8 +18,8 @@ interface SeasonPlayerStatsProps {
 
 export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
   const navigate = useNavigate();
-  const skaters = players.filter(p => p.position !== 'Goalkeeper');
-  const goalies = players.filter(p => p.position === 'Goalkeeper');
+  const skaters = players.filter(p => !p.positions?.includes('Goalkeeper'));
+  const goalies = players.filter(p => p.positions?.includes('Goalkeeper'));
   
   const skaterStats = aggregatePlayerStats(games, skaters);
   const goalieStats = aggregateGoalieStats(games, goalies);

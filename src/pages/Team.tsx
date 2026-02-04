@@ -21,9 +21,9 @@ export default function Team() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   const filteredPlayers = players.filter(player => {
+    const positionsText = player.positions?.join(' ').toLowerCase() || '';
     const matchesSearch = player.name.toLowerCase().includes(search.toLowerCase()) ||
-                         player.position.toLowerCase().includes(search.toLowerCase());
-    
+                         positionsText.includes(search.toLowerCase());
     switch (filter) {
       case 'active':
         return matchesSearch && player.status === 'Active';

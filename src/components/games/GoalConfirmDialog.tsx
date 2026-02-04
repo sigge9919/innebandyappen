@@ -49,8 +49,8 @@ export function GoalConfirmDialog({
   // Get players on the selected line for quick selection
   const selectedLine = lines.find(l => l.id === selectedLineId);
   const linePlayerIds = selectedLine?.playerIds || [];
-  const linePlayers = squadPlayers.filter(p => linePlayerIds.includes(p.id) && p.position !== 'Goalkeeper');
-  const otherPlayers = squadPlayers.filter(p => !linePlayerIds.includes(p.id) && p.position !== 'Goalkeeper');
+  const linePlayers = squadPlayers.filter(p => linePlayerIds.includes(p.id) && !p.positions?.includes('Goalkeeper'));
+  const otherPlayers = squadPlayers.filter(p => !linePlayerIds.includes(p.id) && !p.positions?.includes('Goalkeeper'));
 
   const handleConfirm = () => {
     onConfirm({

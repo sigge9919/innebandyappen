@@ -1,8 +1,10 @@
 // Player types
+export type PlayerPosition = 'Forward' | 'Center' | 'Defender' | 'Goalkeeper';
+
 export interface Player {
   id: string;
   name: string;
-  position: 'Forward' | 'Defender' | 'Goalkeeper';
+  positions: PlayerPosition[];
   stickSide: 'Left' | 'Right';
   jerseyNumber: number;
   status: 'Active' | 'Injured';

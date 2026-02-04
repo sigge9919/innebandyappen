@@ -127,7 +127,7 @@ export default function PlayerDetail() {
                   )}
                 </div>
                 <p className="text-muted-foreground">
-                  {player.position} • {player.stickSide} stick
+                  {player.positions?.join(' / ') || (player as any).position || 'Forward'} • {player.stickSide} stick
                 </p>
               </div>
             </div>

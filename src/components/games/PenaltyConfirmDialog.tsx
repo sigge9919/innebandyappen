@@ -27,7 +27,7 @@ export function PenaltyConfirmDialog({
   const [selectedPlayer, setSelectedPlayer] = useState<string | undefined>();
 
   // Filter out goalkeepers for penalty selection
-  const fieldPlayers = squadPlayers.filter(p => p.position !== 'Goalkeeper');
+  const fieldPlayers = squadPlayers.filter(p => !p.positions?.includes('Goalkeeper'));
 
   const handleConfirm = () => {
     onConfirm(selectedPlayer);

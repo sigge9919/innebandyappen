@@ -40,7 +40,7 @@ export function PlayerCard({ player, onClick }: PlayerCardProps) {
         </div>
         <div className="flex items-center gap-2 mt-1">
           <Badge variant="secondary" className="text-xs">
-            {player.position}
+            {player.positions?.join(' / ') || (player as any).position || 'Forward'}
           </Badge>
           <span className="text-xs text-muted-foreground">
             {player.stickSide} stick
