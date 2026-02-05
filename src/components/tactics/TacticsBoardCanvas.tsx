@@ -6,7 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { 
   Users, UserMinus, Pencil, Eraser, Trash2, RotateCcw, 
   Save, FolderOpen, X, Play, Pause, Circle, Square, 
-  ChevronLeft, ChevronRight, Film
+  ChevronLeft, ChevronRight, Film, CircleDot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -23,7 +23,7 @@ interface PlayerMarker {
   id: string;
   x: number;
   y: number;
-  type: 'home' | 'opponent';
+  type: 'home' | 'opponent' | 'ball';
   number?: number;
 }
 
@@ -47,7 +47,7 @@ interface TacticsLayout {
   isAnimation?: boolean;
 }
 
-type Tool = 'select' | 'addHome' | 'addOpponent' | 'draw' | 'erase';
+type Tool = 'select' | 'addHome' | 'addOpponent' | 'addBall' | 'draw' | 'erase';
 type Mode = 'edit' | 'animate';
 
 const STORAGE_KEY = 'tactics-layouts';
@@ -237,19 +237,31 @@ export function TacticsBoardCanvas() {
     }
     
     playersToRender.forEach((player) => {
-      ctx.beginPath();
-      ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
-      ctx.fillStyle = player.type === 'home' ? primaryColor : destructiveColor;
-      ctx.fill();
-      ctx.strokeStyle = bgColor;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      
-      ctx.fillStyle = fgColor;
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(player.number?.toString() || '', player.x, player.y);
+      if (player.type === 'ball') {
+        // Draw ball - orange circle
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#f97316'; // Orange color for ball
+        ctx.fill();
+        ctx.strokeStyle = '#ea580c';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else {
+        // Draw player
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
+        ctx.fillStyle = player.type === 'home' ? primaryColor : destructiveColor;
+        ctx.fill();
+        ctx.strokeStyle = bgColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        ctx.fillStyle = fgColor;
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(player.number?.toString() || '', player.x, player.y);
+      }
     });
   }, []);
 
@@ -394,7 +406,8 @@ export function TacticsBoardCanvas() {
     return players.find((p) => {
       const dx = p.x - x;
       const dy = p.y - y;
-      return Math.sqrt(dx * dx + dy * dy) < 20;
+      const hitRadius = p.type === 'ball' ? 12 : 20; // Smaller hit area for ball
+      return Math.sqrt(dx * dx + dy * dy) < hitRadius;
     });
   };
 
@@ -416,6 +429,17 @@ export function TacticsBoardCanvas() {
           { id: `opponent-${Date.now()}`, x, y, type: 'opponent', number: opponentPlayerCount },
         ]);
         setOpponentPlayerCount((c) => c + 1);
+      } else if (selectedTool === 'addBall') {
+        // Only allow one ball at a time
+        const hasBall = players.some(p => p.type === 'ball');
+        if (!hasBall) {
+          setPlayers((prev) => [
+            ...prev,
+            { id: `ball-${Date.now()}`, x, y, type: 'ball' },
+          ]);
+        } else {
+          toast.info('Ball already on the field - drag it to move');
+        }
       }
     }
   };
@@ -506,22 +530,24 @@ export function TacticsBoardCanvas() {
     const drawingCanvas = drawingCanvasRef.current;
     const drawingData = drawingCanvas ? drawingCanvas.toDataURL() : '';
     
-    // Calculate timestamp based on position
-    const timestamp = keyframes.length === 0 ? 0 : 
-      keyframes.length === 1 ? 100 :
-      Math.min(100, keyframes[keyframes.length - 1].timestamp + 25);
-    
     const newKeyframe: AnimationKeyframe = {
       id: `keyframe-${Date.now()}`,
-      timestamp,
+      timestamp: 0, // Will be recalculated
       players: [...players],
       drawingData,
     };
     
-    const newKeyframes = [...keyframes, newKeyframe].sort((a, b) => a.timestamp - b.timestamp);
-    setKeyframes(newKeyframes);
-    setCurrentKeyframeIndex(newKeyframes.length - 1);
-    toast.success(`Keyframe ${newKeyframes.length} added`);
+    const newKeyframes = [...keyframes, newKeyframe];
+    
+    // Redistribute timestamps evenly across all keyframes
+    const redistributedKeyframes = newKeyframes.map((kf, index) => ({
+      ...kf,
+      timestamp: newKeyframes.length === 1 ? 0 : (index / (newKeyframes.length - 1)) * 100,
+    }));
+    
+    setKeyframes(redistributedKeyframes);
+    setCurrentKeyframeIndex(redistributedKeyframes.length - 1);
+    toast.success(`Keyframe ${redistributedKeyframes.length} added`);
   };
 
   const updateCurrentKeyframe = () => {
@@ -824,6 +850,15 @@ export function TacticsBoardCanvas() {
             >
               <UserMinus className="h-4 w-4 mr-2" />
               Add Opponent
+            </Button>
+            <Button
+              variant={selectedTool === 'addBall' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedTool('addBall')}
+              className={cn(selectedTool !== 'addBall' && 'border-orange-500 text-orange-500 hover:bg-orange-500/10')}
+            >
+              <CircleDot className="h-4 w-4 mr-2" />
+              Add Ball
             </Button>
             
             <div className="w-px h-8 bg-border mx-1" />
