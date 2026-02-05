@@ -13,6 +13,7 @@ import Games from "./pages/Games";
 import GameDetail from "./pages/GameDetail";
 import Training from "./pages/Training";
 import Playbook from "./pages/Playbook";
+import PlayDetail from "./pages/PlayDetail";
 import Development from "./pages/Development";
 import TacticsBoard from "./pages/TacticsBoard";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/games/:gameId" element={<ProtectedRoute><GameDetail /></ProtectedRoute>} />
             <Route path="/training" element={<ProtectedRoute><Training /></ProtectedRoute>} />
             <Route path="/playbook" element={<ProtectedRoute><Playbook /></ProtectedRoute>} />
+            <Route path="/playbook/:playId" element={<ProtectedRoute><PlayDetail /></ProtectedRoute>} />
             <Route path="/development" element={<ProtectedRoute><Development /></ProtectedRoute>} />
             <Route path="/tactics" element={<ProtectedRoute><TacticsBoard /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

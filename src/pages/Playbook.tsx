@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PlayCard } from '@/components/playbook/PlayCard';
-import { PlayFormDialog } from '@/components/forms/PlayFormDialog';
 import { usePlays } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,11 +11,10 @@ import { Play } from '@/types';
 type CategoryFilter = 'all' | 'System' | 'Set Play' | 'Special Teams';
 
 export default function Playbook() {
-  const { plays, addPlay, updatePlay, deletePlay } = usePlays();
+  const navigate = useNavigate();
+  const { plays } = usePlays();
   const [filter, setFilter] = useState<CategoryFilter>('all');
   const [search, setSearch] = useState('');
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedPlay, setSelectedPlay] = useState<Play | null>(null);
 
   const filteredPlays = plays.filter(play => {
     const matchesSearch = play.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -28,21 +27,11 @@ export default function Playbook() {
   const categories: CategoryFilter[] = ['all', 'System', 'Set Play', 'Special Teams'];
 
   const handlePlayClick = (play: Play) => {
-    setSelectedPlay(play);
-    setDialogOpen(true);
+    navigate(`/playbook/${play.id}`);
   };
 
   const handleAddPlay = () => {
-    setSelectedPlay(null);
-    setDialogOpen(true);
-  };
-
-  const handleSavePlay = (play: Play) => {
-    if (selectedPlay) {
-      updatePlay(play.id, play);
-    } else {
-      addPlay(play);
-    }
+    navigate('/playbook/new');
   };
 
   return (
@@ -105,14 +94,6 @@ export default function Playbook() {
           </div>
         )}
       </div>
-
-      <PlayFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        play={selectedPlay}
-        onSave={handleSavePlay}
-        onDelete={deletePlay}
-      />
     </AppLayout>
   );
 }
