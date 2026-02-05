@@ -71,6 +71,15 @@ export interface Play {
   keyPoints: string[];
   videoUrl?: string;
   tags: string[];
+  linkedLayoutIds?: string[]; // IDs of saved tactics board layouts
+  mediaFiles?: PlayMedia[];
+}
+
+export interface PlayMedia {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  name: string;
 }
 
 // Development types
