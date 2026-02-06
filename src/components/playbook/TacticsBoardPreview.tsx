@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
+import { Play, Pause, Maximize2, Film } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { TacticsBoardFullscreen } from './TacticsBoardFullscreen';
+import { TacticsBoardRenderer } from './TacticsBoardRenderer';
 
 interface PlayerMarker {
   id: string;
@@ -35,6 +37,7 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [displayPositions, setDisplayPositions] = useState<{ [playerId: string]: { x: number; y: number } }>({});
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const animationRef = useRef<number>();
   const lastTimeRef = useRef<number>(0);
   
@@ -48,7 +51,6 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
         const found = parsed.find((l: TacticsLayout) => l.id === layoutId);
         if (found) {
           setLayout(found);
-          // Initialize display positions
           const initial: { [id: string]: { x: number; y: number } } = {};
           found.players.forEach((p: PlayerMarker) => {
             initial[p.id] = { x: p.x, y: p.y };
@@ -130,128 +132,79 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
     );
   }
 
-  // Canvas dimensions (smaller preview version)
-  const width = 400;
-  const height = 240;
-  const scaleX = width / 800;
-  const scaleY = height / 480;
-
   return (
-    <div className={cn("rounded-lg overflow-hidden border bg-card", className)}>
-      {/* Mini Tactics Board */}
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full bg-background">
-        {/* Field background */}
-        <rect x="0" y="0" width={width} height={height} fill="hsl(var(--muted))" />
-        
-        {/* Field outline */}
-        <rect 
-          x={10 * scaleX} y={10 * scaleY} 
-          width={(width - 20 * scaleX)} height={(height - 20 * scaleY)} 
-          fill="none" stroke="hsl(var(--border))" strokeWidth="2"
-          rx="4"
-        />
-        
-        {/* Center line */}
-        <line 
-          x1={width / 2} y1={10 * scaleY} 
-          x2={width / 2} y2={height - 10 * scaleY} 
-          stroke="hsl(var(--border))" strokeWidth="1"
-        />
-        
-        {/* Center circle */}
-        <circle cx={width / 2} cy={height / 2} r={30 * scaleX} fill="none" stroke="hsl(var(--border))" strokeWidth="1" />
-        
-        {/* Goal areas */}
-        <rect 
-          x={10 * scaleX} y={(height / 2) - 40 * scaleY} 
-          width={50 * scaleX} height={80 * scaleY} 
-          fill="hsl(var(--primary) / 0.1)" stroke="hsl(var(--primary))" strokeWidth="1"
-          rx="2"
-        />
-        <rect 
-          x={width - 60 * scaleX} y={(height / 2) - 40 * scaleY} 
-          width={50 * scaleX} height={80 * scaleY} 
-          fill="hsl(var(--primary) / 0.1)" stroke="hsl(var(--primary))" strokeWidth="1"
-          rx="2"
-        />
-
-        {/* Players */}
-        {layout.players.map(player => {
-          const pos = displayPositions[player.id] || { x: player.x, y: player.y };
-          const scaledX = pos.x * scaleX;
-          const scaledY = pos.y * scaleY;
-          const radius = player.team === 'ball' ? 6 : 12;
+    <>
+      <div 
+        className={cn(
+          "rounded-lg overflow-hidden border bg-card cursor-pointer group hover:border-primary/50 transition-colors",
+          className
+        )}
+        onClick={() => setFullscreenOpen(true)}
+      >
+        {/* Mini Tactics Board */}
+        <div className="relative">
+          <TacticsBoardRenderer
+            players={layout.players}
+            displayPositions={displayPositions}
+            width={400}
+            height={240}
+          />
           
-          return (
-            <g key={player.id}>
-              <circle
-                cx={scaledX}
-                cy={scaledY}
-                r={radius}
-                fill={
-                  player.team === 'home' ? 'hsl(var(--primary))' :
-                  player.team === 'away' ? 'hsl(var(--destructive))' :
-                  'hsl(30, 100%, 50%)'
-                }
-              />
-              {player.number && player.team !== 'ball' && (
-                <text
-                  x={scaledX}
-                  y={scaledY}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fill="white"
-                  fontSize="8"
-                  fontWeight="bold"
-                >
-                  {player.number}
-                </text>
-              )}
-            </g>
-          );
-        })}
-      </svg>
-
-      {/* Playback controls for animations */}
-      {hasAnimation && (
-        <div className="flex items-center justify-center gap-2 p-2 border-t bg-muted/50">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => setCurrentTime(0)}
-          >
-            <SkipBack className="h-3 w-3" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => setIsPlaying(!isPlaying)}
-          >
-            {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => setCurrentTime(1)}
-          >
-            <SkipForward className="h-3 w-3" />
-          </Button>
-          <div className="flex-1 mx-2 h-1 bg-muted rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-primary transition-all"
-              style={{ width: `${currentTime * 100}%` }}
-            />
+          {/* Overlay with expand icon */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/90 rounded-full p-3 shadow-lg">
+              <Maximize2 className="h-5 w-5" />
+            </div>
           </div>
+          
+          {/* Animation indicator */}
+          {hasAnimation && (
+            <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1.5">
+              <Film className="h-3 w-3" />
+            </div>
+          )}
         </div>
-      )}
-      
-      {/* Layout name */}
-      <div className="px-3 py-2 border-t text-sm font-medium truncate">
-        {layout.name}
+
+        {/* Playback controls for animations */}
+        {hasAnimation && (
+          <div 
+            className="flex items-center justify-center gap-2 p-2 border-t bg-muted/50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsPlaying(!isPlaying);
+              }}
+            >
+              {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+            </Button>
+            <div className="flex-1 mx-2 h-1 bg-muted rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary transition-all"
+                style={{ width: `${currentTime * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+        
+        {/* Layout name */}
+        <div className="px-3 py-2 border-t text-sm font-medium truncate flex items-center gap-2">
+          {layout.name}
+          <span className="ml-auto text-xs text-muted-foreground group-hover:text-primary transition-colors">
+            Click to expand
+          </span>
+        </div>
       </div>
-    </div>
+
+      <TacticsBoardFullscreen
+        open={fullscreenOpen}
+        onOpenChange={setFullscreenOpen}
+        layoutId={layoutId}
+      />
+    </>
   );
 }
