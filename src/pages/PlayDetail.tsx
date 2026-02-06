@@ -4,11 +4,11 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { usePlays } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { 
   ArrowLeft, 
   Save, 
@@ -18,12 +18,15 @@ import {
   Upload, 
   Film,
   Image as ImageIcon,
-  Video,
-  CheckCircle
+  CheckCircle,
+  Edit2,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { Play, PlayMedia } from '@/types';
 import { TacticsLayoutSelector } from '@/components/playbook/TacticsLayoutSelector';
 import { PlayMediaGallery } from '@/components/playbook/PlayMediaGallery';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export default function PlayDetail() {
   const { playId } = useParams<{ playId: string }>();
@@ -43,6 +46,7 @@ export default function PlayDetail() {
   });
   
   const [hasChanges, setHasChanges] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(isNew);
 
   useEffect(() => {
     if (existingPlay) {
@@ -143,6 +147,9 @@ export default function PlayDetail() {
     });
   };
 
+  const parsedTags = formData.tags.split(',').map(t => t.trim()).filter(t => t);
+  const parsedKeyPoints = formData.keyPoints.filter(kp => kp.trim() !== '');
+
   if (!isNew && !existingPlay) {
     return (
       <AppLayout>
@@ -157,137 +164,136 @@ export default function PlayDetail() {
   }
 
   return (
-    <AppLayout>
-      <div className="page-container">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/playbook')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex-1">
+    <Dialog open={true} onOpenChange={() => navigate('/playbook')}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+        {/* Compact Header */}
+        <div className="sticky top-0 z-10 bg-background border-b p-4">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/playbook')}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <Input
               value={formData.name}
               onChange={(e) => updateFormData({ name: e.target.value })}
               placeholder="Play name"
-              className="text-2xl font-bold border-none bg-transparent p-0 h-auto focus-visible:ring-0"
+              className="text-xl font-bold border-none bg-transparent p-0 h-auto focus-visible:ring-0 flex-1"
             />
-          </div>
-          <div className="flex gap-2">
-            {!isNew && (
-              <Button variant="destructive" size="sm" onClick={handleDelete}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+            <div className="flex gap-2">
+              {!isNew && (
+                <Button variant="ghost" size="icon" onClick={handleDelete} className="text-destructive hover:text-destructive">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+              <Button size="sm" onClick={handleSave} disabled={!formData.name.trim()}>
+                <Save className="h-4 w-4 mr-1" />
+                {hasChanges ? 'Save' : 'Saved'}
+                {!hasChanges && <CheckCircle className="h-3 w-3 ml-1" />}
               </Button>
-            )}
-            <Button onClick={handleSave} disabled={!formData.name.trim()}>
-              <Save className="h-4 w-4 mr-2" />
-              {hasChanges ? 'Save Changes' : 'Saved'}
-              {!hasChanges && <CheckCircle className="h-4 w-4 ml-2" />}
-            </Button>
+            </div>
           </div>
-        </div>
-
-        {/* Category & Tags Section */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex flex-wrap gap-4 items-start">
-              <div className="space-y-2">
-                <Label>Category</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value) => updateFormData({ category: value as Play['category'] })}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="System">System</SelectItem>
-                    <SelectItem value="Set Play">Set Play</SelectItem>
-                    <SelectItem value="Special Teams">Special Teams</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex-1 min-w-[200px] space-y-2">
-                <Label>Tags (comma-separated)</Label>
+          
+          {/* Compact Meta Section */}
+          <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
+              <Select
+                value={formData.category}
+                onValueChange={(value) => updateFormData({ category: value as Play['category'] })}
+              >
+                <SelectTrigger className="w-auto h-7 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="System">System</SelectItem>
+                  <SelectItem value="Set Play">Set Play</SelectItem>
+                  <SelectItem value="Special Teams">Special Teams</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              {parsedTags.map(tag => (
+                <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
+              ))}
+              
+              {parsedKeyPoints.length > 0 && !detailsOpen && (
+                <span className="text-xs text-muted-foreground">
+                  • {parsedKeyPoints.length} key point{parsedKeyPoints.length > 1 ? 's' : ''}
+                </span>
+              )}
+              
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs ml-auto">
+                  <Edit2 className="h-3 w-3 mr-1" />
+                  {detailsOpen ? 'Collapse' : 'Edit Details'}
+                  {detailsOpen ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+            
+            <CollapsibleContent className="mt-3 space-y-3">
+              {/* Tags Input */}
+              <div>
                 <Input
                   value={formData.tags}
                   onChange={(e) => updateFormData({ tags: e.target.value })}
-                  placeholder="PP, 5v4, Defense, Breakout"
+                  placeholder="Tags (comma-separated): PP, 5v4, Defense"
+                  className="text-sm h-8"
                 />
               </div>
-            </div>
-            
-            {formData.tags && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                {formData.tags.split(',').map(t => t.trim()).filter(t => t).map(tag => (
-                  <Badge key={tag} variant="secondary">{tag}</Badge>
+              
+              {/* Key Points */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground font-medium">Key Points</span>
+                  <Button type="button" variant="ghost" size="sm" className="h-6 px-2" onClick={addKeyPoint}>
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add
+                  </Button>
+                </div>
+                {formData.keyPoints.map((point, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <span className="text-primary font-bold text-sm">•</span>
+                    <Input
+                      value={point}
+                      onChange={(e) => updateKeyPoint(index, e.target.value)}
+                      placeholder={`Key point ${index + 1}`}
+                      className="flex-1 h-8 text-sm"
+                    />
+                    {formData.keyPoints.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => removeKeyPoint(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
 
-        {/* Key Points Section */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Key Points</CardTitle>
-              <Button variant="ghost" size="sm" onClick={addKeyPoint}>
-                <Plus className="h-4 w-4 mr-1" />
-                Add Point
-              </Button>
+        {/* Main Content - Tactics & Media */}
+        <div className="p-4 space-y-6">
+          {/* Tactics Board Layouts */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Film className="h-4 w-4 text-primary" />
+              <h3 className="font-semibold text-sm">Tactics Board Layouts</h3>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {formData.keyPoints.map((point, index) => (
-                <div key={index} className="flex gap-2 items-start">
-                  <span className="text-primary font-bold mt-2.5">•</span>
-                  <Textarea
-                    value={point}
-                    onChange={(e) => updateKeyPoint(index, e.target.value)}
-                    placeholder={`Key point ${index + 1}`}
-                    className="min-h-[60px] flex-1"
-                  />
-                  {formData.keyPoints.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeKeyPoint(index)}
-                      className="mt-1"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tactics Board Layouts Section */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Film className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Tactics Board Layouts</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
             <TacticsLayoutSelector
               selectedIds={formData.linkedLayoutIds}
               onSelect={handleLayoutSelect}
             />
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Media Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
+          {/* Media Section */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <ImageIcon className="h-5 w-5 text-primary" />
-                <CardTitle className="text-lg">Photos & Videos</CardTitle>
+                <ImageIcon className="h-4 w-4 text-primary" />
+                <h3 className="font-semibold text-sm">Photos & Videos</h3>
               </div>
               <div>
                 <input
@@ -299,24 +305,22 @@ export default function PlayDetail() {
                   onChange={handleMediaUpload}
                 />
                 <label htmlFor="media-upload">
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" className="h-7 text-xs" asChild>
                     <span>
-                      <Upload className="h-4 w-4 mr-2" />
+                      <Upload className="h-3 w-3 mr-1" />
                       Upload
                     </span>
                   </Button>
                 </label>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
             <PlayMediaGallery
               media={formData.mediaFiles}
               onRemove={removeMedia}
             />
-          </CardContent>
-        </Card>
-      </div>
-    </AppLayout>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
