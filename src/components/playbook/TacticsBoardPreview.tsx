@@ -110,8 +110,8 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
 
     const interpolated: { [id: string]: { x: number; y: number } } = {};
     layout.players.forEach(player => {
-      const prevPos = prevKf.positions[player.id] || { x: player.x, y: player.y };
-      const nextPos = nextKf.positions[player.id] || { x: player.x, y: player.y };
+      const prevPos = prevKf.positions?.[player.id] || { x: player.x, y: player.y };
+      const nextPos = nextKf.positions?.[player.id] || { x: player.x, y: player.y };
       
       interpolated[player.id] = {
         x: prevPos.x + (nextPos.x - prevPos.x) * progress,
