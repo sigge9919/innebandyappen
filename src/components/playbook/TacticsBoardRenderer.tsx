@@ -4,7 +4,7 @@ interface PlayerMarker {
   id: string;
   x: number;
   y: number;
-  team: 'home' | 'away' | 'ball';
+  team: 'home' | 'away' | 'ball' | 'opponent';
   number?: string;
 }
 
@@ -159,7 +159,7 @@ export function TacticsBoardRenderer({
               r={radius}
               fill={
                 player.team === 'home' ? 'hsl(var(--primary))' :
-                player.team === 'away' ? 'hsl(var(--destructive))' :
+                (player.team === 'away' || player.team === 'opponent') ? 'hsl(var(--destructive))' :
                 '#f97316'
               }
               stroke={player.team === 'ball' ? '#ea580c' : 'hsl(var(--background))'}
