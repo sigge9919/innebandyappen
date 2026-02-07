@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipBack, SkipForward, X, Film } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, X, Film, ExternalLink } from 'lucide-react';
 import { TacticsBoardRenderer } from './TacticsBoardRenderer';
 
 interface PlayerMarker {
@@ -34,6 +35,7 @@ interface TacticsBoardFullscreenProps {
 }
 
 export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: TacticsBoardFullscreenProps) {
+  const navigate = useNavigate();
   const [layout, setLayout] = useState<TacticsLayout | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -159,6 +161,11 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
 
   if (!layout) return null;
 
+  const handleOpenInEditor = () => {
+    onOpenChange(false);
+    navigate('/tactics');
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl w-[95vw] max-h-[95vh] p-0 overflow-hidden">
@@ -173,9 +180,15 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
               </span>
             )}
           </div>
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
-            <X className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleOpenInEditor}>
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open in Editor
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Board */}
@@ -185,7 +198,7 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
               players={layout.players}
               displayPositions={displayPositions}
               width={800}
-              height={480}
+              height={500}
             />
           </div>
         </div>

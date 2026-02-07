@@ -130,14 +130,14 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0">
-        <DialogHeader className="px-6 pt-6 pb-4">
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
           <DialogTitle>{play ? 'Edit Play' : 'Add Play'}</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <ScrollArea className="flex-1 px-6">
-            <div className="space-y-6 pb-6">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <ScrollArea className="flex-1">
+            <div className="space-y-6 px-6 pb-6">
               {/* Basic Info */}
               <div className="grid gap-4">
                 <div className="grid gap-2">
@@ -286,7 +286,8 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
             </div>
           </ScrollArea>
 
-          <DialogFooter className="px-6 py-4 border-t">
+
+          <DialogFooter className="px-6 py-4 border-t shrink-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
