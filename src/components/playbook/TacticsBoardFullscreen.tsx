@@ -54,11 +54,46 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        const found = parsed.find((l: TacticsLayout) => l.id === layoutId);
+        const found = parsed.find((l: any) => l.id === layoutId);
         if (found) {
-          setLayout(found);
+          // Convert player format: TacticsBoardCanvas uses 'type', renderer uses 'team'
+          const convertedPlayers = found.players.map((p: any) => ({
+            id: p.id,
+            x: p.x,
+            y: p.y,
+            team: p.type || p.team, // Support both formats
+            number: p.number?.toString(),
+          }));
+          
+          // Convert keyframes to use positions format
+          const convertedKeyframes = (found.keyframes || []).map((kf: any) => {
+            const positions: { [playerId: string]: { x: number; y: number } } = {};
+            if (kf.players) {
+              // Convert from players array to positions object
+              kf.players.forEach((p: any) => {
+                positions[p.id] = { x: p.x, y: p.y };
+              });
+            } else if (kf.positions) {
+              // Already in correct format
+              Object.assign(positions, kf.positions);
+            }
+            return {
+              id: kf.id,
+              timestamp: kf.timestamp / 100, // Convert from 0-100 to 0-1
+              positions,
+            };
+          });
+          
+          setLayout({
+            id: found.id,
+            name: found.name,
+            players: convertedPlayers,
+            drawings: [],
+            keyframes: convertedKeyframes,
+          });
+          
           const initial: { [id: string]: { x: number; y: number } } = {};
-          found.players.forEach((p: PlayerMarker) => {
+          convertedPlayers.forEach((p: PlayerMarker) => {
             initial[p.id] = { x: p.x, y: p.y };
           });
           setDisplayPositions(initial);
