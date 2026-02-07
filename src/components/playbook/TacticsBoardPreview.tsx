@@ -141,13 +141,13 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
         )}
         onClick={() => setFullscreenOpen(true)}
       >
-        {/* Mini Tactics Board */}
-        <div className="relative">
+        {/* Mini Tactics Board - using 800x500 aspect ratio (1.6) */}
+        <div className="relative aspect-[8/5]">
           <TacticsBoardRenderer
             players={layout.players}
             displayPositions={displayPositions}
-            width={400}
-            height={240}
+            width={800}
+            height={500}
           />
           
           {/* Overlay with expand icon */}
