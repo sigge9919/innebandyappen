@@ -135,9 +135,9 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
           <DialogTitle>{play ? 'Edit Play' : 'Add Play'}</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-          <ScrollArea className="flex-1">
-            <div className="space-y-6 px-6 pb-6">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          <ScrollArea className="flex-1 h-0">
+            <div className="space-y-6 px-6 pb-6 pr-4">
               {/* Basic Info */}
               <div className="grid gap-4">
                 <div className="grid gap-2">
