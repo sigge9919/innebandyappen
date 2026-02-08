@@ -8,8 +8,6 @@ import { Plus, X, Film, Image as ImageIcon, Upload } from 'lucide-react';
 import { Play, PlayMedia } from '@/types';
 import { TacticsLayoutSelector } from './TacticsLayoutSelector';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-
 interface EditPlayDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -136,7 +134,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
-          <ScrollArea className="flex-1 h-0">
+          <div className="flex-1 overflow-y-auto">
             <div className="space-y-6 px-6 pb-6 pr-4">
               {/* Basic Info */}
               <div className="grid gap-4">
@@ -284,7 +282,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
                 </TabsContent>
               </Tabs>
             </div>
-          </ScrollArea>
+          </div>
 
 
           <DialogFooter className="px-6 py-4 border-t shrink-0">

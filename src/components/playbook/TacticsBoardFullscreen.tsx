@@ -203,8 +203,8 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl w-[95vw] max-h-[95vh] p-0 overflow-hidden" aria-describedby={undefined}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-5xl w-[95vw] max-h-[95vh] p-0 overflow-hidden flex flex-col min-h-0" aria-describedby={undefined}>
         <VisuallyHidden>
           <DialogTitle>{layout.name}</DialogTitle>
         </VisuallyHidden>
@@ -230,80 +230,82 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
           </div>
         </div>
 
-        {/* Board */}
-        <div className="p-4 bg-background">
-          <div className="rounded-lg overflow-hidden border shadow-lg">
-            <TacticsBoardRenderer
-              players={layout.players}
-              displayPositions={displayPositions}
-              width={800}
-              height={500}
-            />
-          </div>
-        </div>
-
-        {/* Controls */}
-        {hasAnimation && (
-          <div className="px-4 py-4 border-t bg-muted/30 space-y-4">
-            {/* Timeline */}
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground w-12">
-                {Math.round(currentTime * 100)}%
-              </span>
-              <Slider
-                value={[currentTime]}
-                min={0}
-                max={1}
-                step={0.01}
-                onValueChange={handleSeek}
-                className="flex-1"
+        <div className="flex-1 overflow-y-auto">
+          {/* Board */}
+          <div className="p-4 bg-background">
+            <div className="rounded-lg overflow-hidden border shadow-lg">
+              <TacticsBoardRenderer
+                players={layout.players}
+                displayPositions={displayPositions}
+                width={800}
+                height={500}
               />
-              <span className="text-sm text-muted-foreground w-12 text-right">
-                {playbackSpeed}x
-              </span>
             </div>
+          </div>
 
-            {/* Playback controls */}
-            <div className="flex items-center justify-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToKeyframe('prev')}
-              >
-                <SkipBack className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="default"
-                size="lg"
-                className="w-14 h-14 rounded-full"
-                onClick={() => setIsPlaying(!isPlaying)}
-              >
-                {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-1" />}
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToKeyframe('next')}
-              >
-                <SkipForward className="h-4 w-4" />
-              </Button>
-              
-              <div className="ml-6 flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Speed:</span>
-                {[0.5, 1, 1.5, 2].map(speed => (
-                  <Button
-                    key={speed}
-                    variant={playbackSpeed === speed ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setPlaybackSpeed(speed)}
-                  >
-                    {speed}x
-                  </Button>
-                ))}
+          {/* Controls */}
+          {hasAnimation && (
+            <div className="px-4 py-4 border-t bg-muted/30 space-y-4">
+              {/* Timeline */}
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground w-12">
+                  {Math.round(currentTime * 100)}%
+                </span>
+                <Slider
+                  value={[currentTime]}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  onValueChange={handleSeek}
+                  className="flex-1"
+                />
+                <span className="text-sm text-muted-foreground w-12 text-right">
+                  {playbackSpeed}x
+                </span>
+              </div>
+
+              {/* Playback controls */}
+              <div className="flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToKeyframe('prev')}
+                >
+                  <SkipBack className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="w-14 h-14 rounded-full"
+                  onClick={() => setIsPlaying(!isPlaying)}
+                >
+                  {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-1" />}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToKeyframe('next')}
+                >
+                  <SkipForward className="h-4 w-4" />
+                </Button>
+
+                <div className="ml-6 flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Speed:</span>
+                  {[0.5, 1, 1.5, 2].map(speed => (
+                    <Button
+                      key={speed}
+                      variant={playbackSpeed === speed ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPlaybackSpeed(speed)}
+                    >
+                      {speed}x
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
