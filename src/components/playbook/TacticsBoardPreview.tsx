@@ -17,6 +17,15 @@ interface Keyframe {
   id: string;
   timestamp: number;
   positions: { [playerId: string]: { x: number; y: number } };
+  curveControlPoints?: { [playerId: string]: { x: number; y: number } };
+}
+
+interface ShadowZone {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
 interface TacticsLayout {
@@ -25,6 +34,7 @@ interface TacticsLayout {
   players: PlayerMarker[];
   drawings: any[];
   keyframes: Keyframe[];
+  zones: ShadowZone[];
 }
 
 interface TacticsBoardPreviewProps {
@@ -75,6 +85,7 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
               id: kf.id,
               timestamp: kf.timestamp / 100, // Convert from 0-100 to 0-1
               positions,
+              curveControlPoints: kf.curveControlPoints,
             };
           });
           
@@ -84,6 +95,7 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
             players: convertedPlayers,
             drawings: [],
             keyframes: convertedKeyframes,
+            zones: found.zones || [],
           });
           
           const initial: { [id: string]: { x: number; y: number } } = {};
@@ -150,9 +162,15 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
       const prevPos = prevKf.positions?.[player.id] || { x: player.x, y: player.y };
       const nextPos = nextKf.positions?.[player.id] || { x: player.x, y: player.y };
       
+      // Use bezier curve if control point exists
+      const cp = prevKf.curveControlPoints?.[player.id];
+      const cpX = cp ? cp.x : (prevPos.x + nextPos.x) / 2;
+      const cpY = cp ? cp.y : (prevPos.y + nextPos.y) / 2;
+      
+      const mt = 1 - progress;
       interpolated[player.id] = {
-        x: prevPos.x + (nextPos.x - prevPos.x) * progress,
-        y: prevPos.y + (nextPos.y - prevPos.y) * progress,
+        x: mt * mt * prevPos.x + 2 * mt * progress * cpX + progress * progress * nextPos.x,
+        y: mt * mt * prevPos.y + 2 * mt * progress * cpY + progress * progress * nextPos.y,
       };
     });
 
@@ -183,6 +201,7 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
             displayPositions={displayPositions}
             width={800}
             height={500}
+            zones={layout.zones}
           />
           
           {/* Overlay with expand icon */}

@@ -27,11 +27,20 @@ interface PlayerMarker {
   number?: number;
 }
 
+interface ShadowZone {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface AnimationKeyframe {
   id: string;
   timestamp: number; // 0-100 representing % of animation
   players: PlayerMarker[];
   drawingData?: string;
+  curveControlPoints?: { [playerId: string]: { x: number; y: number } };
 }
 
 interface TacticsLayout {
@@ -45,9 +54,11 @@ interface TacticsLayout {
   // Animation data
   keyframes?: AnimationKeyframe[];
   isAnimation?: boolean;
+  // Shadow zones
+  zones?: ShadowZone[];
 }
 
-type Tool = 'select' | 'addHome' | 'addOpponent' | 'addBall' | 'draw' | 'erase';
+type Tool = 'select' | 'addHome' | 'addOpponent' | 'addBall' | 'draw' | 'erase' | 'addZone';
 type Mode = 'edit' | 'animate';
 
 const STORAGE_KEY = 'tactics-layouts';
@@ -75,6 +86,12 @@ const saveLayoutToStorage = (layouts: TacticsLayout[]) => {
 // Linear interpolation helper
 const lerp = (start: number, end: number, t: number) => start + (end - start) * t;
 
+// Quadratic bezier interpolation
+const quadBezier = (p0: number, p1: number, p2: number, t: number) => {
+  const mt = 1 - t;
+  return mt * mt * p0 + 2 * mt * t * p1 + t * t * p2;
+};
+
 export function TacticsBoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -96,6 +113,14 @@ export function TacticsBoardCanvas() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackPosition, setPlaybackPosition] = useState(0);
   const [animationSpeed, setAnimationSpeed] = useState(1);
+  
+  // Shadow zone state
+  const [zones, setZones] = useState<ShadowZone[]>([]);
+  const [zoneStart, setZoneStart] = useState<{x: number, y: number} | null>(null);
+  const [zonePreview, setZonePreview] = useState<{x: number, y: number, width: number, height: number} | null>(null);
+  
+  // Curve control point drag state
+  const [draggedControlPoint, setDraggedControlPoint] = useState<string | null>(null);
   
   // Save/Load state
   const [savedLayouts, setSavedLayouts] = useState<TacticsLayout[]>([]);
@@ -196,58 +221,83 @@ export function TacticsBoardCanvas() {
   }, []);
 
   // Draw players on canvas (with optional movement trails)
-  const drawPlayers = useCallback((ctx: CanvasRenderingContext2D, playersToRender: PlayerMarker[], showTrails = false, prevPlayers?: PlayerMarker[]) => {
+  const drawPlayers = useCallback((
+    ctx: CanvasRenderingContext2D, 
+    playersToRender: PlayerMarker[], 
+    showTrails = false, 
+    prevPlayers?: PlayerMarker[],
+    curvePoints?: { [playerId: string]: { x: number; y: number } }
+  ) => {
     const primaryColor = getCssColor('--primary');
     const destructiveColor = getCssColor('--destructive');
     const bgColor = getCssColor('--background');
     const fgColor = getCssColor('--primary-foreground');
-    const accentColor = getCssColor('--accent');
     
     // Draw movement trails if in animation mode
     if (showTrails && prevPlayers && prevPlayers.length > 0) {
       playersToRender.forEach((player) => {
         const prevPlayer = prevPlayers.find(p => p.id === player.id);
         if (prevPlayer && (prevPlayer.x !== player.x || prevPlayer.y !== player.y)) {
+          const cp = curvePoints?.[player.id];
+          const cpX = cp ? cp.x : (prevPlayer.x + player.x) / 2;
+          const cpY = cp ? cp.y : (prevPlayer.y + player.y) / 2;
+          const isCurved = cp !== undefined;
+          
+          // Draw curved trail
           ctx.beginPath();
           ctx.moveTo(prevPlayer.x, prevPlayer.y);
-          ctx.lineTo(player.x, player.y);
-          ctx.strokeStyle = player.type === 'home' ? primaryColor : destructiveColor;
+          ctx.quadraticCurveTo(cpX, cpY, player.x, player.y);
+          ctx.strokeStyle = player.type === 'home' ? primaryColor : 
+                           player.type === 'ball' ? '#f97316' : destructiveColor;
           ctx.lineWidth = 2;
           ctx.setLineDash([5, 5]);
           ctx.stroke();
           ctx.setLineDash([]);
           
-          // Arrow head
-          const angle = Math.atan2(player.y - prevPlayer.y, player.x - prevPlayer.x);
+          // Arrow head using tangent at curve end (direction from control point to endpoint)
+          const angle = Math.atan2(player.y - cpY, player.x - cpX);
           const arrowSize = 10;
+          const arrowX = player.x - 20 * Math.cos(angle);
+          const arrowY = player.y - 20 * Math.sin(angle);
           ctx.beginPath();
-          ctx.moveTo(player.x - 20 * Math.cos(angle), player.y - 20 * Math.sin(angle));
+          ctx.moveTo(arrowX, arrowY);
           ctx.lineTo(
-            player.x - 20 * Math.cos(angle) - arrowSize * Math.cos(angle - Math.PI / 6),
-            player.y - 20 * Math.sin(angle) - arrowSize * Math.sin(angle - Math.PI / 6)
+            arrowX - arrowSize * Math.cos(angle - Math.PI / 6),
+            arrowY - arrowSize * Math.sin(angle - Math.PI / 6)
           );
-          ctx.moveTo(player.x - 20 * Math.cos(angle), player.y - 20 * Math.sin(angle));
+          ctx.moveTo(arrowX, arrowY);
           ctx.lineTo(
-            player.x - 20 * Math.cos(angle) - arrowSize * Math.cos(angle + Math.PI / 6),
-            player.y - 20 * Math.sin(angle) - arrowSize * Math.sin(angle + Math.PI / 6)
+            arrowX - arrowSize * Math.cos(angle + Math.PI / 6),
+            arrowY - arrowSize * Math.sin(angle + Math.PI / 6)
           );
           ctx.stroke();
+          
+          // Draw control point handle (diamond shape)
+          ctx.save();
+          ctx.translate(cpX, cpY);
+          ctx.rotate(Math.PI / 4);
+          ctx.fillStyle = isCurved ? primaryColor : getCssColor('--muted-foreground');
+          ctx.globalAlpha = isCurved ? 0.9 : 0.4;
+          ctx.fillRect(-6, -6, 12, 12);
+          ctx.strokeStyle = bgColor;
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(-6, -6, 12, 12);
+          ctx.globalAlpha = 1;
+          ctx.restore();
         }
       });
     }
     
     playersToRender.forEach((player) => {
       if (player.type === 'ball') {
-        // Draw ball - orange circle
         ctx.beginPath();
         ctx.arc(player.x, player.y, 10, 0, Math.PI * 2);
-        ctx.fillStyle = '#f97316'; // Orange color for ball
+        ctx.fillStyle = '#f97316';
         ctx.fill();
         ctx.strokeStyle = '#ea580c';
         ctx.lineWidth = 2;
         ctx.stroke();
       } else {
-        // Draw player
         ctx.beginPath();
         ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
         ctx.fillStyle = player.type === 'home' ? primaryColor : destructiveColor;
@@ -291,14 +341,42 @@ export function TacticsBoardCanvas() {
     
     drawRink(ctx, canvasSize.width, canvasSize.height);
     
+    // Draw shadow zones
+    zones.forEach(zone => {
+      ctx.fillStyle = getCssColor('--primary');
+      ctx.globalAlpha = 0.15;
+      ctx.fillRect(zone.x, zone.y, zone.width, zone.height);
+      ctx.strokeStyle = getCssColor('--primary');
+      ctx.globalAlpha = 0.4;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(zone.x, zone.y, zone.width, zone.height);
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    });
+    
+    // Draw zone preview while dragging
+    if (zonePreview) {
+      ctx.fillStyle = getCssColor('--primary');
+      ctx.globalAlpha = 0.1;
+      ctx.fillRect(zonePreview.x, zonePreview.y, zonePreview.width, zonePreview.height);
+      ctx.strokeStyle = getCssColor('--primary');
+      ctx.globalAlpha = 0.6;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(zonePreview.x, zonePreview.y, zonePreview.width, zonePreview.height);
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+    
     // Show trails in animation mode when not playing
     if (mode === 'animate' && !isPlaying && keyframes.length > 1 && currentKeyframeIndex > 0) {
       const prevKeyframe = keyframes[currentKeyframeIndex - 1];
-      drawPlayers(ctx, players, true, prevKeyframe.players);
+      drawPlayers(ctx, players, true, prevKeyframe.players, prevKeyframe.curveControlPoints);
     } else {
       drawPlayers(ctx, players);
     }
-  }, [canvasSize, players, drawRink, drawPlayers, mode, isPlaying, keyframes, currentKeyframeIndex]);
+  }, [canvasSize, players, drawRink, drawPlayers, mode, isPlaying, keyframes, currentKeyframeIndex, zones, zonePreview]);
 
   // Animation playback loop
   useEffect(() => {
@@ -366,15 +444,20 @@ export function TacticsBoardCanvas() {
     const range = nextKeyframe.timestamp - prevKeyframe.timestamp;
     const t = range > 0 ? (playbackPosition - prevKeyframe.timestamp) / range : 0;
     
-    // Interpolate each player position
+    // Interpolate each player position using bezier curves
+    const curvePoints = prevKeyframe.curveControlPoints;
     const interpolatedPlayers = prevKeyframe.players.map(prevPlayer => {
       const nextPlayer = nextKeyframe!.players.find(p => p.id === prevPlayer.id);
       if (!nextPlayer) return prevPlayer;
       
+      const cp = curvePoints?.[prevPlayer.id];
+      const cpX = cp ? cp.x : (prevPlayer.x + nextPlayer.x) / 2;
+      const cpY = cp ? cp.y : (prevPlayer.y + nextPlayer.y) / 2;
+      
       return {
         ...prevPlayer,
-        x: lerp(prevPlayer.x, nextPlayer.x, t),
-        y: lerp(prevPlayer.y, nextPlayer.y, t),
+        x: quadBezier(prevPlayer.x, cpX, nextPlayer.x, t),
+        y: quadBezier(prevPlayer.y, cpY, nextPlayer.y, t),
       };
     });
     
@@ -449,11 +532,35 @@ export function TacticsBoardCanvas() {
     
     const { x, y } = getCanvasCoords(e);
     
+    // In animation mode, check for control point handle hits first
+    if (mode === 'animate' && !isPlaying && keyframes.length > 1 && currentKeyframeIndex > 0) {
+      const prevKf = keyframes[currentKeyframeIndex - 1];
+      const cpMap = prevKf.curveControlPoints || {};
+      
+      for (const player of players) {
+        const prevPlayer = prevKf.players.find(p => p.id === player.id);
+        if (!prevPlayer || (prevPlayer.x === player.x && prevPlayer.y === player.y)) continue;
+        
+        const cp = cpMap[player.id];
+        const cpX = cp ? cp.x : (prevPlayer.x + player.x) / 2;
+        const cpY = cp ? cp.y : (prevPlayer.y + player.y) / 2;
+        
+        const dx = x - cpX;
+        const dy = y - cpY;
+        if (Math.sqrt(dx * dx + dy * dy) < 14) {
+          setDraggedControlPoint(player.id);
+          return;
+        }
+      }
+    }
+    
     if (selectedTool === 'select' || mode === 'animate') {
       const player = findPlayerAtPosition(x, y);
       if (player) {
         setDraggedPlayer(player.id);
       }
+    } else if (selectedTool === 'addZone' && mode === 'edit') {
+      setZoneStart({ x, y });
     } else if ((selectedTool === 'draw' || selectedTool === 'erase') && mode === 'edit') {
       setIsDrawing(true);
       const drawCtx = drawingCanvasRef.current?.getContext('2d');
@@ -469,10 +576,32 @@ export function TacticsBoardCanvas() {
     
     const { x, y } = getCanvasCoords(e);
     
-    if (draggedPlayer) {
+    if (draggedControlPoint) {
+      // Dragging a curve control point handle
+      const prevKfIndex = currentKeyframeIndex - 1;
+      if (prevKfIndex >= 0) {
+        setKeyframes(prev => prev.map((kf, i) => {
+          if (i !== prevKfIndex) return kf;
+          return {
+            ...kf,
+            curveControlPoints: {
+              ...(kf.curveControlPoints || {}),
+              [draggedControlPoint]: { x, y },
+            },
+          };
+        }));
+      }
+    } else if (draggedPlayer) {
       setPlayers((prev) =>
         prev.map((p) => (p.id === draggedPlayer ? { ...p, x, y } : p))
       );
+    } else if (zoneStart && selectedTool === 'addZone') {
+      setZonePreview({
+        x: Math.min(zoneStart.x, x),
+        y: Math.min(zoneStart.y, y),
+        width: Math.abs(x - zoneStart.x),
+        height: Math.abs(y - zoneStart.y),
+      });
     } else if (isDrawing && mode === 'edit') {
       const drawCtx = drawingCanvasRef.current?.getContext('2d');
       if (drawCtx) {
@@ -499,6 +628,20 @@ export function TacticsBoardCanvas() {
   };
 
   const handleMouseUp = () => {
+    if (draggedControlPoint) {
+      setDraggedControlPoint(null);
+      return;
+    }
+    
+    // Finalize zone creation
+    if (zoneStart && zonePreview && zonePreview.width > 10 && zonePreview.height > 10) {
+      setZones(prev => [...prev, {
+        id: `zone-${Date.now()}`,
+        ...zonePreview,
+      }]);
+    }
+    setZoneStart(null);
+    setZonePreview(null);
     setDraggedPlayer(null);
     setIsDrawing(false);
   };
@@ -519,6 +662,7 @@ export function TacticsBoardCanvas() {
   const resetAll = () => {
     clearDrawing();
     clearPlayers();
+    setZones([]);
     setKeyframes([]);
     setCurrentKeyframeIndex(0);
     setPlaybackPosition(0);
@@ -535,6 +679,7 @@ export function TacticsBoardCanvas() {
       timestamp: 0, // Will be recalculated
       players: [...players],
       drawingData,
+      curveControlPoints: {},
     };
     
     const newKeyframes = [...keyframes, newKeyframe];
@@ -651,6 +796,7 @@ export function TacticsBoardCanvas() {
       createdAt: new Date().toISOString(),
       keyframes: keyframes.length > 0 ? keyframes : undefined,
       isAnimation: keyframes.length > 1,
+      zones: zones.length > 0 ? zones : undefined,
     };
 
     const updatedLayouts = [...savedLayouts, newLayout];
@@ -666,6 +812,7 @@ export function TacticsBoardCanvas() {
     setPlayers(layout.players);
     setHomePlayerCount(layout.homePlayerCount);
     setOpponentPlayerCount(layout.opponentPlayerCount);
+    setZones(layout.zones || []);
 
     // Restore drawing
     if (layout.drawingData) {
@@ -882,9 +1029,24 @@ export function TacticsBoardCanvas() {
             
             <div className="w-px h-8 bg-border mx-1" />
             
+            <Button
+              variant={selectedTool === 'addZone' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedTool('addZone')}
+            >
+              <Square className="h-4 w-4 mr-2" />
+              Shadow Zone
+            </Button>
+            
+            <div className="w-px h-8 bg-border mx-1" />
+            
             <Button variant="outline" size="sm" onClick={clearDrawing}>
               <Trash2 className="h-4 w-4 mr-2" />
               Clear Drawing
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setZones([])}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Zones
             </Button>
             <Button variant="outline" size="sm" onClick={clearPlayers}>
               <Trash2 className="h-4 w-4 mr-2" />
@@ -1057,9 +1219,11 @@ export function TacticsBoardCanvas() {
             style={{ 
               cursor: isPlaying 
                 ? 'default' 
-                : (selectedTool === 'select' || mode === 'animate') 
-                  ? 'grab' 
-                  : 'crosshair' 
+                : selectedTool === 'addZone'
+                  ? 'crosshair'
+                  : (selectedTool === 'select' || mode === 'animate') 
+                    ? 'grab' 
+                    : 'crosshair' 
             }}
           />
           <canvas
@@ -1079,13 +1243,15 @@ export function TacticsBoardCanvas() {
             <li>• <strong>Add Home/Opponent:</strong> Click on the rink to place players</li>
             <li>• <strong>Select/Move:</strong> Drag players to reposition them</li>
             <li>• <strong>Draw:</strong> Draw arrows, lines, or annotations</li>
+            <li>• <strong>Shadow Zone:</strong> Click and drag to mark a highlighted area on the field</li>
             <li>• <strong>Animation Mode:</strong> Switch to create movement animations</li>
           </ul>
         ) : (
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• <strong>Add Keyframe:</strong> Record current player positions as a keyframe</li>
             <li>• <strong>Move Players:</strong> Drag players to new positions between keyframes</li>
-            <li>• <strong>Play:</strong> Watch players animate between keyframes</li>
+            <li>• <strong>Curved Paths:</strong> Drag the diamond handles on movement trails to curve paths</li>
+            <li>• <strong>Play:</strong> Watch players animate along curved or straight paths</li>
             <li>• <strong>Save:</strong> Save your animation for later use</li>
             <li>• <strong>Tip:</strong> Add at least 2 keyframes to create an animation</li>
           </ul>
