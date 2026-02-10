@@ -8,12 +8,21 @@ interface PlayerMarker {
   number?: string;
 }
 
+interface ShadowZone {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface TacticsBoardRendererProps {
   players: PlayerMarker[];
   displayPositions: { [playerId: string]: { x: number; y: number } };
   width?: number;
   height?: number;
   className?: string;
+  zones?: ShadowZone[];
 }
 
 export function TacticsBoardRenderer({ 
@@ -21,7 +30,8 @@ export function TacticsBoardRenderer({
   displayPositions, 
   width = 800, 
   height = 500,
-  className 
+  className,
+  zones = [],
 }: TacticsBoardRendererProps) {
   const padding = 20;
   const cornerRadius = 40;
@@ -144,6 +154,23 @@ export function TacticsBoardRenderer({
             stroke="hsl(var(--primary))" strokeWidth="2"
           />
         </g>
+      ))}
+
+      {/* Shadow Zones */}
+      {zones.map(zone => (
+        <rect
+          key={zone.id}
+          x={zone.x}
+          y={zone.y}
+          width={zone.width}
+          height={zone.height}
+          fill="hsl(var(--primary))"
+          fillOpacity={0.15}
+          stroke="hsl(var(--primary))"
+          strokeOpacity={0.4}
+          strokeWidth={2}
+          strokeDasharray="6 4"
+        />
       ))}
 
       {/* Players */}
