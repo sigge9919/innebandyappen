@@ -63,10 +63,12 @@ export interface Drill {
 }
 
 // Playbook types
+export const DEFAULT_PLAY_CATEGORIES = ['System', 'Set Play', 'Special Teams'] as const;
+
 export interface Play {
   id: string;
   name: string;
-  category: 'System' | 'Set Play' | 'Special Teams';
+  category: string;
   diagramUrl?: string;
   keyPoints: string[];
   videoUrl?: string;

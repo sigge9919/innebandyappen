@@ -251,3 +251,23 @@ export function useCoachNotes() {
 
   return { notes, saveNotes };
 }
+
+export function usePlayCategories() {
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    setCategories(storage.getPlayCategories());
+  }, []);
+
+  const addCategory = useCallback((category: string) => {
+    storage.addPlayCategory(category);
+    setCategories(storage.getPlayCategories());
+  }, []);
+
+  const deleteCategory = useCallback((category: string) => {
+    storage.deletePlayCategory(category);
+    setCategories(storage.getPlayCategories());
+  }, []);
+
+  return { categories, addCategory, deleteCategory };
+}
