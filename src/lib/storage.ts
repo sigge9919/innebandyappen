@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   trainingSessions: 'coachOS_trainingSessions',
   drills: 'coachOS_drills',
   plays: 'coachOS_plays',
+  playCategories: 'coachOS_playCategories',
   idps: 'coachOS_idps',
   testResults: 'coachOS_testResults',
   weeklyFocus: 'coachOS_weeklyFocus',
@@ -281,6 +282,28 @@ export function getCoachNotes(): string {
 
 export function saveCoachNotes(notes: string): void {
   localStorage.setItem(STORAGE_KEYS.coachNotes, notes);
+}
+
+// Play Categories
+export function getPlayCategories(): string[] {
+  return getItem<string[]>(STORAGE_KEYS.playCategories, ['System', 'Set Play', 'Special Teams']);
+}
+
+export function savePlayCategories(categories: string[]): void {
+  setItem(STORAGE_KEYS.playCategories, categories);
+}
+
+export function addPlayCategory(category: string): void {
+  const categories = getPlayCategories();
+  if (!categories.includes(category)) {
+    categories.push(category);
+    savePlayCategories(categories);
+  }
+}
+
+export function deletePlayCategory(category: string): void {
+  const categories = getPlayCategories().filter(c => c !== category);
+  savePlayCategories(categories);
 }
 
 // Reset to mock data

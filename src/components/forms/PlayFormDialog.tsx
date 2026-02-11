@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Play } from '@/types';
 import { Plus, X } from 'lucide-react';
+import { usePlayCategories } from '@/hooks/useLocalStorage';
 
 interface PlayFormDialogProps {
   open: boolean;
@@ -17,9 +18,10 @@ interface PlayFormDialogProps {
 }
 
 export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: PlayFormDialogProps) {
+  const { categories } = usePlayCategories();
   const [formData, setFormData] = useState({
     name: '',
-    category: 'System' as Play['category'],
+    category: categories[0] || 'System',
     keyPoints: [''],
     tags: '',
     diagramUrl: '',
@@ -39,7 +41,7 @@ export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: P
     } else {
       setFormData({
         name: '',
-        category: 'System',
+        category: categories[0] || 'System',
         keyPoints: [''],
         tags: '',
         diagramUrl: '',
@@ -104,15 +106,15 @@ export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: P
               <Label htmlFor="category">Category</Label>
               <Select
                 value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value as Play['category'] })}
+                onValueChange={(value) => setFormData({ ...formData, category: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="System">System</SelectItem>
-                  <SelectItem value="Set Play">Set Play</SelectItem>
-                  <SelectItem value="Special Teams">Special Teams</SelectItem>
+                  {categories.map(cat => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

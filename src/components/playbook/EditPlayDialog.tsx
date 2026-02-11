@@ -8,6 +8,7 @@ import { Plus, X, Film, Image as ImageIcon, Upload } from 'lucide-react';
 import { Play, PlayMedia } from '@/types';
 import { TacticsLayoutSelector } from './TacticsLayoutSelector';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { usePlayCategories } from '@/hooks/useLocalStorage';
 interface EditPlayDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -16,9 +17,10 @@ interface EditPlayDialogProps {
 }
 
 export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDialogProps) {
+  const { categories } = usePlayCategories();
   const [formData, setFormData] = useState({
     name: '',
-    category: 'System' as Play['category'],
+    category: categories[0] || 'System',
     keyPoints: [''],
     tags: '',
     linkedLayoutIds: [] as string[],
@@ -38,7 +40,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
     } else {
       setFormData({
         name: '',
-        category: 'System',
+        category: categories[0] || 'System',
         keyPoints: [''],
         tags: '',
         linkedLayoutIds: [],
@@ -154,15 +156,15 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
                     <Label htmlFor="category">Category</Label>
                     <Select
                       value={formData.category}
-                      onValueChange={(value) => setFormData({ ...formData, category: value as Play['category'] })}
+                      onValueChange={(value) => setFormData({ ...formData, category: value })}
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="System">System</SelectItem>
-                        <SelectItem value="Set Play">Set Play</SelectItem>
-                        <SelectItem value="Special Teams">Special Teams</SelectItem>
+                        {categories.map(cat => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
