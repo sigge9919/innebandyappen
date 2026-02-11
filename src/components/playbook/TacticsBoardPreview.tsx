@@ -116,7 +116,7 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
 
     const animate = (timestamp: number) => {
       if (lastTimeRef.current === 0) lastTimeRef.current = timestamp;
-      const delta = (timestamp - lastTimeRef.current) / 1000;
+      const delta = (timestamp - lastTimeRef.current) / 3000; // 3s base duration, matching tactics board
       lastTimeRef.current = timestamp;
 
       setCurrentTime(prev => {

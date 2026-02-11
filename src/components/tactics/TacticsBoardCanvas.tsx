@@ -92,7 +92,11 @@ const quadBezier = (p0: number, p1: number, p2: number, t: number) => {
   return mt * mt * p0 + 2 * mt * t * p1 + t * t * p2;
 };
 
-export function TacticsBoardCanvas() {
+interface TacticsBoardCanvasProps {
+  initialLayoutId?: string;
+}
+
+export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -130,8 +134,18 @@ export function TacticsBoardCanvas() {
 
   // Load saved layouts on mount
   useEffect(() => {
-    setSavedLayouts(getSavedLayouts());
-  }, []);
+    const layouts = getSavedLayouts();
+    setSavedLayouts(layouts);
+    
+    // Auto-load layout if initialLayoutId is provided
+    if (initialLayoutId) {
+      const found = layouts.find(l => l.id === initialLayoutId);
+      if (found) {
+        // Defer to after canvas is ready
+        setTimeout(() => handleLoadLayout(found), 100);
+      }
+    }
+  }, [initialLayoutId]);
 
   // Draw the floorball rink
   const drawRink = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
