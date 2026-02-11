@@ -4,7 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { usePlays } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { 
   ArrowLeft, 
   Edit2, 
@@ -88,6 +88,9 @@ export default function PlayDetail() {
               {play?.tags?.map(tag => (
                 <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
               ))}
+              {play?.keyPoints?.map((point, index) => (
+                <Badge key={`kp-${index}`} variant="default" className="text-xs">{point}</Badge>
+              ))}
             </div>
           </div>
           <div className="flex gap-2">
@@ -103,25 +106,6 @@ export default function PlayDetail() {
           </div>
         </div>
 
-        {/* Key Points */}
-        {play?.keyPoints && play.keyPoints.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Key Points</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {play.keyPoints.map((point, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-primary font-bold">•</span>
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Tactics Board Layouts */}
         {play?.linkedLayoutIds && play.linkedLayoutIds.length > 0 && (
           <div className="mb-6">
@@ -129,7 +113,7 @@ export default function PlayDetail() {
               <Film className="h-5 w-5 text-primary" />
               <h2 className="font-semibold">Tactics Board Layouts</h2>
             </div>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 grid-cols-1">
               {play.linkedLayoutIds.map(layoutId => (
                 <TacticsBoardPreview key={layoutId} layoutId={layoutId} />
               ))}
