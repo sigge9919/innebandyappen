@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,7 @@ interface TacticsBoardFullscreenProps {
 
 export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: TacticsBoardFullscreenProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [layout, setLayout] = useState<TacticsLayout | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -124,7 +125,7 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
 
     const animate = (timestamp: number) => {
       if (lastTimeRef.current === 0) lastTimeRef.current = timestamp;
-      const delta = ((timestamp - lastTimeRef.current) / 1000) * playbackSpeed;
+      const delta = ((timestamp - lastTimeRef.current) / 3000) * playbackSpeed; // 3s base duration
       lastTimeRef.current = timestamp;
 
       setCurrentTime(prev => {
@@ -217,7 +218,7 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
 
   const handleOpenInEditor = () => {
     onOpenChange(false);
-    navigate('/tactics');
+    navigate(`/tactics?layout=${layoutId}&from=${encodeURIComponent(location.pathname)}`);
   };
 
   return (
