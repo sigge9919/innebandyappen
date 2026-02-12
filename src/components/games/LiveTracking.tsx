@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { Player } from '@/types';
-import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation, getSituationLabel, LineStats } from '@/types/game';
+import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation, getSituationLabel, LineStats, PlayerGameStats } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
 import { calculateLineStats } from '@/lib/gameStorage';
 import { GoalConfirmDialog, GoalConfirmData } from './GoalConfirmDialog';
 import { PenaltyConfirmDialog } from './PenaltyConfirmDialog';
+import { ShotPlayerDialog } from './ShotPlayerDialog';
+
 interface LiveTrackingProps {
   game: EnhancedGame;
   squadPlayers: Player[];
@@ -21,6 +24,8 @@ interface LiveTrackingProps {
   onSetActiveLine: (lineId: string) => void;
   onSetSituation: (situation: GameSituation) => void;
   onUndo: () => void;
+  onUpdatePlayerStat?: (playerId: string, field: keyof Omit<PlayerGameStats, 'playerId'>, value: number) => void;
+  playerStats?: PlayerGameStats[];
 }
 
 function LiveLinePlusMinus({ value }: { value: number }) {
@@ -58,9 +63,13 @@ export function LiveTracking({
   onSetActiveLine,
   onSetSituation,
   onUndo,
+  onUpdatePlayerStat,
+  playerStats = [],
 }: LiveTrackingProps) {
   const [pendingGoal, setPendingGoal] = useState<{ team: Team } | null>(null);
   const [showPenaltyDialog, setShowPenaltyDialog] = useState(false);
+  const [advancedMode, setAdvancedMode] = useState(false);
+  const [pendingShot, setPendingShot] = useState<{ type: 'shot_on_goal' | 'shot_off_goal' | 'shot_blocked' | 'defensive_block'; team: Team } | null>(null);
 
   const activeLine = game.lines.find(l => l.id === game.activeLineId);
   const activeLinePlayers = activeLine 
@@ -75,48 +84,80 @@ export function LiveTracking({
   // Get lines based on current situation
   const getRelevantLines = () => {
     const situation = game.currentSituation || '5v5';
-    if (situation === '5v4') {
-      return game.lines.filter(l => l.type === 'PP');
-    } else if (situation === '4v5') {
-      return game.lines.filter(l => l.type === 'PK');
-    } else if (situation === '6v5') {
-      return game.lines.filter(l => l.type === '6v5');
-    } else if (situation === '5v6') {
-      return game.lines.filter(l => l.type === '5v6');
-    }
+    if (situation === '5v4') return game.lines.filter(l => l.type === 'PP');
+    if (situation === '4v5') return game.lines.filter(l => l.type === 'PK');
+    if (situation === '6v5') return game.lines.filter(l => l.type === '6v5');
+    if (situation === '5v6') return game.lines.filter(l => l.type === '5v6');
     return game.lines.filter(l => l.type === '5v5');
   };
 
   const relevantLines = getRelevantLines();
   const otherLines = game.lines.filter(l => !relevantLines.includes(l) && l.playerIds.length > 0);
 
-  // Handle goal button click - open dialog
-  const handleGoalClick = (team: Team) => {
-    setPendingGoal({ team });
-  };
+  const handleGoalClick = (team: Team) => setPendingGoal({ team });
 
-  // Handle goal confirmation from dialog
   const handleGoalConfirm = (data: GoalConfirmData) => {
     if (!pendingGoal) return;
-    
     onRecordEvent('goal', pendingGoal.team, {
       scorerId: data.scorerId,
       assistPlayerIds: data.assistPlayerIds,
       lineId: data.lineId,
     });
-    
     setPendingGoal(null);
   };
 
-  // Handle home team penalty button click - open dialog
-  const handleHomePenaltyClick = () => {
-    setShowPenaltyDialog(true);
-  };
+  const handleHomePenaltyClick = () => setShowPenaltyDialog(true);
 
-  // Handle penalty confirmation from dialog
   const handlePenaltyConfirm = (playerId?: string) => {
     onRecordPenalty('home', playerId);
     setShowPenaltyDialog(false);
+  };
+
+  // Handle shot button clicks - in advanced mode, show player dialog
+  const handleShotClick = (type: EventType, team: Team) => {
+    if (advancedMode && onUpdatePlayerStat) {
+      // Home team SOG/Miss/Blk → attribute to our player
+      if (team === 'home' && (type === 'shot_on_goal' || type === 'shot_off_goal' || type === 'shot_blocked')) {
+        setPendingShot({ type: type as 'shot_on_goal' | 'shot_off_goal' | 'shot_blocked', team });
+        return;
+      }
+      // Opponent blocked → attribute defensive block to our player
+      if (team === 'opponent' && type === 'shot_blocked') {
+        setPendingShot({ type: 'defensive_block', team });
+        return;
+      }
+    }
+    // Simple mode or non-attributed shots
+    onRecordEvent(type, team);
+  };
+
+  // Handle shot player confirmation
+  const handleShotPlayerConfirm = (playerId?: string) => {
+    if (!pendingShot || !playerId || !onUpdatePlayerStat) return;
+
+    if (pendingShot.type === 'defensive_block') {
+      // Record the opponent blocked event and increment player's defensive blocks
+      onRecordEvent('shot_blocked', 'opponent');
+      const currentStats = playerStats.find(ps => ps.playerId === playerId);
+      const currentValue = currentStats?.defensiveBlocks || 0;
+      onUpdatePlayerStat(playerId, 'defensiveBlocks', currentValue + 1);
+    } else {
+      // Record the home shot event and increment player's shot stat
+      onRecordEvent(pendingShot.type, 'home');
+      const fieldMap: Record<string, keyof Omit<PlayerGameStats, 'playerId'>> = {
+        shot_on_goal: 'shotsOnGoal',
+        shot_off_goal: 'shotsOffGoal',
+        shot_blocked: 'shotsBlocked',
+      };
+      const field = fieldMap[pendingShot.type];
+      if (field) {
+        const currentStats = playerStats.find(ps => ps.playerId === playerId);
+        const currentValue = (currentStats?.[field] as number) || 0;
+        onUpdatePlayerStat(playerId, field, currentValue + 1);
+      }
+    }
+
+    setPendingShot(null);
   };
 
   return (
@@ -133,7 +174,7 @@ export function LiveTracking({
         opponentName={game.opponent}
       />
 
-      {/* Penalty Confirmation Dialog (Home Team Only) */}
+      {/* Penalty Confirmation Dialog */}
       <PenaltyConfirmDialog
         open={showPenaltyDialog}
         onClose={() => setShowPenaltyDialog(false)}
@@ -141,7 +182,18 @@ export function LiveTracking({
         squadPlayers={squadPlayers}
       />
 
-      {/* Live Period Stats - Always Visible */}
+      {/* Shot Player Attribution Dialog */}
+      <ShotPlayerDialog
+        open={pendingShot !== null}
+        onClose={() => setPendingShot(null)}
+        onConfirm={handleShotPlayerConfirm}
+        shotType={pendingShot?.type || 'shot_on_goal'}
+        squadPlayers={squadPlayers}
+        lines={game.lines}
+        activeLineId={game.activeLineId}
+      />
+
+      {/* Live Period Stats */}
       <LivePeriodStats
         currentPeriod={game.currentPeriod}
         homeTeamName="Our Team"
@@ -154,16 +206,13 @@ export function LiveTracking({
         opponentScore={game.opponentScore}
       />
 
-      {/* Active Line & Situation - Combined Section */}
+      {/* Active Line & Situation */}
       <div className="space-y-3">
-        {/* Line Selection */}
         <div className="flex items-center justify-between">
           <span className="font-semibold text-sm">Active Line</span>
           <div className="flex items-center gap-2">
             {activeLine && (
-              <Badge variant="default" className="text-xs">
-                {activeLine.name}
-              </Badge>
+              <Badge variant="default" className="text-xs">{activeLine.name}</Badge>
             )}
             {activeLinePlayers.length > 0 && (
               <div className="flex gap-1">
@@ -240,7 +289,7 @@ export function LiveTracking({
         </div>
       </div>
 
-      {/* Event Buttons - Two columns: Our Team / Opponent */}
+      {/* Event Buttons */}
       <div className="grid grid-cols-2 gap-4">
         {/* Our Team */}
         <div className="space-y-3">
@@ -254,21 +303,20 @@ export function LiveTracking({
           <EventButton
             icon={Target}
             label="Shot on Goal"
-            onClick={() => onRecordEvent('shot_on_goal', 'home')}
+            onClick={() => handleShotClick('shot_on_goal', 'home')}
           />
           <EventButton
             icon={XCircle}
             label="Shot Off"
             variant="muted"
-            onClick={() => onRecordEvent('shot_off_goal', 'home')}
+            onClick={() => handleShotClick('shot_off_goal', 'home')}
           />
           <EventButton
             icon={Shield}
             label="Blocked"
             variant="muted"
-            onClick={() => onRecordEvent('shot_blocked', 'home')}
+            onClick={() => handleShotClick('shot_blocked', 'home')}
           />
-          {/* Penalty Button */}
           <button
             onClick={handleHomePenaltyClick}
             className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"
@@ -302,9 +350,8 @@ export function LiveTracking({
             icon={Shield}
             label="Blocked"
             variant="muted"
-            onClick={() => onRecordEvent('shot_blocked', 'opponent')}
+            onClick={() => handleShotClick('shot_blocked', 'opponent')}
           />
-          {/* Penalty Button - Opponent (no dialog needed) */}
           <button
             onClick={() => onRecordPenalty('opponent')}
             className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"
@@ -327,6 +374,25 @@ export function LiveTracking({
         </Button>
       )}
 
+      {/* Simple / Advanced Toggle */}
+      <div className="flex items-center justify-between px-2 py-3 rounded-lg bg-muted/50 border border-border">
+        <span className="text-sm font-medium text-muted-foreground">
+          {advancedMode ? 'Advanced Stats' : 'Simple Stats'}
+        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Simple</span>
+          <Switch
+            checked={advancedMode}
+            onCheckedChange={setAdvancedMode}
+          />
+          <span className="text-xs text-muted-foreground">Advanced</span>
+        </div>
+      </div>
+      {advancedMode && (
+        <p className="text-xs text-muted-foreground text-center -mt-2">
+          Shots will be attributed to individual players
+        </p>
+      )}
     </div>
   );
 }
