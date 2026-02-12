@@ -1,14 +1,10 @@
-import { useState } from 'react';
 import { Player } from '@/types';
 import { GameLine } from '@/types/game';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { Target, XCircle, Shield } from 'lucide-react';
@@ -39,7 +35,6 @@ export function ShotPlayerDialog({
   lines,
   activeLineId,
 }: ShotPlayerDialogProps) {
-  const [selectedPlayer, setSelectedPlayer] = useState<string | undefined>();
   const config = SHOT_TYPE_CONFIG[shotType];
   const Icon = config.icon;
 
@@ -48,18 +43,12 @@ export function ShotPlayerDialog({
   const linePlayers = squadPlayers.filter(p => linePlayerIds.includes(p.id) && !p.positions?.includes('Goalkeeper'));
   const otherPlayers = squadPlayers.filter(p => !linePlayerIds.includes(p.id) && !p.positions?.includes('Goalkeeper'));
 
-  const handleConfirm = () => {
-    onConfirm(selectedPlayer);
-    setSelectedPlayer(undefined);
-  };
-
-  const handleCancel = () => {
-    setSelectedPlayer(undefined);
-    onClose();
+  const handleSelect = (playerId: string) => {
+    onConfirm(playerId);
   };
 
   return (
-    <Dialog open={open} onOpenChange={(open) => !open && handleCancel()}>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -78,13 +67,8 @@ export function ShotPlayerDialog({
                 {linePlayers.map(player => (
                   <button
                     key={player.id}
-                    onClick={() => setSelectedPlayer(player.id)}
-                    className={cn(
-                      'px-2 py-1.5 rounded text-sm transition-colors',
-                      selectedPlayer === player.id
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted hover:bg-muted/80'
-                    )}
+                    onClick={() => handleSelect(player.id)}
+                    className="px-2 py-1.5 rounded text-sm transition-colors bg-muted hover:bg-primary hover:text-primary-foreground"
                   >
                     #{player.jerseyNumber} {player.name.split(' ')[0]}
                   </button>
@@ -100,13 +84,8 @@ export function ShotPlayerDialog({
                 {otherPlayers.map(player => (
                   <button
                     key={player.id}
-                    onClick={() => setSelectedPlayer(player.id)}
-                    className={cn(
-                      'px-2 py-1.5 rounded text-sm transition-colors',
-                      selectedPlayer === player.id
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted/50 hover:bg-muted/80'
-                    )}
+                    onClick={() => handleSelect(player.id)}
+                    className="px-2 py-1.5 rounded text-sm transition-colors bg-muted/50 hover:bg-primary hover:text-primary-foreground"
                   >
                     #{player.jerseyNumber} {player.name.split(' ')[0]}
                   </button>
@@ -115,13 +94,6 @@ export function ShotPlayerDialog({
             </div>
           )}
         </div>
-
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="outline" onClick={handleCancel}>Cancel</Button>
-          <Button onClick={handleConfirm} disabled={!selectedPlayer}>
-            Confirm
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
