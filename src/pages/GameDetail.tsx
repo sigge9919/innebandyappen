@@ -279,6 +279,8 @@ export default function GameDetail() {
               onSetActiveLine={setActiveLine}
               onSetSituation={setCurrentSituation}
               onUndo={undoLast}
+              onUpdatePlayerStat={updatePlayerStat}
+              playerStats={game.playerStats}
             />
           </div>
         )}
