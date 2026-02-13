@@ -60,6 +60,8 @@ export interface Drill {
   description: string;
   categories: string[];
   videoUrl?: string;
+  linkedLayoutIds?: string[];
+  mediaFiles?: PlayMedia[];
 }
 
 // Playbook types
