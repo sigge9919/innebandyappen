@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { TrainingCard } from '@/components/training/TrainingCard';
+import { DrillCard } from '@/components/training/DrillCard';
 import { TrainingFormDialog } from '@/components/forms/TrainingFormDialog';
 import { DrillFormDialog } from '@/components/forms/DrillFormDialog';
 import { useTrainingSessions, usePlayers, useDrills } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Calendar, Dumbbell } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Calendar, Dumbbell, Search } from 'lucide-react';
 import { TrainingSession, Drill } from '@/types';
 
 export default function Training() {
@@ -20,12 +21,25 @@ export default function Training() {
   const [drillDialogOpen, setDrillDialogOpen] = useState(false);
   const [selectedDrill, setSelectedDrill] = useState<Drill | null>(null);
 
+  const [drillSearch, setDrillSearch] = useState('');
+  const [drillFilter, setDrillFilter] = useState<string>('all');
+
   const getPlayerNames = (playerIds: string[]) => {
     return playerIds.map(id => {
       const player = players.find(p => p.id === id);
       return player?.name ?? '';
     });
   };
+
+  // Collect all unique drill categories
+  const allDrillCategories = Array.from(new Set(drills.flatMap(d => d.categories)));
+
+  const filteredDrills = drills.filter(drill => {
+    const matchesSearch = drill.name.toLowerCase().includes(drillSearch.toLowerCase()) ||
+                         drill.description.toLowerCase().includes(drillSearch.toLowerCase());
+    if (drillFilter === 'all') return matchesSearch;
+    return matchesSearch && drill.categories.includes(drillFilter);
+  });
 
   const handleSessionClick = (session: TrainingSession) => {
     setSelectedSession(session);
@@ -80,74 +94,109 @@ export default function Training() {
           </Button>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Sessions */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">Upcoming Sessions</h2>
-            </div>
-            
-            <div className="grid gap-4 sm:grid-cols-2">
-              {sessions.map(session => (
-                <div
-                  key={session.id}
-                  onClick={() => handleSessionClick(session)}
-                  className="cursor-pointer"
-                >
-                  <TrainingCard
-                    session={session}
-                    playerNames={getPlayerNames(session.playerIds)}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {sessions.length === 0 && (
-              <div className="text-center py-12">
-                <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                <p className="text-muted-foreground">No sessions planned</p>
-                <Button variant="outline" className="mt-4" onClick={handleAddSession}>
-                  Create your first session
-                </Button>
+        {/* Upcoming Sessions */}
+        <div className="mb-10">
+          <div className="flex items-center gap-2 mb-4">
+            <Calendar className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Upcoming Sessions</h2>
+          </div>
+          
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {sessions.map(session => (
+              <div
+                key={session.id}
+                onClick={() => handleSessionClick(session)}
+                className="cursor-pointer"
+              >
+                <TrainingCard
+                  session={session}
+                  playerNames={getPlayerNames(session.playerIds)}
+                />
               </div>
-            )}
+            ))}
           </div>
 
-          {/* Drill Library */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Dumbbell className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold text-foreground">Drill Library</h2>
-              </div>
-              <Button variant="ghost" size="sm" onClick={handleAddDrill}>
-                <Plus className="h-4 w-4" />
+          {sessions.length === 0 && (
+            <div className="text-center py-12">
+              <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-muted-foreground">No sessions planned</p>
+              <Button variant="outline" className="mt-4" onClick={handleAddSession}>
+                Create your first session
               </Button>
             </div>
+          )}
+        </div>
 
-            <div className="space-y-3">
-              {drills.map(drill => (
-                <div
-                  key={drill.id}
-                  onClick={() => handleDrillClick(drill)}
-                  className="stat-card p-4 cursor-pointer hover:shadow-md transition-all"
+        {/* Drill Library — Playbook-style */}
+        <div>
+          <div className="section-header">
+            <div>
+              <div className="flex items-center gap-2">
+                <Dumbbell className="h-5 w-5 text-primary" />
+                <h2 className="section-title">Drill Library</h2>
+              </div>
+              <p className="text-muted-foreground mt-1">
+                {drills.length} drills
+              </p>
+            </div>
+            <Button className="gap-2" onClick={handleAddDrill}>
+              <Plus className="h-4 w-4" />
+              Add Drill
+            </Button>
+          </div>
+
+          {/* Search & Filters */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search drills..."
+                value={drillSearch}
+                onChange={(e) => setDrillSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2 flex-wrap items-center">
+              <Button
+                variant={drillFilter === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setDrillFilter('all')}
+              >
+                All
+              </Button>
+              {allDrillCategories.map(cat => (
+                <Button
+                  key={cat}
+                  variant={drillFilter === cat ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setDrillFilter(cat)}
                 >
-                  <h3 className="font-medium text-foreground mb-1">{drill.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-                    {drill.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1">
-                    {drill.categories.map(cat => (
-                      <Badge key={cat} variant="secondary" className="text-xs">
-                        {cat}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+                  {cat}
+                </Button>
               ))}
             </div>
           </div>
+
+          {/* Drills Grid */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredDrills.map(drill => (
+              <DrillCard
+                key={drill.id}
+                drill={drill}
+                onClick={() => handleDrillClick(drill)}
+              />
+            ))}
+          </div>
+
+          {filteredDrills.length === 0 && (
+            <div className="text-center py-12">
+              <Dumbbell className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-muted-foreground">No drills found</p>
+              <Button variant="outline" className="mt-4" onClick={handleAddDrill}>
+                Add your first drill
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
