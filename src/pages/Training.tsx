@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { TrainingCard } from '@/components/training/TrainingCard';
 import { DrillCard } from '@/components/training/DrillCard';
 import { TrainingFormDialog } from '@/components/forms/TrainingFormDialog';
-import { DrillFormDialog } from '@/components/forms/DrillFormDialog';
 import { useTrainingSessions, usePlayers, useDrills } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,15 +11,13 @@ import { Plus, Calendar, Dumbbell, Search } from 'lucide-react';
 import { TrainingSession, Drill } from '@/types';
 
 export default function Training() {
+  const navigate = useNavigate();
   const { sessions, addSession, updateSession, deleteSession } = useTrainingSessions();
   const { players } = usePlayers();
-  const { drills, addDrill, updateDrill, deleteDrill } = useDrills();
+  const { drills } = useDrills();
   
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<TrainingSession | null>(null);
-  
-  const [drillDialogOpen, setDrillDialogOpen] = useState(false);
-  const [selectedDrill, setSelectedDrill] = useState<Drill | null>(null);
 
   const [drillSearch, setDrillSearch] = useState('');
   const [drillFilter, setDrillFilter] = useState<string>('all');
@@ -60,21 +58,11 @@ export default function Training() {
   };
 
   const handleDrillClick = (drill: Drill) => {
-    setSelectedDrill(drill);
-    setDrillDialogOpen(true);
+    navigate(`/training/drill/${drill.id}`);
   };
 
   const handleAddDrill = () => {
-    setSelectedDrill(null);
-    setDrillDialogOpen(true);
-  };
-
-  const handleSaveDrill = (drill: Drill) => {
-    if (selectedDrill) {
-      updateDrill(drill.id, drill);
-    } else {
-      addDrill(drill);
-    }
+    navigate('/training/drill/new');
   };
 
   return (
@@ -210,13 +198,6 @@ export default function Training() {
         onDelete={deleteSession}
       />
 
-      <DrillFormDialog
-        open={drillDialogOpen}
-        onOpenChange={setDrillDialogOpen}
-        drill={selectedDrill}
-        onSave={handleSaveDrill}
-        onDelete={deleteDrill}
-      />
     </AppLayout>
   );
 }

@@ -12,6 +12,7 @@ import PlayerDetail from "./pages/PlayerDetail";
 import Games from "./pages/Games";
 import GameDetail from "./pages/GameDetail";
 import Training from "./pages/Training";
+import DrillDetail from "./pages/DrillDetail";
 import Playbook from "./pages/Playbook";
 import PlayDetail from "./pages/PlayDetail";
 import Development from "./pages/Development";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
             <Route path="/games/:gameId" element={<ProtectedRoute><GameDetail /></ProtectedRoute>} />
             <Route path="/training" element={<ProtectedRoute><Training /></ProtectedRoute>} />
+            <Route path="/training/drill/:drillId" element={<ProtectedRoute><DrillDetail /></ProtectedRoute>} />
             <Route path="/playbook" element={<ProtectedRoute><Playbook /></ProtectedRoute>} />
             <Route path="/playbook/:playId" element={<ProtectedRoute><PlayDetail /></ProtectedRoute>} />
             <Route path="/development" element={<ProtectedRoute><Development /></ProtectedRoute>} />
