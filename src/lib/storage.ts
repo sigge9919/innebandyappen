@@ -17,8 +17,12 @@ const STORAGE_KEYS = {
 } as const;
 
 // Mock IDPs and Test Results
-const mockIDPs: IndividualDevelopmentPlan[] = mockPlayers.slice(0, 3).map(player => ({
+const mockIDPs: IndividualDevelopmentPlan[] = mockPlayers.slice(0, 3).map((player, i) => ({
+  id: `idp-${i + 1}`,
   playerId: player.id,
+  goal: ['Become a stronger two-way player', 'Improve offensive output', 'Develop leadership on the ice'][i],
+  startDate: '2026-01-01',
+  endDate: '2026-04-01',
   focusAreas: ['Defensive positioning', 'Passing accuracy'],
   shortTermGoals: ['Improve stick work', 'Better communication'],
   coachNotes: 'Showing good progress in recent sessions',
@@ -224,17 +228,17 @@ export function addIDP(idp: IndividualDevelopmentPlan): void {
   saveIDPs(idps);
 }
 
-export function updateIDP(playerId: string, updates: Partial<IndividualDevelopmentPlan>): void {
+export function updateIDP(id: string, updates: Partial<IndividualDevelopmentPlan>): void {
   const idps = getIDPs();
-  const index = idps.findIndex(i => i.playerId === playerId);
+  const index = idps.findIndex(i => i.id === id);
   if (index !== -1) {
     idps[index] = { ...idps[index], ...updates, lastUpdated: new Date().toISOString().split('T')[0] };
     saveIDPs(idps);
   }
 }
 
-export function deleteIDP(playerId: string): void {
-  const idps = getIDPs().filter(i => i.playerId !== playerId);
+export function deleteIDP(id: string): void {
+  const idps = getIDPs().filter(i => i.id !== id);
   saveIDPs(idps);
 }
 
