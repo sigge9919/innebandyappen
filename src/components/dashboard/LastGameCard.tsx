@@ -1,16 +1,16 @@
 import { Trophy, TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
-import { Game } from '@/types';
+import { EnhancedGame } from '@/types/game';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface LastGameCardProps {
-  game: Game;
+  game: EnhancedGame;
 }
 
 export function LastGameCard({ game }: LastGameCardProps) {
-  const won = (game.ourScore ?? 0) > (game.opponentScore ?? 0);
+  const won = game.ourScore > game.opponentScore;
   const tied = game.ourScore === game.opponentScore;
 
   return (
@@ -53,7 +53,7 @@ export function LastGameCard({ game }: LastGameCardProps) {
           </div>
         )}
 
-        <Link to="/games">
+        <Link to={`/games/${game.id}`}>
           <Button variant="outline" size="sm" className="w-full group">
             View All Games
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
