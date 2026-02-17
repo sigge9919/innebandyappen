@@ -174,13 +174,13 @@ export function useIDPs() {
     setIdps(storage.getIDPs());
   }, []);
 
-  const updateIDP = useCallback((playerId: string, updates: Partial<IndividualDevelopmentPlan>) => {
-    storage.updateIDP(playerId, updates);
+  const updateIDP = useCallback((id: string, updates: Partial<IndividualDevelopmentPlan>) => {
+    storage.updateIDP(id, updates);
     setIdps(storage.getIDPs());
   }, []);
 
-  const deleteIDP = useCallback((playerId: string) => {
-    storage.deleteIDP(playerId);
+  const deleteIDP = useCallback((id: string) => {
+    storage.deleteIDP(id);
     setIdps(storage.getIDPs());
   }, []);
 

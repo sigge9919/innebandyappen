@@ -6,9 +6,11 @@ import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
 import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Target, TrendingUp, TrendingDown, Minus, ChevronRight, ClipboardList, Plus } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Minus, ChevronRight, ClipboardList, Plus, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Player, IndividualDevelopmentPlan, TestResult } from '@/types';
+
+type PlayerFilter = 'with-plan' | 'without-plan';
 
 const TrendIcon = ({ trend }: { trend: 'up' | 'down' | 'same' }) => {
   if (trend === 'up') return <TrendingUp className="h-4 w-4 text-success" />;
@@ -22,6 +24,7 @@ export default function Development() {
   const { idps, addIDP, updateIDP } = useIDPs();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
 
+  const [playerFilter, setPlayerFilter] = useState<PlayerFilter>('with-plan');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [selectedIDP, setSelectedIDP] = useState<IndividualDevelopmentPlan | null>(null);
   const [idpDialogOpen, setIdpDialogOpen] = useState(false);
@@ -29,14 +32,32 @@ export default function Development() {
   const [selectedTest, setSelectedTest] = useState<TestResult | null>(null);
   const [testDialogOpen, setTestDialogOpen] = useState(false);
 
+  const playersWithPlan = players.filter(p => idps.some(idp => idp.playerId === p.id));
+  const playersWithoutPlan = players.filter(p => !idps.some(idp => idp.playerId === p.id));
+  const filteredPlayers = playerFilter === 'with-plan' ? playersWithPlan : playersWithoutPlan;
+
   const handlePlayerClick = (player: Player) => {
     navigate(`/team/${player.id}`);
   };
 
+  const handleCreatePlan = (player: Player, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedPlayer(player);
+    setSelectedIDP(null);
+    setIdpDialogOpen(true);
+  };
+
+  const handleEditPlan = (player: Player, idp: IndividualDevelopmentPlan, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedPlayer(player);
+    setSelectedIDP(idp);
+    setIdpDialogOpen(true);
+  };
+
   const handleSaveIDP = (idp: IndividualDevelopmentPlan) => {
-    const existingIDP = idps.find(i => i.playerId === idp.playerId);
-    if (existingIDP) {
-      updateIDP(idp.playerId, idp);
+    const existing = idps.find(i => i.id === idp.id);
+    if (existing) {
+      updateIDP(idp.id, idp);
     } else {
       addIDP(idp);
     }
@@ -60,12 +81,6 @@ export default function Development() {
     }
   };
 
-  // Get players with their IDPs
-  const playersWithIDPs = players.slice(0, 6).map(player => ({
-    player,
-    idp: idps.find(idp => idp.playerId === player.id)
-  }));
-
   return (
     <AppLayout>
       <div className="page-container">
@@ -87,60 +102,107 @@ export default function Development() {
               </div>
             </div>
 
-            <div className="space-y-4">
-              {playersWithIDPs.map(({ player, idp }) => (
-                <div 
-                  key={player.id} 
-                  onClick={() => handlePlayerClick(player)}
-                  className="stat-card hover:shadow-md transition-all cursor-pointer"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                        {player.jerseyNumber}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground">{player.name}</h3>
-                        <p className="text-xs text-muted-foreground">{player.positions?.join(' / ') || 'Forward'}</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </div>
+            {/* Player filter toggle */}
+            <div className="flex gap-2">
+              <Button
+                variant={playerFilter === 'with-plan' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setPlayerFilter('with-plan')}
+              >
+                With Plan ({playersWithPlan.length})
+              </Button>
+              <Button
+                variant={playerFilter === 'without-plan' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setPlayerFilter('without-plan')}
+              >
+                Without Plan ({playersWithoutPlan.length})
+              </Button>
+            </div>
 
-                  {idp ? (
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground uppercase mb-1.5">Focus Areas</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {idp.focusAreas.map(area => (
-                            <Badge key={area} variant="secondary" className="text-xs">
-                              {area}
-                            </Badge>
-                          ))}
+            <div className="space-y-4">
+              {filteredPlayers.length === 0 && (
+                <div className="stat-card text-center py-8">
+                  <p className="text-sm text-muted-foreground">
+                    {playerFilter === 'with-plan'
+                      ? 'No players have a development plan yet'
+                      : 'All players have a development plan'}
+                  </p>
+                </div>
+              )}
+
+              {filteredPlayers.map(player => {
+                const playerIdps = idps.filter(idp => idp.playerId === player.id);
+
+                return (
+                  <div
+                    key={player.id}
+                    onClick={() => handlePlayerClick(player)}
+                    className="stat-card hover:shadow-md transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                          {player.jerseyNumber}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground">{player.name}</h3>
+                          <p className="text-xs text-muted-foreground">{player.positions?.join(' / ') || 'Forward'}</p>
                         </div>
                       </div>
-
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground uppercase mb-1.5">Goals</p>
-                        <ul className="space-y-1">
-                          {idp.shortTermGoals.slice(0, 2).map((goal, i) => (
-                            <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                              {goal}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <p className="text-xs text-muted-foreground mt-4">
-                        Updated: {new Date(idp.lastUpdated).toLocaleDateString()}
-                      </p>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Click to create development plan</p>
-                  )}
-                </div>
-              ))}
+
+                    {playerIdps.length > 0 ? (
+                      <div className="space-y-3">
+                        {playerIdps.map(idp => (
+                          <div key={idp.id} className="border border-border rounded-lg p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <p className="font-medium text-foreground text-sm">{idp.goal}</p>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => handleEditPlan(player, idp, e)}
+                                className="text-xs h-7"
+                              >
+                                Edit
+                              </Button>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <CalendarDays className="h-3.5 w-3.5" />
+                              {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
+                            </div>
+                            {idp.focusAreas.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5">
+                                {idp.focusAreas.map(area => (
+                                  <Badge key={area} variant="secondary" className="text-xs">{area}</Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={(e) => handleCreatePlan(player, e)}
+                        >
+                          <Plus className="h-4 w-4 mr-1" /> Add Another Plan
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={(e) => handleCreatePlan(player, e)}
+                      >
+                        <Plus className="h-4 w-4 mr-1" /> Create Development Plan
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -174,22 +236,17 @@ export default function Development() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-foreground">{test.testName}</p>
-                          <Badge variant="outline" className="text-xs">
-                            {test.testType}
-                          </Badge>
+                          <Badge variant="outline" className="text-xs">{test.testType}</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
                           {player?.name} • {new Date(test.date).toLocaleDateString()}
                         </p>
                       </div>
-
                       <div className="text-right flex items-center gap-3">
                         <div>
                           <p className="font-bold text-foreground">{test.result}</p>
                           {test.previousResult && (
-                            <p className="text-xs text-muted-foreground">
-                              prev: {test.previousResult}
-                            </p>
+                            <p className="text-xs text-muted-foreground">prev: {test.previousResult}</p>
                           )}
                         </div>
                         <TrendIcon trend={test.trend} />

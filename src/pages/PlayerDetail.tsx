@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { usePlayers, useIDPs, useTestResults } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
+import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
 import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
 import { PlayerStatsSection } from '@/components/team/PlayerStatsSection';
 import { PlayerTestResults } from '@/components/team/PlayerTestResults';
@@ -11,9 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Edit, Target, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Edit, Target, AlertTriangle, Plus, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { TestResult } from '@/types';
+import { TestResult, IndividualDevelopmentPlan } from '@/types';
 
 export default function PlayerDetail() {
   const { playerId } = useParams<{ playerId: string }>();
@@ -21,15 +22,17 @@ export default function PlayerDetail() {
   
   const { players, updatePlayer, deletePlayer, isLoading: playersLoading } = usePlayers();
   const { games } = useEnhancedGames();
-  const { idps } = useIDPs();
+  const { idps, addIDP, updateIDP } = useIDPs();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [testDialogOpen, setTestDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TestResult | null>(null);
+  const [idpDialogOpen, setIdpDialogOpen] = useState(false);
+  const [selectedIDP, setSelectedIDP] = useState<IndividualDevelopmentPlan | null>(null);
   
   const player = players.find(p => p.id === playerId);
-  const playerIDP = idps.find(idp => idp.playerId === playerId);
+  const playerIDPs = idps.filter(idp => idp.playerId === playerId);
   const playerTests = tests.filter(t => t.playerId === playerId);
   
   if (playersLoading) {
@@ -85,6 +88,25 @@ export default function PlayerDetail() {
     } else {
       addTest(test);
     }
+  };
+
+  const handleSaveIDP = (idp: IndividualDevelopmentPlan) => {
+    const existing = idps.find(i => i.id === idp.id);
+    if (existing) {
+      updateIDP(idp.id, idp);
+    } else {
+      addIDP(idp);
+    }
+  };
+
+  const handleAddPlan = () => {
+    setSelectedIDP(null);
+    setIdpDialogOpen(true);
+  };
+
+  const handleEditPlan = (idp: IndividualDevelopmentPlan) => {
+    setSelectedIDP(idp);
+    setIdpDialogOpen(true);
   };
   
   return (
@@ -145,54 +167,64 @@ export default function PlayerDetail() {
           <PlayerStatsSection player={player} games={games} />
         </div>
         
-        {/* Development / IDP */}
-        {playerIDP && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Target className="h-5 w-5 text-primary" />
-                Development Plan
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {playerIDP.focusAreas.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Focus Areas</p>
-                  <div className="flex flex-wrap gap-2">
-                    {playerIDP.focusAreas.map(area => (
-                      <Badge key={area} variant="secondary">{area}</Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {playerIDP.shortTermGoals.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Goals</p>
-                  <ul className="space-y-1">
-                    {playerIDP.shortTermGoals.map((goal, i) => (
-                      <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        {goal}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              
-              {playerIDP.coachNotes && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Coach Notes</p>
-                  <p className="text-sm text-muted-foreground">{playerIDP.coachNotes}</p>
-                </div>
-              )}
-              
-              <p className="text-xs text-muted-foreground pt-2 border-t border-border">
-                Last updated: {new Date(playerIDP.lastUpdated).toLocaleDateString()}
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        {/* Development Plans */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              Development Plans
+            </h2>
+            <Button variant="outline" size="sm" onClick={handleAddPlan}>
+              <Plus className="h-4 w-4 mr-1" /> Add Plan
+            </Button>
+          </div>
+
+          {playerIDPs.length > 0 ? (
+            <div className="space-y-4">
+              {playerIDPs.map(idp => (
+                <Card key={idp.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditPlan(idp)}>
+                  <CardContent className="pt-6 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-foreground">{idp.goal}</p>
+                      <Button variant="ghost" size="sm" className="text-xs h-7">Edit</Button>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
+                    </div>
+                    {idp.focusAreas.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {idp.focusAreas.map(area => (
+                          <Badge key={area} variant="secondary" className="text-xs">{area}</Badge>
+                        ))}
+                      </div>
+                    )}
+                    {idp.shortTermGoals.length > 0 && (
+                      <ul className="space-y-1">
+                        {idp.shortTermGoals.map((goal, i) => (
+                          <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            {goal}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {idp.coachNotes && (
+                      <p className="text-sm text-muted-foreground border-t border-border pt-2">{idp.coachNotes}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground">Updated: {new Date(idp.lastUpdated).toLocaleDateString()}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                No development plans yet
+              </CardContent>
+            </Card>
+          )}
+        </div>
         
         {/* Test Results */}
         <div>
@@ -215,6 +247,14 @@ export default function PlayerDetail() {
         player={player}
         onSave={handleSavePlayer}
         onDelete={handleDeletePlayer}
+      />
+
+      <IDPFormDialog
+        open={idpDialogOpen}
+        onOpenChange={setIdpDialogOpen}
+        idp={selectedIDP}
+        player={player}
+        onSave={handleSaveIDP}
       />
       
       <TestResultFormDialog

@@ -88,7 +88,11 @@ export interface PlayMedia {
 
 // Development types
 export interface IndividualDevelopmentPlan {
+  id: string;
   playerId: string;
+  goal: string;
+  startDate: string;
+  endDate: string;
   focusAreas: string[];
   shortTermGoals: string[];
   coachNotes: string;
