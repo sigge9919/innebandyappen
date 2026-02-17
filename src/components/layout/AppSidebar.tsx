@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Users,
   Trophy,
+  BarChart3,
   Calendar,
   BookOpen,
   TrendingUp,
@@ -17,7 +18,8 @@ import { useState } from 'react';
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/team', icon: Users, label: 'Team' },
-  { to: '/games', icon: Trophy, label: 'Games & Stats' },
+  { to: '/games', icon: Trophy, label: 'Games' },
+  { to: '/stats', icon: BarChart3, label: 'Stats' },
   { to: '/training', icon: Calendar, label: 'Training' },
   { to: '/playbook', icon: BookOpen, label: 'Playbook' },
   { to: '/development', icon: TrendingUp, label: 'Development' },

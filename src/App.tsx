@@ -8,6 +8,7 @@ import Team from "./pages/Team";
 import PlayerDetail from "./pages/PlayerDetail";
 import Games from "./pages/Games";
 import GameDetail from "./pages/GameDetail";
+import Stats from "./pages/Stats";
 import Training from "./pages/Training";
 import DrillDetail from "./pages/DrillDetail";
 import Playbook from "./pages/Playbook";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/team/:playerId" element={<PlayerDetail />} />
           <Route path="/games" element={<Games />} />
           <Route path="/games/:gameId" element={<GameDetail />} />
+          <Route path="/stats" element={<Stats />} />
           <Route path="/training" element={<Training />} />
           <Route path="/training/drill/:drillId" element={<DrillDetail />} />
           <Route path="/playbook" element={<Playbook />} />
