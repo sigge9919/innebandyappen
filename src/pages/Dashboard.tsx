@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NextGameCard } from '@/components/dashboard/NextGameCard';
@@ -7,24 +6,28 @@ import { NextTrainingCard } from '@/components/dashboard/NextTrainingCard';
 import { PlayerAlerts } from '@/components/dashboard/PlayerAlerts';
 import { WeeklyFocusCard } from '@/components/dashboard/WeeklyFocusCard';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { usePlayers, useGames, useTrainingSessions, useWeeklyFocus, useCoachNotes } from '@/hooks/useLocalStorage';
+import { usePlayers, useTrainingSessions, useWeeklyFocus, useCoachNotes } from '@/hooks/useLocalStorage';
+import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { Users, Trophy, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { players } = usePlayers();
-  const { games } = useGames();
+  const { games } = useEnhancedGames();
   const { sessions } = useTrainingSessions();
   const { focus, saveFocus } = useWeeklyFocus();
   const { notes, saveNotes } = useCoachNotes();
 
-  const upcomingGame = games.find(g => g.status === 'Upcoming');
-  const lastPlayedGame = games.filter(g => g.status === 'Played')[0];
+  const upcomingGame = games.find(g => g.status === 'Not Started');
+  const lastPlayedGame = games
+    .filter(g => g.status === 'Finished')
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
   const nextTraining = sessions[0];
   
   const activePlayers = players.filter(p => p.status === 'Active').length;
-  const gamesPlayed = games.filter(g => g.status === 'Played').length;
-  const gamesWon = games.filter(g => g.status === 'Played' && (g.ourScore ?? 0) > (g.opponentScore ?? 0)).length;
+  const finishedGames = games.filter(g => g.status === 'Finished');
+  const gamesPlayed = finishedGames.length;
+  const gamesWon = finishedGames.filter(g => g.ourScore > g.opponentScore).length;
 
   return (
     <AppLayout>

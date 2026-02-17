@@ -1,11 +1,11 @@
 import { CalendarDays, MapPin, ArrowRight } from 'lucide-react';
-import { Game } from '@/types';
+import { EnhancedGame } from '@/types/game';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 interface NextGameCardProps {
-  game: Game;
+  game: EnhancedGame;
 }
 
 export function NextGameCard({ game }: NextGameCardProps) {
@@ -31,7 +31,7 @@ export function NextGameCard({ game }: NextGameCardProps) {
           </div>
         </div>
 
-        <Link to="/games">
+        <Link to={`/games/${game.id}`}>
           <Button variant="outline" size="sm" className="w-full group">
             View Game Details
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
