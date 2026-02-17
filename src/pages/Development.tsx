@@ -6,9 +6,10 @@ import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
 import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Target, TrendingUp, TrendingDown, Minus, ChevronRight, ClipboardList, Plus, CalendarDays } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Minus, ChevronRight, ClipboardList, Plus, CalendarDays, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Player, IndividualDevelopmentPlan, TestResult } from '@/types';
+import { getIDPStatus, getIDPStatusVariant, isIDPActive } from '@/lib/idpUtils';
 
 type PlayerFilter = 'with-plan' | 'without-plan';
 
@@ -21,7 +22,7 @@ const TrendIcon = ({ trend }: { trend: 'up' | 'down' | 'same' }) => {
 export default function Development() {
   const navigate = useNavigate();
   const { players } = usePlayers();
-  const { idps, addIDP, updateIDP } = useIDPs();
+  const { idps, addIDP, updateIDP, deleteIDP } = useIDPs();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
 
   const [playerFilter, setPlayerFilter] = useState<PlayerFilter>('with-plan');
@@ -32,9 +33,12 @@ export default function Development() {
   const [selectedTest, setSelectedTest] = useState<TestResult | null>(null);
   const [testDialogOpen, setTestDialogOpen] = useState(false);
 
-  const playersWithPlan = players.filter(p => idps.some(idp => idp.playerId === p.id));
-  const playersWithoutPlan = players.filter(p => !idps.some(idp => idp.playerId === p.id));
-  const filteredPlayers = playerFilter === 'with-plan' ? playersWithPlan : playersWithoutPlan;
+  // Only active (non-completed) IDPs for the development tab
+  const activeIdps = idps.filter(isIDPActive);
+
+  const playersWithActivePlan = players.filter(p => activeIdps.some(idp => idp.playerId === p.id));
+  const playersWithoutActivePlan = players.filter(p => !activeIdps.some(idp => idp.playerId === p.id));
+  const filteredPlayers = playerFilter === 'with-plan' ? playersWithActivePlan : playersWithoutActivePlan;
 
   const handlePlayerClick = (player: Player) => {
     navigate(`/team/${player.id}`);
@@ -63,6 +67,15 @@ export default function Development() {
     }
   };
 
+  const handleDeleteIDP = (id: string) => {
+    deleteIDP(id);
+  };
+
+  const handleMarkComplete = (idp: IndividualDevelopmentPlan, e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateIDP(idp.id, { ...idp, completed: true });
+  };
+
   const handleAddTest = () => {
     setSelectedTest(null);
     setTestDialogOpen(true);
@@ -84,7 +97,6 @@ export default function Development() {
   return (
     <AppLayout>
       <div className="page-container">
-        {/* Header */}
         <div className="section-header">
           <div>
             <h1 className="section-title">Development</h1>
@@ -98,25 +110,24 @@ export default function Development() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold text-foreground">Development Plans</h2>
+                <h2 className="text-lg font-semibold text-foreground">Active Plans</h2>
               </div>
             </div>
 
-            {/* Player filter toggle */}
             <div className="flex gap-2">
               <Button
                 variant={playerFilter === 'with-plan' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setPlayerFilter('with-plan')}
               >
-                With Plan ({playersWithPlan.length})
+                With Plan ({playersWithActivePlan.length})
               </Button>
               <Button
                 variant={playerFilter === 'without-plan' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setPlayerFilter('without-plan')}
               >
-                Without Plan ({playersWithoutPlan.length})
+                Without Plan ({playersWithoutActivePlan.length})
               </Button>
             </div>
 
@@ -125,14 +136,14 @@ export default function Development() {
                 <div className="stat-card text-center py-8">
                   <p className="text-sm text-muted-foreground">
                     {playerFilter === 'with-plan'
-                      ? 'No players have a development plan yet'
-                      : 'All players have a development plan'}
+                      ? 'No players have an active development plan'
+                      : 'All players have an active development plan'}
                   </p>
                 </div>
               )}
 
               {filteredPlayers.map(player => {
-                const playerIdps = idps.filter(idp => idp.playerId === player.id);
+                const playerActiveIdps = activeIdps.filter(idp => idp.playerId === player.id);
 
                 return (
                   <div
@@ -153,34 +164,53 @@ export default function Development() {
                       <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
 
-                    {playerIdps.length > 0 ? (
+                    {playerActiveIdps.length > 0 ? (
                       <div className="space-y-3">
-                        {playerIdps.map(idp => (
-                          <div key={idp.id} className="border border-border rounded-lg p-3 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <p className="font-medium text-foreground text-sm">{idp.goal}</p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => handleEditPlan(player, idp, e)}
-                                className="text-xs h-7"
-                              >
-                                Edit
-                              </Button>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <CalendarDays className="h-3.5 w-3.5" />
-                              {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
-                            </div>
-                            {idp.focusAreas.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5">
-                                {idp.focusAreas.map(area => (
-                                  <Badge key={area} variant="secondary" className="text-xs">{area}</Badge>
-                                ))}
+                        {playerActiveIdps.map(idp => {
+                          const status = getIDPStatus(idp);
+                          return (
+                            <div key={idp.id} className="border border-border rounded-lg p-3 space-y-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <p className="font-medium text-foreground text-sm truncate">{idp.goal}</p>
+                                  <Badge variant={getIDPStatusVariant(status)} className="text-xs shrink-0">
+                                    {status === 'Overdue' && <AlertCircle className="h-3 w-3 mr-1" />}
+                                    {status}
+                                  </Badge>
+                                </div>
+                                <div className="flex items-center gap-1 shrink-0">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => handleMarkComplete(idp, e)}
+                                    className="text-xs h-7"
+                                  >
+                                    Complete
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => handleEditPlan(player, idp, e)}
+                                    className="text-xs h-7"
+                                  >
+                                    Edit
+                                  </Button>
+                                </div>
                               </div>
-                            )}
-                          </div>
-                        ))}
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <CalendarDays className="h-3.5 w-3.5" />
+                                {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
+                              </div>
+                              {idp.focusAreas.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5">
+                                  {idp.focusAreas.map(area => (
+                                    <Badge key={area} variant="secondary" className="text-xs">{area}</Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                         <Button
                           variant="outline"
                           size="sm"
@@ -274,6 +304,7 @@ export default function Development() {
         idp={selectedIDP}
         player={selectedPlayer}
         onSave={handleSaveIDP}
+        onDelete={handleDeleteIDP}
       />
 
       <TestResultFormDialog

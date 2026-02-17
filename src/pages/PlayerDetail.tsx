@@ -10,11 +10,12 @@ import { PlayerStatsSection } from '@/components/team/PlayerStatsSection';
 import { PlayerTestResults } from '@/components/team/PlayerTestResults';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Edit, Target, AlertTriangle, Plus, CalendarDays } from 'lucide-react';
+import { ArrowLeft, Edit, Target, AlertTriangle, Plus, CalendarDays, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TestResult, IndividualDevelopmentPlan } from '@/types';
+import { getIDPStatus, getIDPStatusVariant } from '@/lib/idpUtils';
 
 export default function PlayerDetail() {
   const { playerId } = useParams<{ playerId: string }>();
@@ -22,7 +23,7 @@ export default function PlayerDetail() {
   
   const { players, updatePlayer, deletePlayer, isLoading: playersLoading } = usePlayers();
   const { games } = useEnhancedGames();
-  const { idps, addIDP, updateIDP } = useIDPs();
+  const { idps, addIDP, updateIDP, deleteIDP } = useIDPs();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -99,6 +100,10 @@ export default function PlayerDetail() {
     }
   };
 
+  const handleDeleteIDP = (id: string) => {
+    deleteIDP(id);
+  };
+
   const handleAddPlan = () => {
     setSelectedIDP(null);
     setIdpDialogOpen(true);
@@ -108,6 +113,17 @@ export default function PlayerDetail() {
     setSelectedIDP(idp);
     setIdpDialogOpen(true);
   };
+
+  const handleToggleComplete = (idp: IndividualDevelopmentPlan) => {
+    updateIDP(idp.id, { ...idp, completed: !idp.completed });
+  };
+
+  // Sort: active/overdue first, completed last
+  const sortedIDPs = [...playerIDPs].sort((a, b) => {
+    const aCompleted = a.completed ? 1 : 0;
+    const bCompleted = b.completed ? 1 : 0;
+    return aCompleted - bCompleted;
+  });
   
   return (
     <AppLayout>
@@ -179,43 +195,70 @@ export default function PlayerDetail() {
             </Button>
           </div>
 
-          {playerIDPs.length > 0 ? (
+          {sortedIDPs.length > 0 ? (
             <div className="space-y-4">
-              {playerIDPs.map(idp => (
-                <Card key={idp.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleEditPlan(idp)}>
-                  <CardContent className="pt-6 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <p className="font-semibold text-foreground">{idp.goal}</p>
-                      <Button variant="ghost" size="sm" className="text-xs h-7">Edit</Button>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CalendarDays className="h-3.5 w-3.5" />
-                      {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
-                    </div>
-                    {idp.focusAreas.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {idp.focusAreas.map(area => (
-                          <Badge key={area} variant="secondary" className="text-xs">{area}</Badge>
-                        ))}
+              {sortedIDPs.map(idp => {
+                const status = getIDPStatus(idp);
+                return (
+                  <Card
+                    key={idp.id}
+                    className={cn(
+                      "cursor-pointer hover:shadow-md transition-shadow",
+                      status === 'Completed' && "opacity-60"
+                    )}
+                    onClick={() => handleEditPlan(idp)}
+                  >
+                    <CardContent className="pt-6 space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <p className={cn("font-semibold text-foreground", status === 'Completed' && "line-through")}>{idp.goal}</p>
+                          <Badge variant={getIDPStatusVariant(status)} className="text-xs shrink-0">
+                            {status === 'Overdue' && <AlertCircle className="h-3 w-3 mr-1" />}
+                            {status === 'Completed' && <CheckCircle2 className="h-3 w-3 mr-1" />}
+                            {status}
+                          </Badge>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-7 shrink-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleComplete(idp);
+                          }}
+                        >
+                          {status === 'Completed' ? 'Reactivate' : 'Complete'}
+                        </Button>
                       </div>
-                    )}
-                    {idp.shortTermGoals.length > 0 && (
-                      <ul className="space-y-1">
-                        {idp.shortTermGoals.map((goal, i) => (
-                          <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                            {goal}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    {idp.coachNotes && (
-                      <p className="text-sm text-muted-foreground border-t border-border pt-2">{idp.coachNotes}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">Updated: {new Date(idp.lastUpdated).toLocaleDateString()}</p>
-                  </CardContent>
-                </Card>
-              ))}
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <CalendarDays className="h-3.5 w-3.5" />
+                        {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
+                      </div>
+                      {idp.focusAreas.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {idp.focusAreas.map(area => (
+                            <Badge key={area} variant="secondary" className="text-xs">{area}</Badge>
+                          ))}
+                        </div>
+                      )}
+                      {idp.shortTermGoals.length > 0 && (
+                        <ul className="space-y-1">
+                          {idp.shortTermGoals.map((goal, i) => (
+                            <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                              {goal}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      {idp.coachNotes && (
+                        <p className="text-sm text-muted-foreground border-t border-border pt-2">{idp.coachNotes}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground">Updated: {new Date(idp.lastUpdated).toLocaleDateString()}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             <Card>
@@ -255,6 +298,7 @@ export default function PlayerDetail() {
         idp={selectedIDP}
         player={player}
         onSave={handleSaveIDP}
+        onDelete={handleDeleteIDP}
       />
       
       <TestResultFormDialog

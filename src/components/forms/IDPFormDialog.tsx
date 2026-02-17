@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { IndividualDevelopmentPlan, Player } from '@/types';
-import { Plus, X, CalendarIcon } from 'lucide-react';
+import { Plus, X, CalendarIcon, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface IDPFormDialogProps {
@@ -17,9 +17,10 @@ interface IDPFormDialogProps {
   idp?: IndividualDevelopmentPlan | null;
   player: Player | null;
   onSave: (idp: IndividualDevelopmentPlan) => void;
+  onDelete?: (id: string) => void;
 }
 
-export function IDPFormDialog({ open, onOpenChange, idp, player, onSave }: IDPFormDialogProps) {
+export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelete }: IDPFormDialogProps) {
   const [formData, setFormData] = useState({
     goal: '',
     startDate: undefined as Date | undefined,
@@ -64,10 +65,18 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave }: IDPFo
       focusAreas: formData.focusAreas.filter(fa => fa.trim() !== ''),
       shortTermGoals: formData.shortTermGoals.filter(g => g.trim() !== ''),
       coachNotes: formData.coachNotes,
+      completed: idp?.completed || false,
       lastUpdated: new Date().toISOString().split('T')[0],
     };
     onSave(newIDP);
     onOpenChange(false);
+  };
+
+  const handleDelete = () => {
+    if (idp && onDelete) {
+      onDelete(idp.id);
+      onOpenChange(false);
+    }
   };
 
   const addField = (field: 'focusAreas' | 'shortTermGoals') => {
@@ -227,7 +236,13 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave }: IDPFo
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            {idp && onDelete && (
+              <Button type="button" variant="destructive" onClick={handleDelete} className="sm:mr-auto">
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
+            )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
