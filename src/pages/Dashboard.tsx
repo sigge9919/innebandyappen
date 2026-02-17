@@ -8,12 +8,10 @@ import { PlayerAlerts } from '@/components/dashboard/PlayerAlerts';
 import { WeeklyFocusCard } from '@/components/dashboard/WeeklyFocusCard';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { usePlayers, useGames, useTrainingSessions, useWeeklyFocus, useCoachNotes } from '@/hooks/useLocalStorage';
-import { useAuth } from '@/contexts/AuthContext';
 import { Users, Trophy, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { players } = usePlayers();
   const { games } = useGames();
   const { sessions } = useTrainingSessions();
@@ -35,7 +33,7 @@ export default function Dashboard() {
         <div className="section-header">
           <div>
             <h1 className="section-title">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Welcome back, {user?.name || 'Coach'}</p>
+            <p className="text-muted-foreground mt-1">Welcome back, Coach</p>
           </div>
         </div>
 

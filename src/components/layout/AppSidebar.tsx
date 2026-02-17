@@ -8,13 +8,11 @@ import {
   TrendingUp,
   PenTool,
   Menu,
-  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -47,14 +45,6 @@ function NavItem({ to, icon: Icon, label, onClick }: { to: string; icon: React.E
 
 export function AppSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, logout } = useAuth();
-
-  const userInitials = user?.name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || 'HC';
 
   const SidebarContent = ({ onItemClick }: { onItemClick?: () => void }) => (
     <div className="flex flex-col h-full bg-sidebar">
@@ -77,28 +67,6 @@ export function AppSidebar() {
           <NavItem key={item.to} {...item} onClick={onItemClick} />
         ))}
       </nav>
-
-      {/* Footer with User Info */}
-      <div className="p-4 border-t border-sidebar-border">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
-            <span className="text-sm font-medium text-sidebar-foreground">{userInitials}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name || 'Coach'}</p>
-            <p className="text-xs text-sidebar-foreground/60">{user?.role || 'Guest'}</p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={logout}
-            className="h-8 w-8 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
-            title="Sign out"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 
