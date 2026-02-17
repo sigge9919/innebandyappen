@@ -96,6 +96,7 @@ export interface IndividualDevelopmentPlan {
   focusAreas: string[];
   shortTermGoals: string[];
   coachNotes: string;
+  completed?: boolean;
   lastUpdated: string;
 }
 
