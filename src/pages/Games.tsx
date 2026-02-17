@@ -32,6 +32,10 @@ export default function Games() {
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const liveGames = games.filter(g => g.status === 'Live').length;
+  const finishedGames = games.filter(g => g.status === 'Finished');
+  const wins = finishedGames.filter(g => g.ourScore > g.opponentScore).length;
+  const losses = finishedGames.filter(g => g.ourScore < g.opponentScore).length;
+  const draws = finishedGames.filter(g => g.ourScore === g.opponentScore).length;
 
   const handleGameClick = (game: EnhancedGame) => {
     navigate(`/games/${game.id}`);
@@ -60,6 +64,24 @@ export default function Games() {
             Add Game
           </Button>
         </div>
+
+        {/* Stats Banner */}
+        {finishedGames.length > 0 && (
+          <div className="grid grid-cols-3 gap-4">
+            <div className="stat-card flex flex-col items-center py-4">
+              <span className="text-2xl font-bold text-success">{wins}</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Wins</span>
+            </div>
+            <div className="stat-card flex flex-col items-center py-4">
+              <span className="text-2xl font-bold text-muted-foreground">{draws}</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Draws</span>
+            </div>
+            <div className="stat-card flex flex-col items-center py-4">
+              <span className="text-2xl font-bold text-destructive">{losses}</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Losses</span>
+            </div>
+          </div>
+        )}
 
         {/* Game Filters */}
         <div className="flex gap-2 flex-wrap">
