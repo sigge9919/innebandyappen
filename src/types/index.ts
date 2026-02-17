@@ -106,19 +106,9 @@ export interface TestResult {
   trend: 'up' | 'down' | 'same';
 }
 
-// Coach types
-export type CoachRole = 'Head Coach' | 'Assistant Coach' | 'Stats Coach' | 'Viewer';
-
-export interface Coach {
-  id: string;
-  email: string;
-  name: string;
-  role: CoachRole;
-}
 
 export interface Team {
   id: string;
   name: string;
-  coaches: Coach[];
   players: Player[];
 }
