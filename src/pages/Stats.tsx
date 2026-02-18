@@ -3,19 +3,23 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { usePlayers } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Users } from 'lucide-react';
+import { BarChart3, Users, TrendingUp } from 'lucide-react';
 import { getFinishedGames } from '@/lib/seasonStats';
 import { SeasonPlayerStats } from '@/components/stats/SeasonPlayerStats';
 import { SeasonTeamStats } from '@/components/stats/SeasonTeamStats';
+import { TeamTrends } from '@/components/stats/TeamTrends';
+import { PlayerTrends } from '@/components/stats/PlayerTrends';
 
-type StatsViewType = 'player' | 'team';
+type StatsViewType = 'player' | 'team' | 'trends';
 type StatsPeriodType = 'season' | 'last3';
+type TrendsSubView = 'team' | 'player';
 
 export default function Stats() {
   const { games } = useEnhancedGames();
   const { players } = usePlayers();
   const [statsView, setStatsView] = useState<StatsViewType>('player');
   const [statsPeriod, setStatsPeriod] = useState<StatsPeriodType>('season');
+  const [trendsSubView, setTrendsSubView] = useState<TrendsSubView>('team');
 
   const finishedGamesCount = games.filter(g => g.status === 'Finished').length;
 
@@ -68,6 +72,15 @@ export default function Stats() {
                   <BarChart3 className="h-4 w-4" />
                   Team Stats
                 </Button>
+                <Button
+                  variant={statsView === 'trends' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setStatsView('trends')}
+                  className="gap-2"
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  Trends
+                </Button>
               </div>
 
               {/* Period Toggle */}
@@ -97,8 +110,34 @@ export default function Stats() {
             {/* Stats Content */}
             {statsView === 'player' ? (
               <SeasonPlayerStats games={statsGames} players={players} />
-            ) : (
+            ) : statsView === 'team' ? (
               <SeasonTeamStats games={statsGames} />
+            ) : (
+              <div className="space-y-4">
+                {/* Trends Sub-Toggle */}
+                <div className="flex gap-2">
+                  <Button
+                    variant={trendsSubView === 'team' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setTrendsSubView('team')}
+                  >
+                    Team Trends
+                  </Button>
+                  <Button
+                    variant={trendsSubView === 'player' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setTrendsSubView('player')}
+                  >
+                    Player Trends
+                  </Button>
+                </div>
+
+                {trendsSubView === 'team' ? (
+                  <TeamTrends games={statsGames} />
+                ) : (
+                  <PlayerTrends games={statsGames} players={players} />
+                )}
+              </div>
             )}
           </div>
         )}
