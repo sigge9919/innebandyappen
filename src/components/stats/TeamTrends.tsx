@@ -4,7 +4,6 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { EnhancedGame } from '@/types/game';
 import { calculateTeamStats } from '@/lib/gameStorage';
-import { format } from 'date-fns';
 
 interface TeamTrendsProps {
   games: EnhancedGame[];
@@ -18,11 +17,11 @@ export function TeamTrends({ games }: TeamTrendsProps) {
         const homeStats = calculateTeamStats(game.events, 'home');
         const oppStats = calculateTeamStats(game.events, 'opponent');
         return {
-          label: `${game.opponent}`,
-          date: format(new Date(game.date), 'dd/MM'),
+          label: game.opponent,
           ourGoals: game.ourScore,
           oppGoals: game.opponentScore,
           sog: homeStats.shotsOnGoal,
+          oppSog: oppStats.shotsOnGoal,
           shotsOff: homeStats.shotsOffGoal,
           shotsBlocked: homeStats.shotsBlocked,
         };
@@ -37,57 +36,66 @@ export function TeamTrends({ games }: TeamTrendsProps) {
     );
   }
 
-  const goalsConfig = {
-    ourGoals: { label: 'Our Goals', color: 'hsl(var(--chart-1))' },
-    oppGoals: { label: 'Opponent Goals', color: 'hsl(var(--chart-2))' },
-  };
-
-  const shotsConfig = {
-    sog: { label: 'SOG', color: 'hsl(var(--chart-1))' },
-    shotsOff: { label: 'Off Goal', color: 'hsl(var(--chart-3))' },
-    shotsBlocked: { label: 'Blocked', color: 'hsl(var(--chart-4))' },
-  };
+  const charts = [
+    {
+      title: 'Goals Scored',
+      dataKey: 'ourGoals',
+      config: { ourGoals: { label: 'Our Goals', color: 'hsl(var(--chart-1))' } },
+    },
+    {
+      title: 'Goals Against',
+      dataKey: 'oppGoals',
+      config: { oppGoals: { label: 'Opponent Goals', color: 'hsl(var(--chart-2))' } },
+    },
+    {
+      title: 'Shots on Goal',
+      dataKey: 'sog',
+      config: { sog: { label: 'SOG', color: 'hsl(var(--chart-1))' } },
+    },
+    {
+      title: 'Opponent SOG',
+      dataKey: 'oppSog',
+      config: { oppSog: { label: 'Opp SOG', color: 'hsl(var(--chart-2))' } },
+    },
+    {
+      title: 'Shots Off Goal',
+      dataKey: 'shotsOff',
+      config: { shotsOff: { label: 'Off Goal', color: 'hsl(var(--chart-3))' } },
+    },
+    {
+      title: 'Shots Blocked',
+      dataKey: 'shotsBlocked',
+      config: { shotsBlocked: { label: 'Blocked', color: 'hsl(var(--chart-4))' } },
+    },
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Goals Chart */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Goals per Game</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={goalsConfig} className="h-[250px] w-full">
-            <LineChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              <YAxis allowDecimals={false} />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Line type="monotone" dataKey="ourGoals" stroke="var(--color-ourGoals)" strokeWidth={2} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="oppGoals" stroke="var(--color-oppGoals)" strokeWidth={2} dot={{ r: 4 }} />
-            </LineChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
-
-      {/* Shots Chart */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Shots per Game</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={shotsConfig} className="h-[250px] w-full">
-            <LineChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              <YAxis allowDecimals={false} />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Line type="monotone" dataKey="sog" stroke="var(--color-sog)" strokeWidth={2} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="shotsOff" stroke="var(--color-shotsOff)" strokeWidth={2} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="shotsBlocked" stroke="var(--color-shotsBlocked)" strokeWidth={2} dot={{ r: 4 }} />
-            </LineChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+    <div className="grid gap-6 md:grid-cols-2">
+      {charts.map(chart => (
+        <Card key={chart.dataKey}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">{chart.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chart.config} className="h-[200px] w-full">
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis allowDecimals={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line
+                  type="monotone"
+                  dataKey={chart.dataKey}
+                  stroke={`var(--color-${chart.dataKey})`}
+                  strokeWidth={2}
+                  dot={{ r: 5, fill: `var(--color-${chart.dataKey})`, strokeWidth: 0 }}
+                  activeDot={{ r: 7 }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

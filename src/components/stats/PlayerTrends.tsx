@@ -12,6 +12,12 @@ interface PlayerTrendsProps {
   players: Player[];
 }
 
+interface ChartDef {
+  title: string;
+  dataKey: string;
+  config: Record<string, { label: string; color: string }>;
+}
+
 export function PlayerTrends({ games, players }: PlayerTrendsProps) {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>(players[0]?.id || '');
 
@@ -24,7 +30,6 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
     return [...games]
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map(game => {
-        // Check if player was in squad
         if (!game.squadPlayerIds.includes(selectedPlayerId)) return null;
 
         const playerStats = calculatePlayerStatsFromEvents(
@@ -33,7 +38,6 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
         const stat = playerStats.find(s => s.playerId === selectedPlayerId);
 
         if (isGoalie) {
-          // Goalie stats: Goals Against, Save %
           const oppShotsOnGoal = game.events.filter(
             e => (e.type === 'shot_on_goal' || e.type === 'goal') && e.team === 'opponent'
           ).length;
@@ -41,11 +45,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
           const saves = oppShotsOnGoal - goalsAgainst;
           const savePct = oppShotsOnGoal > 0 ? Math.round((saves / oppShotsOnGoal) * 100) : 0;
 
-          return {
-            label: game.opponent,
-            goalsAgainst,
-            savePct,
-          };
+          return { label: game.opponent, goalsAgainst, savePct };
         }
 
         return {
@@ -65,32 +65,24 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
     return <p className="text-center text-muted-foreground py-8">No players available</p>;
   }
 
-  const skaterPointsConfig = {
-    goals: { label: 'Goals', color: 'hsl(var(--chart-1))' },
-    assists: { label: 'Assists', color: 'hsl(var(--chart-3))' },
-  };
+  const skaterCharts: ChartDef[] = [
+    { title: 'Goals', dataKey: 'goals', config: { goals: { label: 'Goals', color: 'hsl(var(--chart-1))' } } },
+    { title: 'Assists', dataKey: 'assists', config: { assists: { label: 'Assists', color: 'hsl(var(--chart-3))' } } },
+    { title: 'Shots on Goal', dataKey: 'sog', config: { sog: { label: 'SOG', color: 'hsl(var(--chart-1))' } } },
+    { title: 'Shots Off Goal', dataKey: 'shotsOff', config: { shotsOff: { label: 'Off Goal', color: 'hsl(var(--chart-3))' } } },
+    { title: 'Shots Blocked', dataKey: 'shotsBlocked', config: { shotsBlocked: { label: 'Blocked', color: 'hsl(var(--chart-4))' } } },
+    { title: 'Plus/Minus (5v5)', dataKey: 'plusMinus', config: { plusMinus: { label: '+/-', color: 'hsl(var(--chart-1))' } } },
+  ];
 
-  const skaterShotsConfig = {
-    sog: { label: 'SOG', color: 'hsl(var(--chart-1))' },
-    shotsOff: { label: 'Off Goal', color: 'hsl(var(--chart-3))' },
-    shotsBlocked: { label: 'Blocked', color: 'hsl(var(--chart-4))' },
-  };
+  const goalieCharts: ChartDef[] = [
+    { title: 'Goals Against', dataKey: 'goalsAgainst', config: { goalsAgainst: { label: 'Goals Against', color: 'hsl(var(--chart-2))' } } },
+    { title: 'Save %', dataKey: 'savePct', config: { savePct: { label: 'Save %', color: 'hsl(var(--chart-1))' } } },
+  ];
 
-  const plusMinusConfig = {
-    plusMinus: { label: '+/-', color: 'hsl(var(--chart-1))' },
-  };
-
-  const goalieGAConfig = {
-    goalsAgainst: { label: 'Goals Against', color: 'hsl(var(--chart-2))' },
-  };
-
-  const goalieSvConfig = {
-    savePct: { label: 'Save %', color: 'hsl(var(--chart-1))' },
-  };
+  const charts = isGoalie ? goalieCharts : skaterCharts;
 
   return (
     <div className="space-y-6">
-      {/* Player Selector */}
       <Select value={selectedPlayerId} onValueChange={setSelectedPlayerId}>
         <SelectTrigger className="w-full max-w-xs">
           <SelectValue placeholder="Select player" />
@@ -108,98 +100,34 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
         <p className="text-center text-muted-foreground py-8">
           No game data for this player
         </p>
-      ) : isGoalie ? (
-        <>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Goals Against per Game</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={goalieGAConfig} className="h-[250px] w-full">
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                  <YAxis allowDecimals={false} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="goalsAgainst" stroke="var(--color-goalsAgainst)" strokeWidth={2} dot={{ r: 4 }} />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Save % per Game</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={goalieSvConfig} className="h-[250px] w-full">
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                  <YAxis domain={[0, 100]} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="savePct" stroke="var(--color-savePct)" strokeWidth={2} dot={{ r: 4 }} />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </>
       ) : (
-        <>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Points per Game</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={skaterPointsConfig} className="h-[250px] w-full">
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                  <YAxis allowDecimals={false} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="goals" stroke="var(--color-goals)" strokeWidth={2} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="assists" stroke="var(--color-assists)" strokeWidth={2} dot={{ r: 4 }} />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Shots per Game</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={skaterShotsConfig} className="h-[250px] w-full">
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                  <YAxis allowDecimals={false} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="sog" stroke="var(--color-sog)" strokeWidth={2} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="shotsOff" stroke="var(--color-shotsOff)" strokeWidth={2} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="shotsBlocked" stroke="var(--color-shotsBlocked)" strokeWidth={2} dot={{ r: 4 }} />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Plus/Minus per Game</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={plusMinusConfig} className="h-[250px] w-full">
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                  <YAxis allowDecimals={false} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="plusMinus" stroke="var(--color-plusMinus)" strokeWidth={2} dot={{ r: 4 }} />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </>
+        <div className="grid gap-6 md:grid-cols-2">
+          {charts.map(chart => (
+            <Card key={chart.dataKey}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">{chart.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chart.config} className="h-[200px] w-full">
+                  <LineChart data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                    <YAxis allowDecimals={false} domain={chart.dataKey === 'savePct' ? [0, 100] : undefined} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Line
+                      type="monotone"
+                      dataKey={chart.dataKey}
+                      stroke={`var(--color-${chart.dataKey})`}
+                      strokeWidth={2}
+                      dot={{ r: 5, fill: `var(--color-${chart.dataKey})`, strokeWidth: 0 }}
+                      activeDot={{ r: 7 }}
+                    />
+                  </LineChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );
