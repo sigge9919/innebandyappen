@@ -89,25 +89,13 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
   const createTeam = async (name: string) => {
     if (!user) return { error: new Error('Not authenticated') };
-    // 1. Create team
-    const { data: team, error: teamErr } = await supabase
-      .from('teams')
-      .insert({ name, created_by: user.id })
-      .select()
-      .single();
-    if (teamErr) return { error: teamErr as unknown as Error };
+    const { data: teamId, error } = await supabase.rpc('create_team', { _name: name });
+    if (error) return { error: error as unknown as Error };
 
-    // 2. Add self as head coach
-    const { error: memberErr } = await supabase
-      .from('team_members')
-      .insert({ team_id: team.id, user_id: user.id, role: 'head_coach' });
-    if (memberErr) return { error: memberErr as unknown as Error };
-
-    // 3. Create team settings
-    await supabase.from('team_settings').insert({ team_id: team.id });
-
-    setActiveTeam(team as Team);
     await refreshTeams();
+    // Auto-select the newly created team
+    const { data: newTeam } = await supabase.from('teams').select('*').eq('id', teamId).single();
+    if (newTeam) setActiveTeam(newTeam as Team);
     return { error: null };
   };
 
