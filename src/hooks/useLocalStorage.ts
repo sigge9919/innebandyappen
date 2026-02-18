@@ -1,68 +1,76 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Player, Game, TrainingSession, Drill, Play, IndividualDevelopmentPlan, TestResult } from '@/types';
-import * as storage from '@/lib/storage';
+import { Player, TrainingSession, Drill, Play, IndividualDevelopmentPlan, TestResult } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+import { useTeam } from '@/contexts/TeamContext';
 
-// Initialize storage on first import
-storage.initializeStorage();
+// Initialize storage - no-op for cloud
+export function initializeStorage() {}
 
 export function usePlayers() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
 
-  useEffect(() => {
-    setPlayers(storage.getPlayers());
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setPlayers([]); setIsLoading(false); return; }
+    const { data } = await supabase
+      .from('players')
+      .select('*')
+      .eq('team_id', activeTeam.id);
+    setPlayers((data ?? []).map(dbToPlayer));
     setIsLoading(false);
-  }, []);
+  }, [activeTeam]);
 
-  const addPlayer = useCallback((player: Player) => {
-    storage.addPlayer(player);
-    setPlayers(storage.getPlayers());
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const updatePlayer = useCallback((id: string, updates: Partial<Player>) => {
-    storage.updatePlayer(id, updates);
-    setPlayers(storage.getPlayers());
-  }, []);
+  const addPlayer = useCallback(async (player: Player) => {
+    if (!activeTeam) return;
+    await supabase.from('players').insert(playerToDb(player, activeTeam.id));
+    refresh();
+  }, [activeTeam, refresh]);
 
-  const deletePlayer = useCallback((id: string) => {
-    storage.deletePlayer(id);
-    setPlayers(storage.getPlayers());
-  }, []);
+  const updatePlayer = useCallback(async (id: string, updates: Partial<Player>) => {
+    await supabase.from('players').update(playerUpdatesToDb(updates)).eq('id', id);
+    refresh();
+  }, [refresh]);
 
-  const refresh = useCallback(() => {
-    setPlayers(storage.getPlayers());
-  }, []);
+  const deletePlayer = useCallback(async (id: string) => {
+    await supabase.from('players').delete().eq('id', id);
+    refresh();
+  }, [refresh]);
 
   return { players, isLoading, addPlayer, updatePlayer, deletePlayer, refresh };
 }
 
 export function useGames() {
-  const [games, setGames] = useState<Game[]>([]);
+  const [games, setGames] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
 
-  useEffect(() => {
-    setGames(storage.getGames());
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setGames([]); setIsLoading(false); return; }
+    const { data } = await supabase.from('games').select('*').eq('team_id', activeTeam.id);
+    setGames(data ?? []);
     setIsLoading(false);
-  }, []);
+  }, [activeTeam]);
 
-  const addGame = useCallback((game: Game) => {
-    storage.addGame(game);
-    setGames(storage.getGames());
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const updateGame = useCallback((id: string, updates: Partial<Game>) => {
-    storage.updateGame(id, updates);
-    setGames(storage.getGames());
-  }, []);
+  const addGame = useCallback(async (game: any) => {
+    if (!activeTeam) return;
+    await supabase.from('games').insert({ ...game, team_id: activeTeam.id });
+    refresh();
+  }, [activeTeam, refresh]);
 
-  const deleteGame = useCallback((id: string) => {
-    storage.deleteGame(id);
-    setGames(storage.getGames());
-  }, []);
+  const updateGame = useCallback(async (id: string, updates: any) => {
+    await supabase.from('games').update(updates).eq('id', id);
+    refresh();
+  }, [refresh]);
 
-  const refresh = useCallback(() => {
-    setGames(storage.getGames());
-  }, []);
+  const deleteGame = useCallback(async (id: string) => {
+    await supabase.from('games').delete().eq('id', id);
+    refresh();
+  }, [refresh]);
 
   return { games, isLoading, addGame, updateGame, deleteGame, refresh };
 }
@@ -70,30 +78,32 @@ export function useGames() {
 export function useTrainingSessions() {
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
 
-  useEffect(() => {
-    setSessions(storage.getTrainingSessions());
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setSessions([]); setIsLoading(false); return; }
+    const { data } = await supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id);
+    setSessions((data ?? []).map(dbToTraining));
     setIsLoading(false);
-  }, []);
+  }, [activeTeam]);
 
-  const addSession = useCallback((session: TrainingSession) => {
-    storage.addTrainingSession(session);
-    setSessions(storage.getTrainingSessions());
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const updateSession = useCallback((id: string, updates: Partial<TrainingSession>) => {
-    storage.updateTrainingSession(id, updates);
-    setSessions(storage.getTrainingSessions());
-  }, []);
+  const addSession = useCallback(async (session: TrainingSession) => {
+    if (!activeTeam) return;
+    await supabase.from('training_sessions').insert(trainingToDb(session, activeTeam.id));
+    refresh();
+  }, [activeTeam, refresh]);
 
-  const deleteSession = useCallback((id: string) => {
-    storage.deleteTrainingSession(id);
-    setSessions(storage.getTrainingSessions());
-  }, []);
+  const updateSession = useCallback(async (id: string, updates: Partial<TrainingSession>) => {
+    await supabase.from('training_sessions').update(trainingUpdatesToDb(updates)).eq('id', id);
+    refresh();
+  }, [refresh]);
 
-  const refresh = useCallback(() => {
-    setSessions(storage.getTrainingSessions());
-  }, []);
+  const deleteSession = useCallback(async (id: string) => {
+    await supabase.from('training_sessions').delete().eq('id', id);
+    refresh();
+  }, [refresh]);
 
   return { sessions, isLoading, addSession, updateSession, deleteSession, refresh };
 }
@@ -101,30 +111,32 @@ export function useTrainingSessions() {
 export function useDrills() {
   const [drills, setDrills] = useState<Drill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
 
-  useEffect(() => {
-    setDrills(storage.getDrills());
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setDrills([]); setIsLoading(false); return; }
+    const { data } = await supabase.from('drills').select('*').eq('team_id', activeTeam.id);
+    setDrills((data ?? []).map(dbToDrill));
     setIsLoading(false);
-  }, []);
+  }, [activeTeam]);
 
-  const addDrill = useCallback((drill: Drill) => {
-    storage.addDrill(drill);
-    setDrills(storage.getDrills());
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const updateDrill = useCallback((id: string, updates: Partial<Drill>) => {
-    storage.updateDrill(id, updates);
-    setDrills(storage.getDrills());
-  }, []);
+  const addDrill = useCallback(async (drill: Drill) => {
+    if (!activeTeam) return;
+    await supabase.from('drills').insert(drillToDb(drill, activeTeam.id));
+    refresh();
+  }, [activeTeam, refresh]);
 
-  const deleteDrill = useCallback((id: string) => {
-    storage.deleteDrill(id);
-    setDrills(storage.getDrills());
-  }, []);
+  const updateDrill = useCallback(async (id: string, updates: Partial<Drill>) => {
+    await supabase.from('drills').update(drillUpdatesToDb(updates)).eq('id', id);
+    refresh();
+  }, [refresh]);
 
-  const refresh = useCallback(() => {
-    setDrills(storage.getDrills());
-  }, []);
+  const deleteDrill = useCallback(async (id: string) => {
+    await supabase.from('drills').delete().eq('id', id);
+    refresh();
+  }, [refresh]);
 
   return { drills, isLoading, addDrill, updateDrill, deleteDrill, refresh };
 }
@@ -132,30 +144,32 @@ export function useDrills() {
 export function usePlays() {
   const [plays, setPlays] = useState<Play[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
 
-  useEffect(() => {
-    setPlays(storage.getPlays());
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setPlays([]); setIsLoading(false); return; }
+    const { data } = await supabase.from('plays').select('*').eq('team_id', activeTeam.id);
+    setPlays((data ?? []).map(dbToPlay));
     setIsLoading(false);
-  }, []);
+  }, [activeTeam]);
 
-  const addPlay = useCallback((play: Play) => {
-    storage.addPlay(play);
-    setPlays(storage.getPlays());
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const updatePlay = useCallback((id: string, updates: Partial<Play>) => {
-    storage.updatePlay(id, updates);
-    setPlays(storage.getPlays());
-  }, []);
+  const addPlay = useCallback(async (play: Play) => {
+    if (!activeTeam) return;
+    await supabase.from('plays').insert(playToDb(play, activeTeam.id));
+    refresh();
+  }, [activeTeam, refresh]);
 
-  const deletePlay = useCallback((id: string) => {
-    storage.deletePlay(id);
-    setPlays(storage.getPlays());
-  }, []);
+  const updatePlay = useCallback(async (id: string, updates: Partial<Play>) => {
+    await supabase.from('plays').update(playUpdatesToDb(updates)).eq('id', id);
+    refresh();
+  }, [refresh]);
 
-  const refresh = useCallback(() => {
-    setPlays(storage.getPlays());
-  }, []);
+  const deletePlay = useCallback(async (id: string) => {
+    await supabase.from('plays').delete().eq('id', id);
+    refresh();
+  }, [refresh]);
 
   return { plays, isLoading, addPlay, updatePlay, deletePlay, refresh };
 }
@@ -163,30 +177,32 @@ export function usePlays() {
 export function useIDPs() {
   const [idps, setIdps] = useState<IndividualDevelopmentPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
 
-  useEffect(() => {
-    setIdps(storage.getIDPs());
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setIdps([]); setIsLoading(false); return; }
+    const { data } = await supabase.from('idps').select('*').eq('team_id', activeTeam.id);
+    setIdps((data ?? []).map(dbToIDP));
     setIsLoading(false);
-  }, []);
+  }, [activeTeam]);
 
-  const addIDP = useCallback((idp: IndividualDevelopmentPlan) => {
-    storage.addIDP(idp);
-    setIdps(storage.getIDPs());
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const updateIDP = useCallback((id: string, updates: Partial<IndividualDevelopmentPlan>) => {
-    storage.updateIDP(id, updates);
-    setIdps(storage.getIDPs());
-  }, []);
+  const addIDP = useCallback(async (idp: IndividualDevelopmentPlan) => {
+    if (!activeTeam) return;
+    await supabase.from('idps').insert(idpToDb(idp, activeTeam.id));
+    refresh();
+  }, [activeTeam, refresh]);
 
-  const deleteIDP = useCallback((id: string) => {
-    storage.deleteIDP(id);
-    setIdps(storage.getIDPs());
-  }, []);
+  const updateIDP = useCallback(async (id: string, updates: Partial<IndividualDevelopmentPlan>) => {
+    await supabase.from('idps').update(idpUpdatesToDb(updates)).eq('id', id);
+    refresh();
+  }, [refresh]);
 
-  const refresh = useCallback(() => {
-    setIdps(storage.getIDPs());
-  }, []);
+  const deleteIDP = useCallback(async (id: string) => {
+    await supabase.from('idps').delete().eq('id', id);
+    refresh();
+  }, [refresh]);
 
   return { idps, isLoading, addIDP, updateIDP, deleteIDP, refresh };
 }
@@ -194,80 +210,335 @@ export function useIDPs() {
 export function useTestResults() {
   const [tests, setTests] = useState<TestResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
 
-  useEffect(() => {
-    setTests(storage.getTestResults());
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setTests([]); setIsLoading(false); return; }
+    const { data } = await supabase.from('test_results').select('*').eq('team_id', activeTeam.id);
+    setTests((data ?? []).map(dbToTestResult));
     setIsLoading(false);
-  }, []);
+  }, [activeTeam]);
 
-  const addTest = useCallback((test: TestResult) => {
-    storage.addTestResult(test);
-    setTests(storage.getTestResults());
-  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const updateTest = useCallback((id: string, updates: Partial<TestResult>) => {
-    storage.updateTestResult(id, updates);
-    setTests(storage.getTestResults());
-  }, []);
+  const addTest = useCallback(async (test: TestResult) => {
+    if (!activeTeam) return;
+    await supabase.from('test_results').insert(testResultToDb(test, activeTeam.id));
+    refresh();
+  }, [activeTeam, refresh]);
 
-  const deleteTest = useCallback((id: string) => {
-    storage.deleteTestResult(id);
-    setTests(storage.getTestResults());
-  }, []);
+  const updateTest = useCallback(async (id: string, updates: Partial<TestResult>) => {
+    await supabase.from('test_results').update(testResultUpdatesToDb(updates)).eq('id', id);
+    refresh();
+  }, [refresh]);
 
-  const refresh = useCallback(() => {
-    setTests(storage.getTestResults());
-  }, []);
+  const deleteTest = useCallback(async (id: string) => {
+    await supabase.from('test_results').delete().eq('id', id);
+    refresh();
+  }, [refresh]);
 
   return { tests, isLoading, addTest, updateTest, deleteTest, refresh };
 }
 
 export function useWeeklyFocus() {
   const [focus, setFocus] = useState('');
+  const { activeTeam } = useTeam();
 
   useEffect(() => {
-    setFocus(storage.getWeeklyFocus());
-  }, []);
+    if (!activeTeam) return;
+    supabase.from('team_settings').select('weekly_focus').eq('team_id', activeTeam.id).single()
+      .then(({ data }) => setFocus(data?.weekly_focus ?? ''));
+  }, [activeTeam]);
 
-  const saveFocus = useCallback((newFocus: string) => {
-    storage.saveWeeklyFocus(newFocus);
+  const saveFocus = useCallback(async (newFocus: string) => {
+    if (!activeTeam) return;
+    await supabase.from('team_settings').update({ weekly_focus: newFocus, updated_at: new Date().toISOString() })
+      .eq('team_id', activeTeam.id);
     setFocus(newFocus);
-  }, []);
+  }, [activeTeam]);
 
   return { focus, saveFocus };
 }
 
 export function useCoachNotes() {
   const [notes, setNotes] = useState('');
+  const { activeTeam } = useTeam();
 
   useEffect(() => {
-    setNotes(storage.getCoachNotes());
-  }, []);
+    if (!activeTeam) return;
+    supabase.from('team_settings').select('coach_notes').eq('team_id', activeTeam.id).single()
+      .then(({ data }) => setNotes(data?.coach_notes ?? ''));
+  }, [activeTeam]);
 
-  const saveNotes = useCallback((newNotes: string) => {
-    storage.saveCoachNotes(newNotes);
+  const saveNotes = useCallback(async (newNotes: string) => {
+    if (!activeTeam) return;
+    await supabase.from('team_settings').update({ coach_notes: newNotes, updated_at: new Date().toISOString() })
+      .eq('team_id', activeTeam.id);
     setNotes(newNotes);
-  }, []);
+  }, [activeTeam]);
 
   return { notes, saveNotes };
 }
 
 export function usePlayCategories() {
   const [categories, setCategories] = useState<string[]>([]);
+  const { activeTeam } = useTeam();
 
   useEffect(() => {
-    setCategories(storage.getPlayCategories());
-  }, []);
+    if (!activeTeam) return;
+    supabase.from('team_settings').select('play_categories').eq('team_id', activeTeam.id).single()
+      .then(({ data }) => setCategories(data?.play_categories ?? ['System', 'Set Play', 'Special Teams']));
+  }, [activeTeam]);
 
-  const addCategory = useCallback((category: string) => {
-    storage.addPlayCategory(category);
-    setCategories(storage.getPlayCategories());
-  }, []);
+  const addCategory = useCallback(async (category: string) => {
+    if (!activeTeam) return;
+    const updated = [...categories, category];
+    await supabase.from('team_settings').update({ play_categories: updated }).eq('team_id', activeTeam.id);
+    setCategories(updated);
+  }, [activeTeam, categories]);
 
-  const deleteCategory = useCallback((category: string) => {
-    storage.deletePlayCategory(category);
-    setCategories(storage.getPlayCategories());
-  }, []);
+  const deleteCategory = useCallback(async (category: string) => {
+    if (!activeTeam) return;
+    const updated = categories.filter(c => c !== category);
+    await supabase.from('team_settings').update({ play_categories: updated }).eq('team_id', activeTeam.id);
+    setCategories(updated);
+  }, [activeTeam, categories]);
 
   return { categories, addCategory, deleteCategory };
+}
+
+// --- DB mapping helpers ---
+
+function dbToPlayer(row: any): Player {
+  return {
+    id: row.id,
+    name: row.name,
+    positions: row.positions ?? [],
+    stickSide: row.stick_side ?? 'Left',
+    jerseyNumber: row.jersey_number ?? 0,
+    status: row.status ?? 'Active',
+    notes: row.notes ?? '',
+    focusFlag: row.focus_flag ?? false,
+  };
+}
+
+function playerToDb(p: Player, teamId: string) {
+  return {
+    id: p.id,
+    team_id: teamId,
+    name: p.name,
+    positions: p.positions,
+    stick_side: p.stickSide,
+    jersey_number: p.jerseyNumber,
+    status: p.status,
+    notes: p.notes,
+    focus_flag: p.focusFlag,
+  };
+}
+
+function playerUpdatesToDb(u: Partial<Player>) {
+  const r: any = {};
+  if (u.name !== undefined) r.name = u.name;
+  if (u.positions !== undefined) r.positions = u.positions;
+  if (u.stickSide !== undefined) r.stick_side = u.stickSide;
+  if (u.jerseyNumber !== undefined) r.jersey_number = u.jerseyNumber;
+  if (u.status !== undefined) r.status = u.status;
+  if (u.notes !== undefined) r.notes = u.notes;
+  if (u.focusFlag !== undefined) r.focus_flag = u.focusFlag;
+  return r;
+}
+
+function dbToTraining(row: any): TrainingSession {
+  return {
+    id: row.id,
+    date: row.date,
+    theme: row.theme,
+    duration: row.duration,
+    playerIds: row.player_ids ?? [],
+    sections: row.sections ?? [],
+  };
+}
+
+function trainingToDb(s: TrainingSession, teamId: string) {
+  return {
+    id: s.id,
+    team_id: teamId,
+    date: s.date,
+    theme: s.theme,
+    duration: s.duration,
+    player_ids: s.playerIds,
+    sections: s.sections as any,
+  };
+}
+
+function trainingUpdatesToDb(u: Partial<TrainingSession>) {
+  const r: any = {};
+  if (u.date !== undefined) r.date = u.date;
+  if (u.theme !== undefined) r.theme = u.theme;
+  if (u.duration !== undefined) r.duration = u.duration;
+  if (u.playerIds !== undefined) r.player_ids = u.playerIds;
+  if (u.sections !== undefined) r.sections = u.sections;
+  return r;
+}
+
+function dbToDrill(row: any): Drill {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description ?? '',
+    categories: row.categories ?? [],
+    videoUrl: row.video_url,
+    linkedLayoutIds: row.linked_layout_ids ?? [],
+    mediaFiles: row.media_files ?? [],
+  };
+}
+
+function drillToDb(d: Drill, teamId: string) {
+  return {
+    id: d.id,
+    team_id: teamId,
+    name: d.name,
+    description: d.description,
+    categories: d.categories,
+    video_url: d.videoUrl,
+    linked_layout_ids: d.linkedLayoutIds,
+    media_files: d.mediaFiles as any,
+  };
+}
+
+function drillUpdatesToDb(u: Partial<Drill>) {
+  const r: any = {};
+  if (u.name !== undefined) r.name = u.name;
+  if (u.description !== undefined) r.description = u.description;
+  if (u.categories !== undefined) r.categories = u.categories;
+  if (u.videoUrl !== undefined) r.video_url = u.videoUrl;
+  if (u.linkedLayoutIds !== undefined) r.linked_layout_ids = u.linkedLayoutIds;
+  if (u.mediaFiles !== undefined) r.media_files = u.mediaFiles;
+  return r;
+}
+
+function dbToPlay(row: any): Play {
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.category ?? 'System',
+    diagramUrl: row.diagram_url,
+    keyPoints: row.key_points ?? [],
+    videoUrl: row.video_url,
+    tags: row.tags ?? [],
+    linkedLayoutIds: row.linked_layout_ids ?? [],
+    mediaFiles: row.media_files ?? [],
+  };
+}
+
+function playToDb(p: Play, teamId: string) {
+  return {
+    id: p.id,
+    team_id: teamId,
+    name: p.name,
+    category: p.category,
+    diagram_url: p.diagramUrl,
+    key_points: p.keyPoints,
+    video_url: p.videoUrl,
+    tags: p.tags,
+    linked_layout_ids: p.linkedLayoutIds,
+    media_files: p.mediaFiles as any,
+  };
+}
+
+function playUpdatesToDb(u: Partial<Play>) {
+  const r: any = {};
+  if (u.name !== undefined) r.name = u.name;
+  if (u.category !== undefined) r.category = u.category;
+  if (u.diagramUrl !== undefined) r.diagram_url = u.diagramUrl;
+  if (u.keyPoints !== undefined) r.key_points = u.keyPoints;
+  if (u.videoUrl !== undefined) r.video_url = u.videoUrl;
+  if (u.tags !== undefined) r.tags = u.tags;
+  if (u.linkedLayoutIds !== undefined) r.linked_layout_ids = u.linkedLayoutIds;
+  if (u.mediaFiles !== undefined) r.media_files = u.mediaFiles;
+  return r;
+}
+
+function dbToIDP(row: any): IndividualDevelopmentPlan {
+  return {
+    id: row.id,
+    playerId: row.player_id,
+    goal: row.goal,
+    startDate: row.start_date,
+    endDate: row.end_date,
+    focusAreas: row.focus_areas ?? [],
+    shortTermGoals: row.short_term_goals ?? [],
+    coachNotes: row.coach_notes ?? '',
+    completed: row.completed ?? false,
+    lastUpdated: row.last_updated ?? '',
+  };
+}
+
+function idpToDb(i: IndividualDevelopmentPlan, teamId: string) {
+  return {
+    id: i.id,
+    team_id: teamId,
+    player_id: i.playerId,
+    goal: i.goal,
+    start_date: i.startDate,
+    end_date: i.endDate,
+    focus_areas: i.focusAreas,
+    short_term_goals: i.shortTermGoals,
+    coach_notes: i.coachNotes,
+    completed: i.completed,
+    last_updated: i.lastUpdated,
+  };
+}
+
+function idpUpdatesToDb(u: Partial<IndividualDevelopmentPlan>) {
+  const r: any = {};
+  if (u.playerId !== undefined) r.player_id = u.playerId;
+  if (u.goal !== undefined) r.goal = u.goal;
+  if (u.startDate !== undefined) r.start_date = u.startDate;
+  if (u.endDate !== undefined) r.end_date = u.endDate;
+  if (u.focusAreas !== undefined) r.focus_areas = u.focusAreas;
+  if (u.shortTermGoals !== undefined) r.short_term_goals = u.shortTermGoals;
+  if (u.coachNotes !== undefined) r.coach_notes = u.coachNotes;
+  if (u.completed !== undefined) r.completed = u.completed;
+  if (u.lastUpdated !== undefined) r.last_updated = u.lastUpdated;
+  return r;
+}
+
+function dbToTestResult(row: any): TestResult {
+  return {
+    id: row.id,
+    playerId: row.player_id,
+    testType: row.test_type as 'Fitness' | 'Skill',
+    testName: row.test_name,
+    date: row.date,
+    result: row.result,
+    previousResult: row.previous_result,
+    trend: row.trend as 'up' | 'down' | 'same',
+  };
+}
+
+function testResultToDb(t: TestResult, teamId: string) {
+  return {
+    id: t.id,
+    team_id: teamId,
+    player_id: t.playerId,
+    test_type: t.testType,
+    test_name: t.testName,
+    date: t.date,
+    result: t.result,
+    previous_result: t.previousResult,
+    trend: t.trend,
+  };
+}
+
+function testResultUpdatesToDb(u: Partial<TestResult>) {
+  const r: any = {};
+  if (u.playerId !== undefined) r.player_id = u.playerId;
+  if (u.testType !== undefined) r.test_type = u.testType;
+  if (u.testName !== undefined) r.test_name = u.testName;
+  if (u.date !== undefined) r.date = u.date;
+  if (u.result !== undefined) r.result = u.result;
+  if (u.previousResult !== undefined) r.previous_result = u.previousResult;
+  if (u.trend !== undefined) r.trend = u.trend;
+  return r;
 }
