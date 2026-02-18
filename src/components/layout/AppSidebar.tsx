@@ -9,11 +9,15 @@ import {
   TrendingUp,
   PenTool,
   Menu,
+  Settings,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useState } from 'react';
+import { useTeam } from '@/contexts/TeamContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -24,6 +28,7 @@ const navItems = [
   { to: '/playbook', icon: BookOpen, label: 'Playbook' },
   { to: '/development', icon: TrendingUp, label: 'Development' },
   { to: '/tactics', icon: PenTool, label: 'Tactics Board' },
+  { to: '/settings', icon: Settings, label: 'Team Settings' },
 ];
 
 function NavItem({ to, icon: Icon, label, onClick }: { to: string; icon: React.ElementType; label: string; onClick?: () => void }) {
@@ -47,6 +52,8 @@ function NavItem({ to, icon: Icon, label, onClick }: { to: string; icon: React.E
 
 export function AppSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { activeTeam } = useTeam();
+  const { signOut } = useAuth();
 
   const SidebarContent = ({ onItemClick }: { onItemClick?: () => void }) => (
     <div className="flex flex-col h-full bg-sidebar">
@@ -58,7 +65,9 @@ export function AppSidebar() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-sidebar-foreground">Coach OS</h1>
-            <p className="text-xs text-sidebar-foreground/60">Floorball</p>
+            <p className="text-xs text-sidebar-foreground/60 truncate max-w-[140px]">
+              {activeTeam?.name ?? 'Floorball'}
+            </p>
           </div>
         </div>
       </div>
@@ -69,6 +78,17 @@ export function AppSidebar() {
           <NavItem key={item.to} {...item} onClick={onItemClick} />
         ))}
       </nav>
+
+      {/* Sign out */}
+      <div className="p-4 border-t border-sidebar-border">
+        <button
+          onClick={signOut}
+          className="nav-item w-full text-sidebar-foreground/50 hover:text-sidebar-foreground"
+        >
+          <LogOut className="h-5 w-5" />
+          <span className="font-medium">Sign Out</span>
+        </button>
+      </div>
     </div>
   );
 
@@ -86,7 +106,9 @@ export function AppSidebar() {
             <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
               <span className="text-sidebar-primary-foreground font-bold text-sm">C</span>
             </div>
-            <span className="font-bold text-sidebar-foreground">Coach OS</span>
+            <span className="font-bold text-sidebar-foreground">
+              {activeTeam?.name ?? 'Coach OS'}
+            </span>
           </div>
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
