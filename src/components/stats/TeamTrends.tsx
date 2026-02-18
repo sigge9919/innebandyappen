@@ -22,9 +22,15 @@ export function TeamTrends({ games }: TeamTrendsProps) {
         const opp = calculateTeamStats(game.events, 'opponent');
         const homePP = calculateTeamStats(game.events, 'home', undefined, '5v4');
         const homePK = calculateTeamStats(game.events, 'home', undefined, '4v5');
+        const oppPK = calculateTeamStats(game.events, 'opponent', undefined, '4v5');
 
         const homeTotalShots = home.shotsOnGoal + home.shotsOffGoal + home.shotsBlocked;
         const oppTotalShots = opp.shotsOnGoal + opp.shotsOffGoal + opp.shotsBlocked;
+
+        const penalties = game.penalties || [];
+        const ppOpportunities = penalties.filter(p => p.team === 'opponent').length;
+        const pkOpportunities = penalties.filter(p => p.team === 'home').length;
+        const pkGoalsAgainst = oppPK.goals;
 
         return {
           label: game.opponent,
@@ -46,8 +52,10 @@ export function TeamTrends({ games }: TeamTrendsProps) {
           oppBlkPct: oppTotalShots > 0 ? Math.round((opp.shotsBlocked / oppTotalShots) * 100) : 0,
           ppGoals: homePP.goals,
           ppSog: homePP.shotsOnGoal,
-          pkGoals: homePK.goals,
+          ppPct: ppOpportunities > 0 ? Math.round((homePP.goals / ppOpportunities) * 100) : 0,
+          pkGoals: pkGoalsAgainst,
           pkSog: homePK.shotsOnGoal,
+          pkPct: pkOpportunities > 0 ? Math.round(((pkOpportunities - pkGoalsAgainst) / pkOpportunities) * 100) : 0,
         };
       });
   }, [games]);
@@ -141,6 +149,12 @@ export function TeamTrends({ games }: TeamTrendsProps) {
       config: { ppSog: { label: 'PP SOG', color: BLUE } },
     },
     {
+      title: 'PP %',
+      keys: ['ppPct'] as const,
+      config: { ppPct: { label: 'PP %', color: BLUE } },
+      domain: [0, 100] as [number, number],
+    },
+    {
       title: 'Box Play Goals Against',
       keys: ['pkGoals'] as const,
       config: { pkGoals: { label: 'PK Goals', color: BLUE } },
@@ -149,6 +163,12 @@ export function TeamTrends({ games }: TeamTrendsProps) {
       title: 'Box Play SOG',
       keys: ['pkSog'] as const,
       config: { pkSog: { label: 'PK SOG', color: BLUE } },
+    },
+    {
+      title: 'PK %',
+      keys: ['pkPct'] as const,
+      config: { pkPct: { label: 'PK %', color: BLUE } },
+      domain: [0, 100] as [number, number],
     },
   ];
 
