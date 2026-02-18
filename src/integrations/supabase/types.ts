@@ -60,41 +60,68 @@ export type Database = {
       }
       games: {
         Row: {
+          active_goalie_id: string | null
+          active_line_id: string | null
           created_at: string
+          current_period: string | null
+          current_situation: string | null
           date: string
           events: Json | null
           id: string
+          lines: Json | null
           location: string
           notes: Json | null
           opponent: string
           opponent_score: number | null
           our_score: number | null
+          penalties: Json | null
+          player_stats: Json | null
+          squad_player_ids: string[] | null
+          starting_goalie_id: string | null
           status: string
           team_id: string
         }
         Insert: {
+          active_goalie_id?: string | null
+          active_line_id?: string | null
           created_at?: string
+          current_period?: string | null
+          current_situation?: string | null
           date: string
           events?: Json | null
           id?: string
+          lines?: Json | null
           location?: string
           notes?: Json | null
           opponent: string
           opponent_score?: number | null
           our_score?: number | null
+          penalties?: Json | null
+          player_stats?: Json | null
+          squad_player_ids?: string[] | null
+          starting_goalie_id?: string | null
           status?: string
           team_id: string
         }
         Update: {
+          active_goalie_id?: string | null
+          active_line_id?: string | null
           created_at?: string
+          current_period?: string | null
+          current_situation?: string | null
           date?: string
           events?: Json | null
           id?: string
+          lines?: Json | null
           location?: string
           notes?: Json | null
           opponent?: string
           opponent_score?: number | null
           our_score?: number | null
+          penalties?: Json | null
+          player_stats?: Json | null
+          squad_player_ids?: string[] | null
+          starting_goalie_id?: string | null
           status?: string
           team_id?: string
         }
