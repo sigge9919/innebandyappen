@@ -9,21 +9,36 @@ interface TeamTrendsProps {
   games: EnhancedGame[];
 }
 
+const GREEN = 'hsl(142, 71%, 45%)';
+const RED = 'hsl(0, 72%, 51%)';
+
 export function TeamTrends({ games }: TeamTrendsProps) {
   const trendData = useMemo(() => {
     return [...games]
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map(game => {
-        const homeStats = calculateTeamStats(game.events, 'home');
-        const oppStats = calculateTeamStats(game.events, 'opponent');
+        const home = calculateTeamStats(game.events, 'home');
+        const opp = calculateTeamStats(game.events, 'opponent');
+
+        const homeTotalShots = home.shotsOnGoal + home.shotsOffGoal + home.shotsBlocked;
+        const oppTotalShots = opp.shotsOnGoal + opp.shotsOffGoal + opp.shotsBlocked;
+
         return {
           label: game.opponent,
           ourGoals: game.ourScore,
           oppGoals: game.opponentScore,
-          sog: homeStats.shotsOnGoal,
-          oppSog: oppStats.shotsOnGoal,
-          shotsOff: homeStats.shotsOffGoal,
-          shotsBlocked: homeStats.shotsBlocked,
+          ourSog: home.shotsOnGoal,
+          oppSog: opp.shotsOnGoal,
+          ourShotsOff: home.shotsOffGoal,
+          oppShotsOff: opp.shotsOffGoal,
+          ourBlk: home.shotsBlocked,
+          oppBlk: opp.shotsBlocked,
+          ourDef: opp.shotsBlocked,   // opponent blocked = our defensive blocks
+          oppDef: home.shotsBlocked,  // our blocked = their defensive blocks
+          ourSogPct: homeTotalShots > 0 ? Math.round((home.shotsOnGoal / homeTotalShots) * 100) : 0,
+          oppSogPct: oppTotalShots > 0 ? Math.round((opp.shotsOnGoal / oppTotalShots) * 100) : 0,
+          ourBlkPct: homeTotalShots > 0 ? Math.round((home.shotsBlocked / homeTotalShots) * 100) : 0,
+          oppBlkPct: oppTotalShots > 0 ? Math.round((opp.shotsBlocked / oppTotalShots) * 100) : 0,
         };
       });
   }, [games]);
@@ -38,41 +53,69 @@ export function TeamTrends({ games }: TeamTrendsProps) {
 
   const charts = [
     {
-      title: 'Goals Scored',
-      dataKey: 'ourGoals',
-      config: { ourGoals: { label: 'Our Goals', color: 'hsl(var(--chart-1))' } },
-    },
-    {
-      title: 'Goals Against',
-      dataKey: 'oppGoals',
-      config: { oppGoals: { label: 'Opponent Goals', color: 'hsl(var(--chart-2))' } },
+      title: 'Goals',
+      keys: ['ourGoals', 'oppGoals'] as const,
+      config: {
+        ourGoals: { label: 'Our Goals', color: GREEN },
+        oppGoals: { label: 'Opponent Goals', color: RED },
+      },
     },
     {
       title: 'Shots on Goal',
-      dataKey: 'sog',
-      config: { sog: { label: 'SOG', color: 'hsl(var(--chart-1))' } },
+      keys: ['ourSog', 'oppSog'] as const,
+      config: {
+        ourSog: { label: 'Our SOG', color: GREEN },
+        oppSog: { label: 'Opp SOG', color: RED },
+      },
     },
     {
-      title: 'Opponent SOG',
-      dataKey: 'oppSog',
-      config: { oppSog: { label: 'Opp SOG', color: 'hsl(var(--chart-2))' } },
+      title: 'SOG %',
+      keys: ['ourSogPct', 'oppSogPct'] as const,
+      config: {
+        ourSogPct: { label: 'Our SOG %', color: GREEN },
+        oppSogPct: { label: 'Opp SOG %', color: RED },
+      },
+      domain: [0, 100] as [number, number],
     },
     {
       title: 'Shots Off Goal',
-      dataKey: 'shotsOff',
-      config: { shotsOff: { label: 'Off Goal', color: 'hsl(var(--chart-3))' } },
+      keys: ['ourShotsOff', 'oppShotsOff'] as const,
+      config: {
+        ourShotsOff: { label: 'Our Off Goal', color: GREEN },
+        oppShotsOff: { label: 'Opp Off Goal', color: RED },
+      },
     },
     {
       title: 'Shots Blocked',
-      dataKey: 'shotsBlocked',
-      config: { shotsBlocked: { label: 'Blocked', color: 'hsl(var(--chart-4))' } },
+      keys: ['ourBlk', 'oppBlk'] as const,
+      config: {
+        ourBlk: { label: 'Our Blocked', color: GREEN },
+        oppBlk: { label: 'Opp Blocked', color: RED },
+      },
+    },
+    {
+      title: 'BLK %',
+      keys: ['ourBlkPct', 'oppBlkPct'] as const,
+      config: {
+        ourBlkPct: { label: 'Our BLK %', color: GREEN },
+        oppBlkPct: { label: 'Opp BLK %', color: RED },
+      },
+      domain: [0, 100] as [number, number],
+    },
+    {
+      title: 'Defensive Blocks',
+      keys: ['ourDef', 'oppDef'] as const,
+      config: {
+        ourDef: { label: 'Our Def Blocks', color: GREEN },
+        oppDef: { label: 'Opp Def Blocks', color: RED },
+      },
     },
   ];
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {charts.map(chart => (
-        <Card key={chart.dataKey}>
+        <Card key={chart.title}>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">{chart.title}</CardTitle>
           </CardHeader>
@@ -81,16 +124,19 @@ export function TeamTrends({ games }: TeamTrendsProps) {
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                <YAxis allowDecimals={false} />
+                <YAxis allowDecimals={false} domain={chart.domain} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Line
-                  type="monotone"
-                  dataKey={chart.dataKey}
-                  stroke={`var(--color-${chart.dataKey})`}
-                  strokeWidth={2}
-                  dot={{ r: 5, fill: `var(--color-${chart.dataKey})`, strokeWidth: 0 }}
-                  activeDot={{ r: 7 }}
-                />
+                {chart.keys.map(key => (
+                  <Line
+                    key={key}
+                    type="monotone"
+                    dataKey={key}
+                    stroke={`var(--color-${key})`}
+                    strokeWidth={2}
+                    dot={{ r: 5, fill: `var(--color-${key})`, strokeWidth: 0 }}
+                    activeDot={{ r: 7 }}
+                  />
+                ))}
               </LineChart>
             </ChartContainer>
           </CardContent>
