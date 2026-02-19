@@ -83,11 +83,11 @@ export default function PlayerDetail() {
     setTestDialogOpen(true);
   };
   
-  const handleSaveTest = (test: TestResult) => {
-    if (selectedTest) {
-      updateTest(test.id, test);
+  const handleSaveTest = (tests: TestResult[]) => {
+    if (selectedTest && tests.length === 1) {
+      updateTest(tests[0].id, tests[0]);
     } else {
-      addTest(test);
+      tests.forEach(addTest);
     }
   };
 
