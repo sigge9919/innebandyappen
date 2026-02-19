@@ -2,10 +2,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTeam } from '@/contexts/TeamContext';
 import Login from '@/pages/Login';
 import TeamSetup from '@/pages/TeamSetup';
+import { useLocation } from 'react-router-dom';
 
 export function AppGuard({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const { activeTeam, loading: teamLoading } = useTeam();
+  const location = useLocation();
 
   if (authLoading || (user && teamLoading)) {
     return (
@@ -18,7 +20,7 @@ export function AppGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) return <Login />;
-  if (!activeTeam) return <TeamSetup />;
+  if (!activeTeam && location.pathname !== '/team-setup') return <TeamSetup />;
 
   return <>{children}</>;
 }
