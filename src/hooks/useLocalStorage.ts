@@ -307,6 +307,34 @@ export function usePlayCategories() {
   return { categories, addCategory, deleteCategory };
 }
 
+export function useTestTypes() {
+  const DEFAULT_TYPES = ['Fitness', 'Skill'];
+  const [testTypes, setTestTypes] = useState<string[]>(DEFAULT_TYPES);
+  const { activeTeam } = useTeam();
+
+  useEffect(() => {
+    if (!activeTeam) return;
+    supabase.from('team_settings').select('test_types').eq('team_id', activeTeam.id).single()
+      .then(({ data }) => setTestTypes((data as any)?.test_types ?? DEFAULT_TYPES));
+  }, [activeTeam]);
+
+  const addTestType = useCallback(async (type: string) => {
+    if (!activeTeam) return;
+    const updated = [...testTypes, type];
+    await supabase.from('team_settings').update({ test_types: updated } as any).eq('team_id', activeTeam.id);
+    setTestTypes(updated);
+  }, [activeTeam, testTypes]);
+
+  const deleteTestType = useCallback(async (type: string) => {
+    if (!activeTeam) return;
+    const updated = testTypes.filter(t => t !== type);
+    await supabase.from('team_settings').update({ test_types: updated } as any).eq('team_id', activeTeam.id);
+    setTestTypes(updated);
+  }, [activeTeam, testTypes]);
+
+  return { testTypes, addTestType, deleteTestType };
+}
+
 // --- DB mapping helpers ---
 
 function dbToPlayer(row: any): Player {

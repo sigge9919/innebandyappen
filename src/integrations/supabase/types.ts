@@ -333,6 +333,7 @@ export type Database = {
           id: string
           play_categories: string[] | null
           team_id: string
+          test_types: string[] | null
           updated_at: string
           weekly_focus: string | null
         }
@@ -341,6 +342,7 @@ export type Database = {
           id?: string
           play_categories?: string[] | null
           team_id: string
+          test_types?: string[] | null
           updated_at?: string
           weekly_focus?: string | null
         }
@@ -349,6 +351,7 @@ export type Database = {
           id?: string
           play_categories?: string[] | null
           team_id?: string
+          test_types?: string[] | null
           updated_at?: string
           weekly_focus?: string | null
         }
