@@ -1,62 +1,64 @@
-# Add Game-by-Game Trend Charts to Stats Tab
 
-## Overview
+## Add Multi-Player Test Entry Support
 
-Add a new "Trends" view to the Stats tab that shows game-by-game performance trends using line charts. Users can switch between Player Trends and Team Trends, with each chart plotting key metrics across finished games sorted chronologically.
+### Goal
+When adding a new test result, the coach can choose between "Single Player" mode (current behaviour) and "Group Test" mode — where all test fields (name, type, date) are shared, and each player gets their own result, previous result, and trend inputs.
 
-## What You'll See
+### How it works today
+`TestResultFormDialog` handles one player at a time. It calls `onSave(test: TestResult)` once with a single record. The `Development.tsx` page calls `addTest` once per save.
 
-### Stats Tab Changes
+### What changes
 
-- A third view option added alongside "Player Stats" and "Team Stats": **"Trends"**
-- When "Trends" is selected, two sub-tabs appear: **Player Trends** and **Team Trends**
+#### 1. `src/components/forms/TestResultFormDialog.tsx`
+This is the core change. When creating a new test (not editing), a **toggle** at the top lets the coach switch between:
 
-### Team Trends
+- **Single Player** — current form, unchanged
+- **Group Test** — shared fields (test name, type, date) at the top, then a list of all players, each with their own result input, previous result, and trend selector. Players are opted-in via a checkbox. Only checked players are saved.
 
-- Line charts showing game-by-game data with the opponent name as the x-axis label
-- **Goals chart**: Our goals vs. opponent goals per game
-- **Shots chart**: SOG, shots off goal, and shots blocked per game
-- &nbsp;
+The `onSave` prop signature stays `(test: TestResult) => void`, but we need to call it multiple times (once per selected player). To handle this cleanly:
 
-### Player Trends
+- Change `onSave` to `onSave: (tests: TestResult[]) => void` — an array, even when single
+- This is a local-only interface change; callers need updating
 
-- A dropdown to select a specific player
-- **Points chart**: Goals and assists per game
-- **Shots chart**: SOG, shots off goal, and shots blocked per game
-- **Plus/Minus chart**: +/- per game
-- Goalie players show: Goals Against and Save % per game instead
+#### 2. `src/pages/Development.tsx`
+Update `handleSaveTest` to iterate over the array of `TestResult` objects returned and call `addTest` for each one (or `updateTest` for single edits).
 
-## Technical Details
+#### 3. `src/components/team/PlayerTestResults.tsx` (if it uses the dialog)
+Check and update the `onSave` call-site if this dialog is reused on the player detail page.
 
-### New Files
+### Form layout for Group Test mode
 
-1. `**src/components/stats/TeamTrends.tsx**` - Team trend charts component
-  - Uses Recharts `LineChart` + `ResponsiveContainer` (already installed)
-  - Computes per-game team stats by iterating finished games chronologically
-  - Charts: Goals (our vs opponent), Shots breakdown, cumulative W/D/L record
-2. `**src/components/stats/PlayerTrends.tsx**` - Player trend charts component
-  - Player selector dropdown using existing Select component
-  - Computes per-game stats for the selected player using `calculatePlayerStatsFromEvents`
-  - Skater charts: Goals, Assists, Points, +/-, SOG per game
-  - Goalie charts: Goals Against, Save % per game
+```text
+┌─────────────────────────────────────────┐
+│  Add Test Result                        │
+│  [Single Player]  [Group Test]  ← tabs  │
+│                                         │
+│  Test Name: ___________________________  │
+│  Type: [Fitness ▼]   Date: [__/__/__]   │
+│                                         │
+│  Players                         Result │
+│  ☑ #11 Smith              4.2s  [____]  │
+│  ☑ #7  Jones              4.5s  [____]  │
+│  ☐ #3  Lee                              │
+│  ...                                    │
+│                                         │
+│           [Cancel]  [Save X Results]    │
+└─────────────────────────────────────────┘
+```
 
-### Modified Files
+Each checked player row has:
+- Checkbox to include/exclude
+- Player name & jersey number
+- Result input (required when checked)
+- Previous result input (optional)
+- Trend select (up / same / down)
 
-3. `**src/pages/Stats.tsx**`
-  - Add `'trends'` to the `StatsViewType` union
-  - Add a third toggle button with a `TrendingUp` icon labeled "Trends"
-  - Render `TeamTrends` or `PlayerTrends` based on a sub-toggle within the trends view
-  - Pass `statsGames` and `players` to the trend components
+### Files to edit
+| File | Change |
+|---|---|
+| `src/components/forms/TestResultFormDialog.tsx` | Add mode toggle + group entry UI; update `onSave` to return `TestResult[]` |
+| `src/pages/Development.tsx` | Update `handleSaveTest` to loop and call `addTest` for each result |
+| `src/components/team/PlayerTestResults.tsx` | Update `onSave` call-site if this dialog is used there |
 
-### Data Flow
-
-- Reuse existing `calculateTeamStats` and `calculatePlayerStatsFromEvents` from `gameStorage.ts`
-- Sort finished games by date ascending (oldest first) for chronological x-axis
-- Each game becomes one data point; x-axis labels show opponent name + date
-- The existing "Full Season" vs "Last 3 Games" period filter will also apply to trends
-
-### Chart Styling
-
-- Use the existing `ChartContainer`, `ChartTooltip`, and `ChartTooltipContent` from `src/components/ui/chart.tsx`
-- Color scheme: team colors using CSS variables (green for our team, red for opponent)
-- Responsive design with proper mobile sizing
+### No database schema changes needed
+The `test_results` table already stores one row per player per test — exactly what this feature produces.
