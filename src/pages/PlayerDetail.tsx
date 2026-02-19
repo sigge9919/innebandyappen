@@ -306,6 +306,7 @@ export default function PlayerDetail() {
         onOpenChange={setTestDialogOpen}
         test={selectedTest}
         players={[player]}
+        allTests={tests}
         onSave={handleSaveTest}
         onDelete={deleteTest}
         defaultPlayerId={player.id}

@@ -312,6 +312,7 @@ export default function Development() {
         onOpenChange={setTestDialogOpen}
         test={selectedTest}
         players={players}
+        allTests={tests}
         onSave={handleSaveTest}
         onDelete={deleteTest}
       />
