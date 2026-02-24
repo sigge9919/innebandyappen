@@ -39,7 +39,7 @@ const navItems = [
   { to: '/playbook', icon: BookOpen, label: 'Playbook' },
   { to: '/development', icon: TrendingUp, label: 'Development' },
   { to: '/tactics', icon: PenTool, label: 'Tactics Board' },
-  { to: '/settings', icon: Settings, label: 'Team Settings' },
+  { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 function NavItem({ to, icon: Icon, label, onClick }: { to: string; icon: React.ElementType; label: string; onClick?: () => void }) {
@@ -55,8 +55,8 @@ function NavItem({ to, icon: Icon, label, onClick }: { to: string; icon: React.E
         isActive && 'nav-item-active'
       )}
     >
-      <Icon className="h-5 w-5" />
-      <span className="font-medium">{label}</span>
+      <Icon className="h-4 w-4" />
+      <span className="text-sm">{label}</span>
     </NavLink>
   );
 }
@@ -68,49 +68,36 @@ function TeamSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="w-full flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-sidebar-accent transition-colors group">
-          <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center shrink-0">
-            <span className="text-sidebar-primary-foreground font-bold text-sm">
-              {activeTeam?.name?.[0]?.toUpperCase() ?? 'C'}
-            </span>
-          </div>
-          <div className="flex-1 text-left min-w-0">
-            <p className="text-sm font-semibold text-sidebar-foreground truncate">
-              {activeTeam?.name ?? 'No team'}
-            </p>
-            <p className="text-xs text-sidebar-foreground/50">Switch team</p>
-          </div>
-          <ChevronDown className="h-4 w-4 text-sidebar-foreground/50 shrink-0 group-hover:text-sidebar-foreground transition-colors" />
+        <button className="w-full flex items-center gap-2 px-2 py-1.5 hover:bg-sidebar-accent transition-colors text-left">
+          <span className="text-sm font-semibold text-sidebar-foreground truncate flex-1">
+            {activeTeam?.name ?? 'No team'}
+          </span>
+          <ChevronDown className="h-3 w-3 text-sidebar-foreground/50 shrink-0" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         side="bottom"
         align="start"
-        className="w-56 bg-popover border border-border shadow-lg z-[200]"
+        className="w-56 bg-popover border border-border z-[200]"
       >
         {teams.map((team: Team) => (
           <DropdownMenuItem
             key={team.id}
             onClick={() => setActiveTeam(team)}
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer text-sm"
           >
-            <div className="w-6 h-6 rounded bg-sidebar-primary flex items-center justify-center shrink-0">
-              <span className="text-sidebar-primary-foreground font-bold text-xs">
-                {team.name[0]?.toUpperCase()}
-              </span>
-            </div>
             <span className="flex-1 truncate">{team.name}</span>
             {activeTeam?.id === team.id && (
-              <Check className="h-4 w-4 text-primary shrink-0" />
+              <Check className="h-3 w-3 text-primary shrink-0" />
             )}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => navigate('/team-setup')}
-          className="flex items-center gap-2 cursor-pointer text-muted-foreground"
+          className="flex items-center gap-2 cursor-pointer text-muted-foreground text-sm"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3 w-3" />
           <span>Create new team</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -125,32 +112,27 @@ export function AppSidebar() {
 
   const SidebarContent = ({ onItemClick }: { onItemClick?: () => void }) => (
     <div className="flex flex-col h-full bg-sidebar">
-      {/* Logo + Team Switcher */}
-      <div className="p-4 border-b border-sidebar-border space-y-3">
-        <div className="flex items-center gap-2 px-2">
-          <div className="w-7 h-7 rounded-lg bg-sidebar-primary flex items-center justify-center shrink-0">
-            <span className="text-sidebar-primary-foreground font-bold text-xs">C</span>
-          </div>
-          <h1 className="text-base font-bold text-sidebar-foreground">Coach OS</h1>
-        </div>
+      {/* Team name */}
+      <div className="px-4 py-3 border-b border-sidebar-border">
+        <p className="text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-1">Coach OS</p>
         <TeamSwitcher />
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 py-2">
         {navItems.map((item) => (
           <NavItem key={item.to} {...item} onClick={onItemClick} />
         ))}
       </nav>
 
       {/* Sign out */}
-      <div className="p-4 border-t border-sidebar-border">
+      <div className="border-t border-sidebar-border py-2">
         <button
           onClick={signOut}
           className="nav-item w-full text-sidebar-foreground/50 hover:text-sidebar-foreground"
         >
-          <LogOut className="h-5 w-5" />
-          <span className="font-medium">Sign Out</span>
+          <LogOut className="h-4 w-4" />
+          <span className="text-sm">Sign Out</span>
         </button>
       </div>
     </div>
@@ -159,28 +141,23 @@ export function AppSidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col border-r border-sidebar-border bg-sidebar">
+      <aside className="hidden lg:flex w-56 flex-col border-r border-sidebar-border bg-sidebar shrink-0">
         <SidebarContent />
       </aside>
 
       {/* Mobile Header & Sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-sidebar border-b border-sidebar-border">
-        <div className="flex items-center justify-between px-4 h-16">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-sidebar-primary flex items-center justify-center">
-              <span className="text-sidebar-primary-foreground font-bold text-xs">C</span>
-            </div>
-            <span className="font-bold text-sidebar-foreground text-sm">
-              {activeTeam?.name ?? 'Coach OS'}
-            </span>
-          </div>
+        <div className="flex items-center justify-between px-4 h-12">
+          <span className="text-sm font-semibold text-sidebar-foreground">
+            {activeTeam?.name ?? 'Coach OS'}
+          </span>
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-sidebar-foreground">
-                <Menu className="h-6 w-6" />
+              <Button variant="ghost" size="icon" className="text-sidebar-foreground h-8 w-8">
+                <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-64 bg-sidebar border-sidebar-border">
+            <SheetContent side="left" className="p-0 w-56 bg-sidebar border-sidebar-border">
               <SidebarContent onItemClick={() => setMobileOpen(false)} />
             </SheetContent>
           </Sheet>
