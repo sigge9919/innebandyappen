@@ -8,7 +8,6 @@ import { WeeklyFocusCard } from '@/components/dashboard/WeeklyFocusCard';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { usePlayers, useTrainingSessions, useWeeklyFocus, useCoachNotes } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
-import { Users, Trophy, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -32,60 +31,39 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <div className="page-container">
-        {/* Header */}
         <div className="section-header">
-          <div>
-            <h1 className="section-title">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Welcome back, Coach</p>
-          </div>
+          <h1 className="section-title">Dashboard</h1>
         </div>
 
-        {/* Quick Stats - Clickable */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Stats row */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border mb-6 border border-border">
           <div onClick={() => navigate('/team')} className="cursor-pointer">
-            <StatCard
-              title="Active Players"
-              value={activePlayers}
-              subtitle={`of ${players.length} total`}
-              icon={Users}
-            />
+            <StatCard title="Active Players" value={activePlayers} subtitle={`of ${players.length}`} />
           </div>
           <div onClick={() => navigate('/games')} className="cursor-pointer">
-            <StatCard
-              title="Games Played"
-              value={gamesPlayed}
-              subtitle="this season"
-              icon={Trophy}
-            />
+            <StatCard title="Games Played" value={gamesPlayed} subtitle="this season" />
           </div>
           <div onClick={() => navigate('/games')} className="cursor-pointer">
             <StatCard
               title="Win Rate"
               value={gamesPlayed > 0 ? `${Math.round((gamesWon / gamesPlayed) * 100)}%` : 'N/A'}
-              subtitle={`${gamesWon} wins`}
+              subtitle={`${gamesWon}W ${gamesPlayed - gamesWon}L`}
               variant="success"
             />
           </div>
           <div onClick={() => navigate('/training')} className="cursor-pointer">
-            <StatCard
-              title="Sessions"
-              value={sessions.length}
-              subtitle="upcoming"
-              icon={CalendarIcon}
-            />
+            <StatCard title="Sessions" value={sessions.length} subtitle="scheduled" />
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column - Games */}
-          <div className="space-y-6">
+        {/* Content grid */}
+        <div className="grid lg:grid-cols-3 gap-4">
+          <div className="space-y-4">
             {upcomingGame && <NextGameCard game={upcomingGame} />}
             {lastPlayedGame && <LastGameCard game={lastPlayedGame} />}
           </div>
 
-          {/* Middle Column - Training & Focus */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {nextTraining && (
               <NextTrainingCard
                 session={nextTraining}
@@ -100,8 +78,7 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* Right Column - Alerts */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <PlayerAlerts players={players} onPlayerClick={(player) => navigate(`/team/${player.id}`)} />
           </div>
         </div>

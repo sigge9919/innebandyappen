@@ -1,8 +1,6 @@
-import { Trophy, TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
 import { EnhancedGame } from '@/types/game';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface LastGameCardProps {
@@ -14,52 +12,43 @@ export function LastGameCard({ game }: LastGameCardProps) {
   const tied = game.ourScore === game.opponentScore;
 
   return (
-    <div className="stat-card animate-slide-up">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Last Game</h3>
+    <div className="stat-card">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="metric-label">Last Game</h3>
         <span className={cn(
           'status-badge',
-          won ? 'bg-success/10 text-success' : tied ? 'bg-muted text-muted-foreground' : 'bg-destructive/10 text-destructive'
+          won ? 'bg-success/10 text-success border-success/20' : tied ? 'bg-muted text-muted-foreground' : 'bg-destructive/10 text-destructive border-destructive/20'
         )}>
-          {won ? 'Win' : tied ? 'Tie' : 'Loss'}
+          {won ? 'W' : tied ? 'D' : 'L'}
         </span>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium text-muted-foreground text-sm">vs {game.opponent}</p>
-            <p className="text-xs text-muted-foreground/70 mt-0.5">
-              {format(new Date(game.date), 'MMM d')} • {game.location}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-3xl font-bold text-foreground">
-              {game.ourScore} - {game.opponentScore}
-            </p>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-foreground">vs {game.opponent}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {format(new Date(game.date), 'MMM d')} &middot; {game.location}
+          </p>
         </div>
-
-        {game.notes && (
-          <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-            <div className="flex items-start gap-2">
-              <TrendingUp className="h-4 w-4 text-success mt-0.5 shrink-0" />
-              <p className="text-sm text-muted-foreground line-clamp-2">{game.notes.whatWorked}</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <TrendingDown className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
-              <p className="text-sm text-muted-foreground line-clamp-2">{game.notes.whatDidnt}</p>
-            </div>
-          </div>
-        )}
-
-        <Link to={`/games/${game.id}`}>
-          <Button variant="outline" size="sm" className="w-full group">
-            View All Games
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Button>
-        </Link>
+        <p className="text-2xl font-bold text-foreground tabular-nums">
+          {game.ourScore}&ndash;{game.opponentScore}
+        </p>
       </div>
+
+      {game.notes && (
+        <div className="mt-3 pt-3 border-t border-border space-y-1">
+          {game.notes.whatWorked && (
+            <p className="text-xs text-muted-foreground"><span className="font-medium text-success">+</span> {game.notes.whatWorked}</p>
+          )}
+          {game.notes.whatDidnt && (
+            <p className="text-xs text-muted-foreground"><span className="font-medium text-destructive">&minus;</span> {game.notes.whatDidnt}</p>
+          )}
+        </div>
+      )}
+
+      <Link to={`/games/${game.id}`} className="block mt-3 text-xs font-medium text-primary hover:underline">
+        View all games
+      </Link>
     </div>
   );
 }
