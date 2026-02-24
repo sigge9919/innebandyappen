@@ -8,6 +8,7 @@ import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
 import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
 import { PlayerStatsSection } from '@/components/team/PlayerStatsSection';
 import { PlayerTestResults } from '@/components/team/PlayerTestResults';
+import { PlayerTestTrends } from '@/components/team/PlayerTestTrends';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -269,6 +270,13 @@ export default function PlayerDetail() {
           )}
         </div>
         
+        {/* Test Trends */}
+        {playerTests.length >= 2 && (
+          <div className="mb-6">
+            <PlayerTestTrends tests={playerTests} />
+          </div>
+        )}
+
         {/* Test Results */}
         <div>
           <div className="flex items-center justify-between mb-4">
