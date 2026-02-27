@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Player } from '@/types';
 import { EnhancedGame, Period, EventType, Team, TeamStats, GameSituation, getSituationLabel, LineStats, PlayerGameStats } from '@/types/game';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon, TrendingUp, TrendingDown, Minus, LayoutGrid } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
 import { calculateLineStats } from '@/lib/gameStorage';
 import { GoalConfirmDialog, GoalConfirmData } from './GoalConfirmDialog';
@@ -66,6 +67,7 @@ export function LiveTracking({
   onUpdatePlayerStat,
   playerStats = [],
 }: LiveTrackingProps) {
+  const navigate = useNavigate();
   const [pendingGoal, setPendingGoal] = useState<{ team: Team } | null>(null);
   const [showPenaltyDialog, setShowPenaltyDialog] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(false);
@@ -209,7 +211,18 @@ export function LiveTracking({
       {/* Active Line & Situation */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-sm">Active Line</span>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sm">Active Line</span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => navigate(`/tactics?from=/games/${game.id}`)}
+            >
+              <LayoutGrid className="h-3.5 w-3.5 mr-1" />
+              Tactics
+            </Button>
+          </div>
           <div className="flex items-center gap-2">
             {activeLine && (
               <Badge variant="default" className="text-xs">{activeLine.name}</Badge>
