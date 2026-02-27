@@ -31,7 +31,7 @@ import { CollapsibleSection } from '@/components/games/CollapsibleSection';
 import { GoalieSelector } from '@/components/games/GoalieSelector';
 import { Period, Team, TeamStats, GameSituation } from '@/types/game';
 import { format } from 'date-fns';
-import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText, ChevronRight, Square, Shield, Settings } from 'lucide-react';
+import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText, ChevronRight, Square, Shield, Settings, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function GameDetail() {
@@ -149,6 +149,15 @@ export default function GameDetail() {
               >
                 <Settings className="h-4 w-4" />
                 {showLiveLineEdit ? 'Hide' : 'Edit Lines'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1"
+                onClick={() => navigate(`/tactics?from=/games/${gameId}`)}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Tactics
               </Button>
               {!isLastPeriod && (
                 <Button 
