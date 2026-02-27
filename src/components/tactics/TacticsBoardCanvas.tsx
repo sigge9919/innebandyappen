@@ -109,6 +109,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   const [homePlayerCount, setHomePlayerCount] = useState(1);
   const [opponentPlayerCount, setOpponentPlayerCount] = useState(1);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+  const [touchStartPos, setTouchStartPos] = useState<{x: number, y: number} | null>(null);
   
   // Animation state
   const [mode, setMode] = useState<Mode>('edit');
@@ -487,9 +488,11 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     const scaleY = canvas.height / rect.height;
     
     if ('touches' in e) {
+      const touch = e.touches[0] || (e as React.TouchEvent).changedTouches[0];
+      if (!touch) return { x: 0, y: 0 };
       return {
-        x: (e.touches[0].clientX - rect.left) * scaleX,
-        y: (e.touches[0].clientY - rect.top) * scaleY,
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top) * scaleY,
       };
     }
     
@@ -509,6 +512,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   };
 
   const handleCanvasClick = (e: React.MouseEvent) => {
+    // Skip if this was triggered by a touch event (handled in handleTouchEnd)
     if (mode === 'animate' && isPlaying) return;
     
     const { x, y } = getCanvasCoords(e);
@@ -541,10 +545,13 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     }
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    if ('touches' in e) e.preventDefault();
     if (mode === 'animate' && isPlaying) return;
     
     const { x, y } = getCanvasCoords(e);
+    const isTouchEvent = 'touches' in e;
+    if (isTouchEvent) setTouchStartPos({ x, y });
     
     // In animation mode, check for control point handle hits first
     if (mode === 'animate' && !isPlaying && keyframes.length > 1 && currentKeyframeIndex > 0) {
@@ -585,7 +592,8 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if ('touches' in e) e.preventDefault();
     if (mode === 'animate' && isPlaying) return;
     
     const { x, y } = getCanvasCoords(e);
@@ -641,7 +649,34 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e?: React.MouseEvent | React.TouchEvent) => {
+    // Handle touch tap (short distance = tap = place player)
+    if (touchStartPos && e && 'changedTouches' in e) {
+      const { x, y } = getCanvasCoords(e);
+      const dx = x - touchStartPos.x;
+      const dy = y - touchStartPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance < 10 && !draggedPlayer && !draggedControlPoint && mode === 'edit') {
+        // This was a tap, not a drag — place a player
+        if (selectedTool === 'addHome') {
+          setPlayers(prev => [...prev, { id: `home-${Date.now()}`, x, y, type: 'home', number: homePlayerCount }]);
+          setHomePlayerCount(c => c + 1);
+        } else if (selectedTool === 'addOpponent') {
+          setPlayers(prev => [...prev, { id: `opponent-${Date.now()}`, x, y, type: 'opponent', number: opponentPlayerCount }]);
+          setOpponentPlayerCount(c => c + 1);
+        } else if (selectedTool === 'addBall') {
+          const hasBall = players.some(p => p.type === 'ball');
+          if (!hasBall) {
+            setPlayers(prev => [...prev, { id: `ball-${Date.now()}`, x, y, type: 'ball' }]);
+          } else {
+            toast.info('Ball already on the field - drag it to move');
+          }
+        }
+      }
+      setTouchStartPos(null);
+    }
+
     if (draggedControlPoint) {
       setDraggedControlPoint(null);
       return;
@@ -1228,9 +1263,14 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             onClick={handleCanvasClick}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onMouseUp={(e) => handleMouseUp(e)}
+            onMouseLeave={() => handleMouseUp()}
+            onTouchStart={handleMouseDown}
+            onTouchMove={handleMouseMove}
+            onTouchEnd={(e) => handleMouseUp(e)}
+            onTouchCancel={() => handleMouseUp()}
             style={{ 
+              touchAction: 'none',
               cursor: isPlaying 
                 ? 'default' 
                 : selectedTool === 'addZone'
