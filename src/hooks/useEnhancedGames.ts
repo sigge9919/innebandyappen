@@ -114,6 +114,8 @@ export function useGameDetail(gameId: string) {
     goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string }
   ) => {
     if (!game) return;
+    const eventLineId = goalDetails?.lineId || game.activeLineId;
+    const activeLine = game.lines.find(l => l.id === eventLineId);
     const newEvent: GameEvent = {
       id: crypto.randomUUID(),
       gameId,
@@ -121,9 +123,11 @@ export function useGameDetail(gameId: string) {
       team,
       period: game.currentPeriod,
       situation: game.currentSituation || '5v5',
-      lineId: goalDetails?.lineId || game.activeLineId,
+      lineId: eventLineId,
       playerId: goalDetails?.scorerId,
       assistPlayerIds: goalDetails?.assistPlayerIds,
+      onIcePlayerIds: activeLine?.playerIds ? [...activeLine.playerIds] : undefined,
+      goalieId: game.activeGoalieId || game.startingGoalieId,
       timestamp: Date.now(),
     };
     const newEvents = [...game.events, newEvent];

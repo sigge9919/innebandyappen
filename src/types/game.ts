@@ -25,6 +25,8 @@ export interface GameEvent {
   playerId?: string; // For player-level attribution (goal scorer, penalty taker)
   blockedByPlayerId?: string; // For blocked shot attribution
   assistPlayerIds?: string[]; // For goal assists (0-2 players)
+  onIcePlayerIds?: string[]; // Snapshot of players on ice when event occurred
+  goalieId?: string; // Snapshot of active goalie when event occurred
   timestamp: number;
 }
 

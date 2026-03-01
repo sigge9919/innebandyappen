@@ -80,13 +80,19 @@ export function PostGamePlayerStats({
   const blkMismatch = totalBlk !== teamStats.shotsBlocked;
   const defMismatch = totalDef !== opponentBlockedShots;
 
-  // Calculate goalie stats
-  const opponentShotsOnGoal = events.filter(
-    e => e.team === 'opponent' && (e.type === 'shot_on_goal' || e.type === 'goal')
-  ).length;
-  const opponentGoals = events.filter(
-    e => e.team === 'opponent' && e.type === 'goal'
-  ).length;
+  // Calculate per-goalie stats using event snapshots
+  const getGoalieStats = (goalieId: string) => {
+    let goalsAgainst = 0;
+    let shotsAgainst = 0;
+    events.forEach(e => {
+      if (e.team !== 'opponent') return;
+      const eventGoalieId = e.goalieId || activeGoalieId;
+      if (eventGoalieId !== goalieId) return;
+      if (e.type === 'goal') { goalsAgainst++; shotsAgainst++; }
+      else if (e.type === 'shot_on_goal') { shotsAgainst++; }
+    });
+    return { goalsAgainst, shotsAgainst };
+  };
 
   const handleStatChange = (playerId: string, field: 'shotsOnGoal' | 'shotsOffGoal' | 'shotsBlocked' | 'defensiveBlocks', value: string) => {
     const numValue = parseInt(value) || 0;
@@ -288,8 +294,7 @@ export function PostGamePlayerStats({
               <tbody>
                 {goalies.map(goalie => {
                   const isActive = goalie.id === activeGoalieId;
-                  const goalsAgainst = isActive ? opponentGoals : 0;
-                  const shotsAgainst = isActive ? opponentShotsOnGoal : 0;
+                  const { goalsAgainst, shotsAgainst } = getGoalieStats(goalie.id);
                   const saves = shotsAgainst - goalsAgainst;
                   const savePercentage = shotsAgainst > 0 
                     ? (saves / shotsAgainst) * 100 

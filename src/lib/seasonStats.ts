@@ -225,23 +225,26 @@ export function aggregateGoalieStats(
   });
   
   games.forEach(game => {
-    // Count the starting goalie and any active goalie
-    const goalieIds = new Set<string>();
-    if (game.startingGoalieId) goalieIds.add(game.startingGoalieId);
-    if (game.activeGoalieId) goalieIds.add(game.activeGoalieId);
+    // Track which goalies played in this game
+    const goalieIdsInGame = new Set<string>();
+    if (game.startingGoalieId) goalieIdsInGame.add(game.startingGoalieId);
+    if (game.activeGoalieId) goalieIdsInGame.add(game.activeGoalieId);
     
-    // For simplicity, attribute all stats to the starting goalie
-    // (A more advanced system would track goalie changes mid-game)
-    const goalieId = game.startingGoalieId;
-    if (goalieId && statsMap.has(goalieId)) {
-      const stats = statsMap.get(goalieId)!;
-      stats.gamesPlayed += 1;
+    // Attribute stats per event using snapshotted goalieId
+    game.events.forEach(e => {
+      if (e.team !== 'opponent') return;
+      const eventGoalieId = e.goalieId || game.startingGoalieId;
+      if (!eventGoalieId || !statsMap.has(eventGoalieId)) return;
       
-      // Calculate opponent shots and goals from events
-      const oppStats = calculateTeamStats(game.events, 'opponent');
-      stats.goalsAgainst += oppStats.goals;
-      stats.shotsAgainst += oppStats.shotsOnGoal;
-    }
+      const stats = statsMap.get(eventGoalieId)!;
+      if (e.type === 'goal') { stats.goalsAgainst++; stats.shotsAgainst++; }
+      else if (e.type === 'shot_on_goal') { stats.shotsAgainst++; }
+    });
+    
+    // Count games played for each goalie that appeared
+    goalieIdsInGame.forEach(gid => {
+      if (statsMap.has(gid)) statsMap.get(gid)!.gamesPlayed += 1;
+    });
   });
   
   // Calculate save percentage
