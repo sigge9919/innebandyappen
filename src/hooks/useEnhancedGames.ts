@@ -111,7 +111,7 @@ export function useGameDetail(gameId: string) {
 
   const recordEvent = useCallback((
     type: EventType, team: Team,
-    goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string }
+    goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string; situationOverride?: GameSituation }
   ) => {
     if (!game) return;
     const eventLineId = goalDetails?.lineId || game.activeLineId;
@@ -122,11 +122,11 @@ export function useGameDetail(gameId: string) {
       type,
       team,
       period: game.currentPeriod,
-      situation: game.currentSituation || '5v5',
-      lineId: eventLineId,
+      situation: goalDetails?.situationOverride || game.currentSituation || '5v5',
+      lineId: goalDetails?.situationOverride === 'PS' ? undefined : eventLineId,
       playerId: goalDetails?.scorerId,
       assistPlayerIds: goalDetails?.assistPlayerIds,
-      onIcePlayerIds: activeLine?.playerIds ? [...activeLine.playerIds] : undefined,
+      onIcePlayerIds: goalDetails?.situationOverride === 'PS' ? undefined : (activeLine?.playerIds ? [...activeLine.playerIds] : undefined),
       goalieId: game.activeGoalieId || game.startingGoalieId,
       timestamp: Date.now(),
     };
