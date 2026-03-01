@@ -172,12 +172,12 @@ export function LiveTracking({
 
   // Handle penalty shot confirmation
   const handlePenaltyShotConfirm = (result: PenaltyShotResult) => {
-    // Record SOG for the shooting team with PS situation
-    onRecordEvent('shot_on_goal', result.shootingTeam, { situationOverride: 'PS', scorerId: result.playerId });
-
     if (result.scored) {
-      // Record goal with PS situation
+      // Record goal with PS situation (goal already counts as SOG in stats)
       onRecordEvent('goal', result.shootingTeam, { situationOverride: 'PS', scorerId: result.playerId });
+    } else {
+      // Only record SOG when not scored (to avoid double-counting)
+      onRecordEvent('shot_on_goal', result.shootingTeam, { situationOverride: 'PS', scorerId: result.playerId });
     }
 
     // Update manual player stats if our team is shooting
