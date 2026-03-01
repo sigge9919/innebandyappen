@@ -66,9 +66,7 @@ export function PostGamePlayerStats({
   };
 
   // Calculate totals from player stats
-  const eventDrivenStatsAll = calculatePlayerStatsFromEvents(events, penalties, lines, squadPlayers.map(p => p.id));
-  const totalSOG = playerStats.reduce((sum, ps) => sum + (ps.shotsOnGoal || 0), 0) 
-    + eventDrivenStatsAll.reduce((sum, es) => sum + es.shotsOnGoal, 0);
+  const totalSOG = playerStats.reduce((sum, ps) => sum + (ps.shotsOnGoal || 0), 0);
   const totalMiss = playerStats.reduce((sum, ps) => sum + (ps.shotsOffGoal || 0), 0);
   const totalBlk = playerStats.reduce((sum, ps) => sum + (ps.shotsBlocked || 0), 0);
   const totalDef = playerStats.reduce((sum, ps) => sum + (ps.defensiveBlocks || 0), 0);
@@ -170,8 +168,7 @@ export function PostGamePlayerStats({
             {squadPlayers.map(player => {
               const eventStats = getEventStats(player.id);
               const manualStats = getManualStats(player.id);
-              const combinedSOG = manualStats.shotsOnGoal + eventStats.shotsOnGoal;
-              const totalShots = combinedSOG + manualStats.shotsOffGoal + manualStats.shotsBlocked;
+              const totalShots = manualStats.shotsOnGoal + manualStats.shotsOffGoal + manualStats.shotsBlocked;
               return (
                 <tr key={player.id} className="border-b border-border">
                   <td className="py-2 px-2">
@@ -204,19 +201,14 @@ export function PostGamePlayerStats({
                     )}
                   </td>
                   <td className="py-2 px-1 text-center">
-                    <div className="flex items-center justify-center gap-0.5">
-                      {eventStats.shotsOnGoal > 0 && (
-                        <span className="text-xs text-muted-foreground tabular-nums">{eventStats.shotsOnGoal}+</span>
-                      )}
-                      <Input
-                        type="number"
-                        min="0"
-                        value={manualStats.shotsOnGoal || ''}
-                        onChange={(e) => handleStatChange(player.id, 'shotsOnGoal', e.target.value)}
-                        className="w-14 h-8 text-center text-sm px-1"
-                        placeholder="0"
-                      />
-                    </div>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={manualStats.shotsOnGoal || ''}
+                      onChange={(e) => handleStatChange(player.id, 'shotsOnGoal', e.target.value)}
+                      className="w-14 h-8 text-center text-sm px-1"
+                      placeholder="0"
+                    />
                   </td>
                   <td className="py-2 px-1 text-center">
                     <Input

@@ -103,6 +103,14 @@ export function LiveTracking({
       assistPlayerIds: data.assistPlayerIds,
       lineId: data.lineId,
     });
+
+    // Auto-add SOG for the goal scorer (same as advanced mode shot attribution)
+    if (pendingGoal.team === 'home' && data.scorerId && onUpdatePlayerStat) {
+      const currentStats = playerStats?.find(ps => ps.playerId === data.scorerId);
+      const currentValue = currentStats?.shotsOnGoal || 0;
+      onUpdatePlayerStat(data.scorerId, 'shotsOnGoal', currentValue + 1);
+    }
+
     setPendingGoal(null);
   };
 
