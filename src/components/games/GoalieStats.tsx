@@ -29,22 +29,26 @@ export function GoalieStats({
     );
   }
 
-  // Calculate opponent shots on goal (includes goals)
-  const opponentShotsOnGoal = events.filter(
-    e => e.team === 'opponent' && (e.type === 'shot_on_goal' || e.type === 'goal')
-  ).length;
-
-  // Calculate opponent goals
-  const opponentGoals = events.filter(
-    e => e.team === 'opponent' && e.type === 'goal'
-  ).length;
-
-  // For now, attribute all stats to the active/starting goalie
-  // In a more advanced version, you'd track goalie changes and split stats
+  // Calculate per-goalie stats using event snapshots
   const goalieStats: GoalieStatLine[] = goalies.map(goalie => {
-    const isActive = goalie.id === activeGoalieId;
-    const goalsAgainst = isActive ? opponentGoals : 0;
-    const shotsAgainst = isActive ? opponentShotsOnGoal : 0;
+    // Count opponent shots/goals attributed to this goalie via event snapshot
+    let goalsAgainst = 0;
+    let shotsAgainst = 0;
+
+    events.forEach(e => {
+      if (e.team !== 'opponent') return;
+      // Use snapshotted goalieId if available, otherwise fall back to activeGoalieId
+      const eventGoalieId = e.goalieId || activeGoalieId;
+      if (eventGoalieId !== goalie.id) return;
+
+      if (e.type === 'goal') {
+        goalsAgainst++;
+        shotsAgainst++;
+      } else if (e.type === 'shot_on_goal') {
+        shotsAgainst++;
+      }
+    });
+
     const saves = shotsAgainst - goalsAgainst;
     const savePercentage = shotsAgainst > 0 
       ? (saves / shotsAgainst) * 100 

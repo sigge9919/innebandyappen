@@ -198,10 +198,10 @@ export function calculatePlayerStatsFromEvents(
 
   events.filter(e => e.type === 'goal' && e.situation === '5v5').forEach(event => {
     if (!event.lineId) return;
-    const line = lines.find(l => l.id === event.lineId);
-    if (!line) return;
     const delta = event.team === 'home' ? 1 : -1;
-    line.playerIds.forEach(id => { if (statsMap.has(id)) statsMap.get(id)!.plusMinus5v5 += delta; });
+    // Use snapshotted on-ice players if available, otherwise fall back to current line roster
+    const playerIds = event.onIcePlayerIds || lines.find(l => l.id === event.lineId)?.playerIds || [];
+    playerIds.forEach(id => { if (statsMap.has(id)) statsMap.get(id)!.plusMinus5v5 += delta; });
   });
 
   return Array.from(statsMap.values());
