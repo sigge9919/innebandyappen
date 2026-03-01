@@ -1,64 +1,58 @@
 
-## Add Multi-Player Test Entry Support
 
-### Goal
-When adding a new test result, the coach can choose between "Single Player" mode (current behaviour) and "Group Test" mode — where all test fields (name, type, date) are shared, and each player gets their own result, previous result, and trend inputs.
+## Problem
 
-### How it works today
-`TestResultFormDialog` handles one player at a time. It calls `onSave(test: TestResult)` once with a single record. The `Development.tsx` page calls `addTest` once per save.
+Two bugs with the same root cause: **events don't snapshot who was on ice when they happened**.
 
-### What changes
+### Bug 1: Player +/- breaks when players change lines
 
-#### 1. `src/components/forms/TestResultFormDialog.tsx`
-This is the core change. When creating a new test (not editing), a **toggle** at the top lets the coach switch between:
+`calculatePlayerStatsFromEvents` (gameStorage.ts, line 199-205) processes each 5v5 goal event by looking up `event.lineId`, finding the **current** line object, and applying +/- to **all players currently on that line**. If a player moved from Line 1 to Line 2 mid-game, the calculation uses the current roster of each line, not who was actually on ice when the goal was scored.
 
-- **Single Player** — current form, unchanged
-- **Group Test** — shared fields (test name, type, date) at the top, then a list of all players, each with their own result input, previous result, and trend selector. Players are opted-in via a checkbox. Only checked players are saved.
+### Bug 2: Goalie stats all go to current active goalie
 
-The `onSave` prop signature stays `(test: TestResult) => void`, but we need to call it multiple times (once per selected player). To handle this cleanly:
+`GoalieStats.tsx` and `PostGamePlayerStats.tsx` attribute **all** opponent shots/goals to whoever is currently `activeGoalieId`. If a goalie is swapped mid-game, the replacement goalie gets all the stats and the original goalie gets zero.
 
-- Change `onSave` to `onSave: (tests: TestResult[]) => void` — an array, even when single
-- This is a local-only interface change; callers need updating
+---
 
-#### 2. `src/pages/Development.tsx`
-Update `handleSaveTest` to iterate over the array of `TestResult` objects returned and call `addTest` for each one (or `updateTest` for single edits).
+## Solution
 
-#### 3. `src/components/team/PlayerTestResults.tsx` (if it uses the dialog)
-Check and update the `onSave` call-site if this dialog is reused on the player detail page.
+**Store a snapshot of on-ice players and active goalie on each event at recording time.** This is a data-level fix that makes calculations historically accurate regardless of later roster changes.
 
-### Form layout for Group Test mode
+### 1. Extend `GameEvent` type with snapshot fields
 
-```text
-┌─────────────────────────────────────────┐
-│  Add Test Result                        │
-│  [Single Player]  [Group Test]  ← tabs  │
-│                                         │
-│  Test Name: ___________________________  │
-│  Type: [Fitness ▼]   Date: [__/__/__]   │
-│                                         │
-│  Players                         Result │
-│  ☑ #11 Smith              4.2s  [____]  │
-│  ☑ #7  Jones              4.5s  [____]  │
-│  ☐ #3  Lee                              │
-│  ...                                    │
-│                                         │
-│           [Cancel]  [Save X Results]    │
-└─────────────────────────────────────────┘
-```
+Add two optional fields to the `GameEvent` interface in `src/types/game.ts`:
+- `onIcePlayerIds?: string[]` — the player IDs from the active line at event time
+- `goalieId?: string` — the active goalie ID at event time
 
-Each checked player row has:
-- Checkbox to include/exclude
-- Player name & jersey number
-- Result input (required when checked)
-- Previous result input (optional)
-- Trend select (up / same / down)
+### 2. Record snapshot data when events are created
 
-### Files to edit
-| File | Change |
-|---|---|
-| `src/components/forms/TestResultFormDialog.tsx` | Add mode toggle + group entry UI; update `onSave` to return `TestResult[]` |
-| `src/pages/Development.tsx` | Update `handleSaveTest` to loop and call `addTest` for each result |
-| `src/components/team/PlayerTestResults.tsx` | Update `onSave` call-site if this dialog is used there |
+In `src/hooks/useEnhancedGames.ts` `recordEvent` function, populate the new fields from the current game state:
+- `onIcePlayerIds`: look up the active line's `playerIds` at the moment of recording
+- `goalieId`: use `game.activeGoalieId || game.startingGoalieId`
 
-### No database schema changes needed
-The `test_results` table already stores one row per player per test — exactly what this feature produces.
+Also do the same in `recordPenalty` if penalty events need goalie tracking.
+
+### 3. Fix `calculatePlayerStatsFromEvents` in `src/lib/gameStorage.ts`
+
+Change the +/- calculation (lines 199-205) from looking up the current line roster to using `event.onIcePlayerIds` when available, falling back to the current line lookup for backward compatibility with older events.
+
+### 4. Fix `GoalieStats.tsx` — attribute stats per event
+
+Instead of dumping all opponent stats onto the current active goalie, iterate through opponent shot/goal events and attribute each to `event.goalieId`. Fall back to `activeGoalieId` for old events without the field.
+
+### 5. Fix `PostGamePlayerStats.tsx` — same goalie fix
+
+Apply the same per-event goalie attribution logic.
+
+### 6. Fix `seasonStats.ts` goalie aggregation
+
+Update `aggregateGoalieStats` to use per-event `goalieId` when available instead of attributing everything to `startingGoalieId`.
+
+### 7. Fix line +/- display components
+
+`EnhancedLinePerformance.tsx` calculates line-level +/- using `event.lineId` which is correct (it tracks which line was active when the event happened, not which players were on that line). This is fine and doesn't need changes — line +/- is about the line identity, not its current members.
+
+### Backward compatibility
+
+All new fields are optional. Old events without `onIcePlayerIds` or `goalieId` fall back to the existing (imperfect) logic. No migration needed.
+
