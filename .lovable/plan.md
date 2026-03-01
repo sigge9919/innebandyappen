@@ -1,36 +1,45 @@
 
 
-## Plan: Add SOG to manual playerStats when a goal is scored
+## Plan: Add Penalty Shot Situation
 
-The current approach calculates SOG from goals inside `calculatePlayerStatsFromEvents`, which shows as a separate "1+" prefix in the stats table. Instead, when a home goal is confirmed with a scorer, the scorer's manual `playerStats.shotsOnGoal` should be incremented — exactly how advanced mode handles shot attribution.
+Add a "Penalty Shot" option to the situation controls. When triggered, it opens a dialog to record the full penalty shot sequence: which team is shooting, player selection (if our team), and the outcome (scored/saved). No +/- is affected. Player and goalie stats are recorded.
 
 ### Changes
 
-**1. `src/components/games/LiveTracking.tsx` — increment SOG on goal confirm**
+**1. `src/types/game.ts` — extend types**
+- Add `'PS'` to `GameSituation` type: `'5v5' | '5v4' | '4v5' | '6v5' | '5v6' | 'PS'`
+- Add `'PS'` label to `getSituationLabel`: `'PS': 'Penalty Shot'`
 
-In `handleGoalConfirm`, after recording the goal event, also increment the scorer's `shotsOnGoal` in manual `playerStats` via `onUpdatePlayerStat`:
+**2. New component: `src/components/games/PenaltyShotDialog.tsx`**
+- Multi-step dialog:
+  - Step 1: Choose team shooting (Our Team / Opponent)
+  - Step 2 (if our team): Select the penalty taker from squad players (field players only)
+  - Step 3: Outcome — Scored or Saved
+- On confirm, calls back with `{ shootingTeam: Team, playerId?: string, scored: boolean }`
 
-```typescript
-const handleGoalConfirm = (data: GoalConfirmData) => {
-  if (!pendingGoal) return;
-  onRecordEvent('goal', pendingGoal.team, { ... });
-  
-  // Auto-add SOG for the goal scorer (same as advanced mode shot attribution)
-  if (pendingGoal.team === 'home' && data.scorerId && onUpdatePlayerStat) {
-    const currentStats = playerStats.find(ps => ps.playerId === data.scorerId);
-    const currentValue = currentStats?.shotsOnGoal || 0;
-    onUpdatePlayerStat(data.scorerId, 'shotsOnGoal', currentValue + 1);
-  }
-  
-  setPendingGoal(null);
-};
-```
+**3. `src/components/games/LiveTracking.tsx` — add penalty shot flow**
+- Add a "Penalty Shot" button (separate from the situation row, perhaps below or between the two team columns as a full-width button, or in each team column)
+- Actually: add a single full-width "Penalty Shot" button below both team columns (since the dialog handles team selection)
+- On confirm from dialog:
+  - Record a `shot_on_goal` event with situation `'PS'` for the shooting team
+  - If scored: also record a `goal` event with situation `'PS'`
+  - If our team scored: increment scorer's `shotsOnGoal` and `goals` in manual playerStats (via `onUpdatePlayerStat`)
+  - If our team missed: increment scorer's `shotsOnGoal` only
+  - The goalie snapshot is captured automatically via existing `recordEvent` logic (goalieId on event)
 
-**2. `src/lib/gameStorage.ts` — remove SOG increment from goal calculation**
+**4. `src/lib/gameStorage.ts` — exclude PS from +/- calculation**
+- In `calculatePlayerStatsFromEvents`, the +/- loop already filters by `situation === '5v5'`, so penalty shot goals (`situation === 'PS'`) are automatically excluded. No change needed.
 
-Remove the `shotsOnGoal += 1` line from the goal processing block in `calculatePlayerStatsFromEvents` (line 189), so goals no longer double-count as event-driven SOG.
+**5. No change to situation buttons row** — Penalty Shot is not a "game state" like 5v4; it's a discrete event. The situation selector stays as-is. The PS situation is only stamped on the events created during the penalty shot sequence.
 
-**3. `src/components/games/PostGamePlayerStats.tsx` — revert the "X+" prefix display**
-
-Revert the recent changes that show event-driven SOG as a prefix. The SOG column goes back to showing just the manual input since goals now feed directly into manual stats. Remove the `eventDrivenStatsAll` recalculation for `totalSOG` and simplify back to just summing `playerStats.shotsOnGoal`.
+### Flow Summary
+1. Coach taps "Penalty Shot" button
+2. Dialog asks: Our Team or Opponent?
+3. If Our Team: select player, then Scored/Saved
+4. If Opponent: just Scored/Saved
+5. Events recorded with `situation: 'PS'`:
+   - Always: `shot_on_goal` for shooting team (counted in team SOG and goalie SA)
+   - If scored: `goal` for shooting team (counted in team goals and goalie GA)
+   - If our player: manual playerStats updated (SOG, and goal if scored)
+6. No +/- impact (already excluded by existing 5v5 filter)
 
