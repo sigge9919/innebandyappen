@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Target, XCircle, Shield, CircleDot, Undo2, AlertOctagon, TrendingUp, TrendingDown, Minus, Crosshair } from 'lucide-react';
 import { LivePeriodStats } from './LivePeriodStats';
 import { calculateLineStats } from '@/lib/gameStorage';
 import { GoalConfirmDialog, GoalConfirmData } from './GoalConfirmDialog';
 import { PenaltyConfirmDialog } from './PenaltyConfirmDialog';
 import { ShotPlayerDialog } from './ShotPlayerDialog';
+import { PenaltyShotDialog, PenaltyShotResult } from './PenaltyShotDialog';
 
 interface LiveTrackingProps {
   game: EnhancedGame;
@@ -19,7 +20,7 @@ interface LiveTrackingProps {
   opponentStats: TeamStats;
   periodHomeStats: TeamStats;
   periodOpponentStats: TeamStats;
-  onRecordEvent: (type: EventType, team: Team, goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string }) => void;
+  onRecordEvent: (type: EventType, team: Team, goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string; situationOverride?: GameSituation }) => void;
   onRecordPenalty: (team: Team, playerId?: string) => void;
   onSetActiveLine: (lineId: string) => void;
   onSetSituation: (situation: GameSituation) => void;
@@ -68,6 +69,7 @@ export function LiveTracking({
 }: LiveTrackingProps) {
   const [pendingGoal, setPendingGoal] = useState<{ team: Team } | null>(null);
   const [showPenaltyDialog, setShowPenaltyDialog] = useState(false);
+  const [showPenaltyShotDialog, setShowPenaltyShotDialog] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(false);
   const [pendingShot, setPendingShot] = useState<{ type: 'shot_on_goal' | 'shot_off_goal' | 'shot_blocked' | 'defensive_block'; team: Team } | null>(null);
 
@@ -168,6 +170,31 @@ export function LiveTracking({
     setPendingShot(null);
   };
 
+  // Handle penalty shot confirmation
+  const handlePenaltyShotConfirm = (result: PenaltyShotResult) => {
+    // Record SOG for the shooting team with PS situation
+    onRecordEvent('shot_on_goal', result.shootingTeam, { situationOverride: 'PS', scorerId: result.playerId });
+
+    if (result.scored) {
+      // Record goal with PS situation
+      onRecordEvent('goal', result.shootingTeam, { situationOverride: 'PS', scorerId: result.playerId });
+    }
+
+    // Update manual player stats if our team is shooting
+    if (result.shootingTeam === 'home' && result.playerId && onUpdatePlayerStat) {
+      const currentStats = playerStats.find(ps => ps.playerId === result.playerId);
+      const currentSOG = currentStats?.shotsOnGoal || 0;
+      onUpdatePlayerStat(result.playerId, 'shotsOnGoal', currentSOG + 1);
+
+      if (result.scored) {
+        const currentGoals = currentStats?.goals || 0;
+        onUpdatePlayerStat(result.playerId, 'goals', currentGoals + 1);
+      }
+    }
+
+    setShowPenaltyShotDialog(false);
+  };
+
   return (
     <div className="space-y-4">
       {/* Goal Confirmation Dialog */}
@@ -199,6 +226,15 @@ export function LiveTracking({
         squadPlayers={squadPlayers}
         lines={game.lines}
         activeLineId={game.activeLineId}
+      />
+
+      {/* Penalty Shot Dialog */}
+      <PenaltyShotDialog
+        open={showPenaltyShotDialog}
+        onClose={() => setShowPenaltyShotDialog(false)}
+        onConfirm={handlePenaltyShotConfirm}
+        squadPlayers={squadPlayers}
+        opponentName={game.opponent}
       />
 
       {/* Live Period Stats */}
@@ -369,6 +405,15 @@ export function LiveTracking({
           </button>
         </div>
       </div>
+
+      {/* Penalty Shot Button */}
+      <button
+        onClick={() => setShowPenaltyShotDialog(true)}
+        className="w-full p-4 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-95 border-2 border-primary bg-primary/10 text-primary hover:bg-primary/20"
+      >
+        <Crosshair className="h-6 w-6" />
+        <span className="font-semibold">Penalty Shot</span>
+      </button>
 
       {/* Undo */}
       {game.events.length > 0 && (

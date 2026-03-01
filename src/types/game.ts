@@ -5,7 +5,7 @@ export type Period = '1' | '2' | '3' | 'OT';
 export type LineType = '5v5' | 'PP' | 'PK' | '6v5' | '5v6';
 export type EventType = 'goal' | 'shot_on_goal' | 'shot_off_goal' | 'shot_blocked' | 'penalty';
 export type Team = 'home' | 'opponent';
-export type GameSituation = '5v5' | '5v4' | '4v5' | '6v5' | '5v6';
+export type GameSituation = '5v5' | '5v4' | '4v5' | '6v5' | '5v6' | 'PS';
 
 export interface GameLine {
   id: string;
@@ -200,6 +200,7 @@ export function getSituationLabel(situation: GameSituation): string {
     '4v5': 'Box Play',
     '6v5': '6v5 (ENG)',
     '5v6': '5v6 (ENG)',
+    'PS': 'Penalty Shot',
   };
   return labels[situation];
 }
