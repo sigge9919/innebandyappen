@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 
 export default function GameDetail() {
   const [showLiveLineEdit, setShowLiveLineEdit] = useState(false);
+  const [liveView, setLiveView] = useState<'tracking' | 'stats'>('tracking');
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const { players } = usePlayers();
@@ -141,6 +142,15 @@ export default function GameDetail() {
           {/* Live game controls in header */}
           {game.status === 'Live' && (
             <div className="flex items-center gap-2">
+              <Button
+                variant={liveView === 'stats' ? 'secondary' : 'outline'}
+                size="sm"
+                className="gap-1"
+                onClick={() => setLiveView(liveView === 'tracking' ? 'stats' : 'tracking')}
+              >
+                <BarChart3 className="h-4 w-4" />
+                {liveView === 'stats' ? 'Live' : 'Stats'}
+              </Button>
               <Button
                 variant={showLiveLineEdit ? 'secondary' : 'outline'}
                 size="sm"
@@ -275,22 +285,82 @@ export default function GameDetail() {
               </div>
             )}
 
-            {/* Main Live Tracking */}
-            <LiveTracking
-              game={game}
-              squadPlayers={squadPlayers}
-              homeStats={getHomeStats()}
-              opponentStats={getOpponentStats()}
-              periodHomeStats={getPeriodHomeStats()}
-              periodOpponentStats={getPeriodOpponentStats()}
-              onRecordEvent={recordEvent}
-              onRecordPenalty={recordPenalty}
-              onSetActiveLine={setActiveLine}
-              onSetSituation={setCurrentSituation}
-              onUndo={undoLast}
-              onUpdatePlayerStat={updatePlayerStat}
-              playerStats={game.playerStats}
-            />
+            {/* Main Content: Tracking or Stats */}
+            {liveView === 'tracking' ? (
+              <LiveTracking
+                game={game}
+                squadPlayers={squadPlayers}
+                homeStats={getHomeStats()}
+                opponentStats={getOpponentStats()}
+                periodHomeStats={getPeriodHomeStats()}
+                periodOpponentStats={getPeriodOpponentStats()}
+                onRecordEvent={recordEvent}
+                onRecordPenalty={recordPenalty}
+                onSetActiveLine={setActiveLine}
+                onSetSituation={setCurrentSituation}
+                onUndo={undoLast}
+                onUpdatePlayerStat={updatePlayerStat}
+                playerStats={game.playerStats}
+              />
+            ) : (
+              <div className="space-y-4">
+                {/* Live Score */}
+                <div className="stat-card text-center py-4">
+                  <p className="text-4xl font-bold">
+                    {game.ourScore} - {game.opponentScore}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {PERIOD_LABELS[game.currentPeriod]} — Live
+                  </p>
+                </div>
+
+                <CollapsibleSection title="Team Statistics" icon={<BarChart3 className="h-5 w-5" />}>
+                  <PostGameTeamStats
+                    homeTeamName="Our Team"
+                    opponentName={game.opponent}
+                    getHomeStats={getHomeStats}
+                    getOpponentStats={getOpponentStats}
+                    homeScore={game.ourScore}
+                    opponentScore={game.opponentScore}
+                    onUpdateStats={handleUpdateTeamStats}
+                  />
+                </CollapsibleSection>
+
+                {(() => {
+                  const specialTeams = getSpecialTeamsStats();
+                  return specialTeams.powerPlay && specialTeams.boxPlay ? (
+                    <CollapsibleSection title="Special Teams Summary" icon={<Zap className="h-5 w-5" />}>
+                      <SpecialTeamsSummary
+                        powerPlay={specialTeams.powerPlay}
+                        boxPlay={specialTeams.boxPlay}
+                      />
+                    </CollapsibleSection>
+                  ) : null;
+                })()}
+
+                <CollapsibleSection title="Player Statistics" icon={<User className="h-5 w-5" />}>
+                  <PostGamePlayerStats
+                    squadPlayers={squadPlayers.filter(p => !p.positions?.includes('Goalkeeper'))}
+                    goalies={squadGoalies}
+                    events={game.events}
+                    penalties={game.penalties || []}
+                    lines={game.lines}
+                    playerStats={game.playerStats}
+                    teamStats={getHomeStats()}
+                    activeGoalieId={game.activeGoalieId || game.startingGoalieId}
+                    onUpdatePlayerStat={updatePlayerStat}
+                  />
+                </CollapsibleSection>
+
+                <CollapsibleSection title="Line Performance" icon={<TrendingUp className="h-5 w-5" />}>
+                  <EnhancedLinePerformance
+                    lines={game.lines}
+                    events={game.events}
+                    squadPlayers={squadPlayers}
+                  />
+                </CollapsibleSection>
+              </div>
+            )}
           </div>
         )}
 
@@ -320,7 +390,6 @@ export default function GameDetail() {
               </p>
             </div>
 
-            {/* Team Stats Editing */}
             <CollapsibleSection title="Team Statistics" icon={<BarChart3 className="h-5 w-5" />}>
               <PostGameTeamStats
                 homeTeamName="Our Team"
@@ -333,7 +402,6 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
-            {/* Special Teams Summary */}
             {(() => {
               const specialTeams = getSpecialTeamsStats();
               return specialTeams.powerPlay && specialTeams.boxPlay ? (
@@ -346,7 +414,6 @@ export default function GameDetail() {
               ) : null;
             })()}
 
-            {/* Player Stats */}
             <CollapsibleSection title="Player Statistics" icon={<User className="h-5 w-5" />}>
               <PostGamePlayerStats
                 squadPlayers={squadPlayers.filter(p => !p.positions?.includes('Goalkeeper'))}
@@ -361,7 +428,6 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
-            {/* Line Performance */}
             <CollapsibleSection title="Line Performance" icon={<TrendingUp className="h-5 w-5" />}>
               <EnhancedLinePerformance
                 lines={game.lines}
@@ -370,7 +436,6 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
-            {/* Post-Game Notes */}
             <CollapsibleSection title="Post-Game Notes" icon={<FileText className="h-5 w-5" />}>
               <PostGameNotes
                 game={game}
@@ -378,7 +443,6 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
-            {/* Goal Details Editing - at bottom, minimized by default */}
             <CollapsibleSection title="Goal Details" icon={<CircleDot className="h-5 w-5 text-success" />} defaultOpen={false}>
               <GoalDetailsEditor
                 goalEvents={game.events.filter(e => e.type === 'goal')}
@@ -387,7 +451,6 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
-            {/* Penalty Attribution - at bottom, minimized by default */}
             <CollapsibleSection title="Penalty Attribution" icon={<AlertOctagon className="h-5 w-5 text-amber-500" />} defaultOpen={false}>
               <PenaltyEditor
                 penalties={game.penalties || []}
