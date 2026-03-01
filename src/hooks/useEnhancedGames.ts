@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   EnhancedGame, 
   GameEvent, 
@@ -61,37 +61,50 @@ export function useEnhancedGames() {
 
 export function useGameDetail(gameId: string) {
   const [game, setGame] = useState<EnhancedGame | null>(null);
+  const gameRef = useRef<EnhancedGame | null>(null);
+
+  // Keep ref in sync
+  useEffect(() => { gameRef.current = game; }, [game]);
 
   const refresh = useCallback(async () => {
     const { data } = await supabase.from('games').select('*').eq('id', gameId).single();
-    setGame(data ? dbToEnhancedGame(data) : null);
+    const g = data ? dbToEnhancedGame(data) : null;
+    setGame(g);
+    gameRef.current = g;
   }, [gameId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  // Save full game state helper
+  // Save full game state helper — optimistically merges into local state via ref
   const saveGame = useCallback(async (updates: Partial<EnhancedGame>) => {
+    // Merge into ref so rapid sequential calls see each other's changes
+    if (gameRef.current) {
+      const merged = { ...gameRef.current, ...updates };
+      gameRef.current = merged;
+      setGame(merged);
+    }
     await supabase.from('games').update(enhancedGameUpdatesToDb(updates)).eq('id', gameId);
-    refresh();
-  }, [gameId, refresh]);
+  }, [gameId]);
 
   const updateGame = useCallback((updates: Partial<EnhancedGame>) => {
-    if (!game) return;
+    if (!gameRef.current) return;
     saveGame(updates);
-  }, [game, saveGame]);
+  }, [saveGame]);
 
   const updateSquad = useCallback((playerIds: string[]) => saveGame({ squadPlayerIds: playerIds }), [saveGame]);
 
   const updateLine = useCallback((lineId: string, updates: Partial<GameLine>) => {
-    if (!game) return;
-    const newLines = game.lines.map(l => l.id === lineId ? { ...l, ...updates } : l);
+    const g = gameRef.current;
+    if (!g) return;
+    const newLines = g.lines.map(l => l.id === lineId ? { ...l, ...updates } : l);
     saveGame({ lines: newLines });
-  }, [game, saveGame]);
+  }, [saveGame]);
 
   const startGame = useCallback(() => {
-    if (!game) return;
-    saveGame({ status: 'Live', currentPeriod: '1', activeGoalieId: game.startingGoalieId });
-  }, [game, saveGame]);
+    const g = gameRef.current;
+    if (!g) return;
+    saveGame({ status: 'Live', currentPeriod: '1', activeGoalieId: g.startingGoalieId });
+  }, [saveGame]);
 
   const endGame = useCallback(() => saveGame({ status: 'Finished' }), [saveGame]);
 
@@ -101,11 +114,12 @@ export function useGameDetail(gameId: string) {
   const setCurrentPeriod = useCallback((period: Period) => saveGame({ currentPeriod: period }), [saveGame]);
 
   const nextPeriod = useCallback(() => {
-    if (!game) return;
+    const g = gameRef.current;
+    if (!g) return;
     const order: Period[] = ['1', '2', '3', 'OT'];
-    const idx = order.indexOf(game.currentPeriod);
+    const idx = order.indexOf(g.currentPeriod);
     if (idx < order.length - 1) saveGame({ currentPeriod: order[idx + 1] });
-  }, [game, saveGame]);
+  }, [saveGame]);
 
   const setCurrentSituation = useCallback((situation: GameSituation) => saveGame({ currentSituation: situation }), [saveGame]);
 
@@ -113,59 +127,62 @@ export function useGameDetail(gameId: string) {
     type: EventType, team: Team,
     goalDetails?: { scorerId?: string; assistPlayerIds?: string[]; lineId?: string; situationOverride?: GameSituation }
   ) => {
-    if (!game) return;
-    const eventLineId = goalDetails?.lineId || game.activeLineId;
-    const activeLine = game.lines.find(l => l.id === eventLineId);
+    const g = gameRef.current;
+    if (!g) return;
+    const eventLineId = goalDetails?.lineId || g.activeLineId;
+    const activeLine = g.lines.find(l => l.id === eventLineId);
     const newEvent: GameEvent = {
       id: crypto.randomUUID(),
       gameId,
       type,
       team,
-      period: game.currentPeriod,
-      situation: goalDetails?.situationOverride || game.currentSituation || '5v5',
+      period: g.currentPeriod,
+      situation: goalDetails?.situationOverride || g.currentSituation || '5v5',
       lineId: goalDetails?.situationOverride === 'PS' ? undefined : eventLineId,
       playerId: goalDetails?.scorerId,
       assistPlayerIds: goalDetails?.assistPlayerIds,
       onIcePlayerIds: goalDetails?.situationOverride === 'PS' ? undefined : (activeLine?.playerIds ? [...activeLine.playerIds] : undefined),
-      goalieId: game.activeGoalieId || game.startingGoalieId,
+      goalieId: g.activeGoalieId || g.startingGoalieId,
       timestamp: Date.now(),
     };
-    const newEvents = [...game.events, newEvent];
+    const newEvents = [...g.events, newEvent];
     const updates: Partial<EnhancedGame> = { events: newEvents };
     if (type === 'goal') {
-      if (team === 'home') updates.ourScore = game.ourScore + 1;
-      else updates.opponentScore = game.opponentScore + 1;
+      if (team === 'home') updates.ourScore = g.ourScore + 1;
+      else updates.opponentScore = g.opponentScore + 1;
     }
     saveGame(updates);
-  }, [game, gameId, saveGame]);
+  }, [gameId, saveGame]);
 
   const undoLast = useCallback(() => {
-    if (!game || game.events.length === 0) return;
-    const removed = game.events[game.events.length - 1];
-    const newEvents = game.events.slice(0, -1);
+    const g = gameRef.current;
+    if (!g || g.events.length === 0) return;
+    const removed = g.events[g.events.length - 1];
+    const newEvents = g.events.slice(0, -1);
     const updates: Partial<EnhancedGame> = { events: newEvents };
     if (removed.type === 'goal') {
-      if (removed.team === 'home') updates.ourScore = Math.max(0, game.ourScore - 1);
-      else updates.opponentScore = Math.max(0, game.opponentScore - 1);
+      if (removed.team === 'home') updates.ourScore = Math.max(0, g.ourScore - 1);
+      else updates.opponentScore = Math.max(0, g.opponentScore - 1);
     }
     saveGame(updates);
-  }, [game, saveGame]);
+  }, [saveGame]);
 
   const recordPenalty = useCallback((team: Team, playerId?: string) => {
-    if (!game) return;
+    const g = gameRef.current;
+    if (!g) return;
     const newPenalty: PenaltyEvent = {
       id: crypto.randomUUID(),
       gameId,
       team,
-      period: game.currentPeriod,
+      period: g.currentPeriod,
       duration: 2,
       playerId,
       timestamp: Date.now(),
     };
-    const newPenalties = [...(game.penalties || []), newPenalty];
+    const newPenalties = [...(g.penalties || []), newPenalty];
     const newSituation: GameSituation = team === 'home' ? '4v5' : '5v4';
     saveGame({ penalties: newPenalties, currentSituation: newSituation });
-  }, [game, gameId, saveGame]);
+  }, [gameId, saveGame]);
 
   const getHomeStats = useCallback((period?: Period): TeamStats => {
     if (!game) return { shotsOnGoal: 0, shotsOffGoal: 0, shotsBlocked: 0, goals: 0 };
@@ -205,8 +222,9 @@ export function useGameDetail(gameId: string) {
   const updateNotes = useCallback((notes: EnhancedGame['notes']) => saveGame({ notes }), [saveGame]);
 
   const updatePlayerStat = useCallback((playerId: string, field: keyof Omit<PlayerGameStats, 'playerId'>, value: number) => {
-    if (!game) return;
-    const stats = [...(game.playerStats || [])];
+    const g = gameRef.current;
+    if (!g) return;
+    const stats = [...(g.playerStats || [])];
     const idx = stats.findIndex(s => s.playerId === playerId);
     if (idx !== -1) {
       stats[idx] = { ...stats[idx], [field]: value };
@@ -216,17 +234,19 @@ export function useGameDetail(gameId: string) {
       stats.push(newStat);
     }
     saveGame({ playerStats: stats });
-  }, [game, saveGame]);
+  }, [saveGame]);
 
   const assignBlockedShot = useCallback((eventId: string, playerId: string) => {
-    if (!game) return;
-    const events = game.events.map(e => e.id === eventId ? { ...e, blockedByPlayerId: playerId } : e);
+    const g = gameRef.current;
+    if (!g) return;
+    const events = g.events.map(e => e.id === eventId ? { ...e, blockedByPlayerId: playerId } : e);
     saveGame({ events });
-  }, [game, saveGame]);
+  }, [saveGame]);
 
   const updateGoalDetails = useCallback((eventId: string, scorerId?: string, assistPlayerIds?: string[]) => {
-    if (!game) return;
-    const events = game.events.map(e => {
+    const g = gameRef.current;
+    if (!g) return;
+    const events = g.events.map(e => {
       if (e.id !== eventId) return e;
       return {
         ...e,
@@ -235,20 +255,21 @@ export function useGameDetail(gameId: string) {
       };
     });
     saveGame({ events });
-  }, [game, saveGame]);
+  }, [saveGame]);
 
   const assignPenaltyPlayer = useCallback((penaltyId: string, playerId: string) => {
-    if (!game) return;
-    const penalties = (game.penalties || []).map(p => p.id === penaltyId ? { ...p, playerId } : p);
+    const g = gameRef.current;
+    if (!g) return;
+    const penalties = (g.penalties || []).map(p => p.id === penaltyId ? { ...p, playerId } : p);
     saveGame({ penalties });
-  }, [game, saveGame]);
+  }, [saveGame]);
 
   const updateTeamPeriodStats = useCallback((team: Team, period: Period, stats: Partial<TeamStats>) => {
-    if (!game) return;
-    // Add/remove events to match target stats
-    let events = [...game.events];
-    let ourScore = game.ourScore;
-    let opponentScore = game.opponentScore;
+    const g = gameRef.current;
+    if (!g) return;
+    let events = [...g.events];
+    let ourScore = g.ourScore;
+    let opponentScore = g.opponentScore;
 
     const eventTypeMap: Record<keyof TeamStats, EventType> = {
       goals: 'goal', shotsOnGoal: 'shot_on_goal', shotsOffGoal: 'shot_off_goal', shotsBlocked: 'shot_blocked',
@@ -287,7 +308,7 @@ export function useGameDetail(gameId: string) {
     });
 
     saveGame({ events, ourScore, opponentScore });
-  }, [game, gameId, saveGame]);
+  }, [gameId, saveGame]);
 
   return {
     game, refresh, updateGame, updateSquad, updateLine,
