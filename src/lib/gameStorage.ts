@@ -186,7 +186,6 @@ export function calculatePlayerStatsFromEvents(
   events.filter(e => e.type === 'goal' && e.team === 'home').forEach(event => {
     if (event.playerId && statsMap.has(event.playerId)) {
       statsMap.get(event.playerId)!.goals += 1;
-      statsMap.get(event.playerId)!.shotsOnGoal += 1;
     }
     event.assistPlayerIds?.forEach(id => { if (statsMap.has(id)) statsMap.get(id)!.assists += 1; });
   });
