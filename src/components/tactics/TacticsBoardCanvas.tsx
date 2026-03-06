@@ -58,7 +58,7 @@ interface TacticsLayout {
   zones?: ShadowZone[];
 }
 
-type Tool = 'select' | 'addHome' | 'addOpponent' | 'addBall' | 'draw' | 'erase' | 'addZone';
+type Tool = 'select' | 'addHome' | 'addOpponent' | 'addBall' | 'draw' | 'erase' | 'addZone' | 'delete';
 type Mode = 'edit' | 'animate';
 
 const STORAGE_KEY = 'tactics-layouts';
@@ -520,7 +520,13 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     const { x, y } = getCanvasCoords(e);
     
     if (mode === 'edit') {
-      if (selectedTool === 'addHome') {
+      if (selectedTool === 'delete') {
+        const player = findPlayerAtPosition(x, y);
+        if (player) {
+          setPlayers(prev => prev.filter(p => p.id !== player.id));
+          toast.success('Player removed');
+        }
+      } else if (selectedTool === 'addHome') {
         setPlayers((prev) => [
           ...prev,
           { id: `home-${Date.now()}`, x, y, type: 'home', number: homePlayerCount },
@@ -533,7 +539,6 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
         ]);
         setOpponentPlayerCount((c) => c + 1);
       } else if (selectedTool === 'addBall') {
-        // Only allow one ball at a time
         const hasBall = players.some(p => p.type === 'ball');
         if (!hasBall) {
           setPlayers((prev) => [
@@ -660,8 +665,14 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance < 10 && !draggedPlayer && !draggedControlPoint && mode === 'edit') {
-        // This was a tap, not a drag — place a player
-        if (selectedTool === 'addHome') {
+        // This was a tap, not a drag
+        if (selectedTool === 'delete') {
+          const player = findPlayerAtPosition(x, y);
+          if (player) {
+            setPlayers(prev => prev.filter(p => p.id !== player.id));
+            toast.success('Player removed');
+          }
+        } else if (selectedTool === 'addHome') {
           setPlayers(prev => [...prev, { id: `home-${Date.now()}`, x, y, type: 'home', number: homePlayerCount }]);
           setHomePlayerCount(c => c + 1);
         } else if (selectedTool === 'addOpponent') {
@@ -1058,6 +1069,14 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             >
               <CircleDot className="h-4 w-4 mr-2" />
               Add Ball
+            </Button>
+            <Button
+              variant={selectedTool === 'delete' ? 'destructive' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedTool('delete')}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Delete
             </Button>
             
             <div className="w-px h-8 bg-border mx-1" />
