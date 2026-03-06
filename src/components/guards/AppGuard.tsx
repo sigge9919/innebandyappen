@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 
 export function AppGuard({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
-  const { activeTeam, loading: teamLoading } = useTeam();
+  const { activeTeam, activeRole, loading: teamLoading } = useTeam();
   const location = useLocation();
 
   if (authLoading || (user && teamLoading)) {
