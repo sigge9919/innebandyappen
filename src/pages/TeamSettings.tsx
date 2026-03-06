@@ -16,6 +16,7 @@ const ROLE_LABELS: Record<TeamRole, string> = {
   assistant_coach: 'Assistant Coach',
   stats_coach: 'Stats Coach',
   viewer: 'Viewer',
+  player: 'Player',
 };
 
 export default function TeamSettings() {

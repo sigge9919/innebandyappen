@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Player, TrainingSession, Drill, Play, IndividualDevelopmentPlan, TestResult } from '@/types';
+import { Player, TrainingSession, Drill, Play, IndividualDevelopmentPlan, TestResult, PlayerRPERating, PersonalTraining } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useTeam } from '@/contexts/TeamContext';
 
@@ -347,6 +347,8 @@ function dbToPlayer(row: any): Player {
     status: row.status ?? 'Active',
     notes: row.notes ?? '',
     focusFlag: row.focus_flag ?? false,
+    userId: row.user_id ?? undefined,
+    inviteEmail: row.invite_email ?? undefined,
   };
 }
 
@@ -361,6 +363,7 @@ function playerToDb(p: Player, teamId: string) {
     status: p.status,
     notes: p.notes,
     focus_flag: p.focusFlag,
+    invite_email: p.inviteEmail || null,
   };
 }
 
@@ -373,6 +376,7 @@ function playerUpdatesToDb(u: Partial<Player>) {
   if (u.status !== undefined) r.status = u.status;
   if (u.notes !== undefined) r.notes = u.notes;
   if (u.focusFlag !== undefined) r.focus_flag = u.focusFlag;
+  if (u.inviteEmail !== undefined) r.invite_email = u.inviteEmail;
   return r;
 }
 
@@ -583,4 +587,108 @@ function testResultUpdatesToDb(u: Partial<TestResult>) {
   if (u.previousResult !== undefined) r.previous_result = u.previousResult;
   if (u.trend !== undefined) r.trend = u.trend;
   return r;
+}
+
+// ── RPE Ratings ──────────────────────────────────────────────
+
+export function useRPERatings(playerId?: string) {
+  const [ratings, setRatings] = useState<PlayerRPERating[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
+
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setRatings([]); setIsLoading(false); return; }
+    let query = supabase
+      .from('player_rpe_ratings')
+      .select('*')
+      .eq('team_id', activeTeam.id);
+    if (playerId) query = query.eq('player_id', playerId);
+    const { data } = await query;
+    setRatings((data ?? []).map(dbToRPE));
+    setIsLoading(false);
+  }, [activeTeam, playerId]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const addRating = useCallback(async (rating: Omit<PlayerRPERating, 'id' | 'createdAt'>) => {
+    if (!activeTeam) return;
+    await supabase.from('player_rpe_ratings').insert({
+      player_id: rating.playerId,
+      team_id: activeTeam.id,
+      session_type: rating.sessionType,
+      session_id: rating.sessionId,
+      rating: rating.rating,
+    });
+    refresh();
+  }, [activeTeam, refresh]);
+
+  return { ratings, isLoading, addRating, refresh };
+}
+
+function dbToRPE(row: any): PlayerRPERating {
+  return {
+    id: row.id,
+    playerId: row.player_id,
+    teamId: row.team_id,
+    sessionType: row.session_type,
+    sessionId: row.session_id,
+    rating: row.rating,
+    createdAt: row.created_at,
+  };
+}
+
+// ── Personal Trainings ──────────────────────────────────────
+
+export function usePersonalTrainings(playerId?: string) {
+  const [trainings, setTrainings] = useState<PersonalTraining[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
+
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setTrainings([]); setIsLoading(false); return; }
+    let query = supabase
+      .from('personal_trainings')
+      .select('*')
+      .eq('team_id', activeTeam.id)
+      .order('date', { ascending: false });
+    if (playerId) query = query.eq('player_id', playerId);
+    const { data } = await query;
+    setTrainings((data ?? []).map(dbToPersonalTraining));
+    setIsLoading(false);
+  }, [activeTeam, playerId]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const addTraining = useCallback(async (training: Omit<PersonalTraining, 'id' | 'createdAt'>) => {
+    if (!activeTeam) return;
+    await supabase.from('personal_trainings').insert({
+      player_id: training.playerId,
+      team_id: activeTeam.id,
+      date: training.date,
+      description: training.description,
+      duration: training.duration,
+      rpe_rating: training.rpeRating,
+    });
+    refresh();
+  }, [activeTeam, refresh]);
+
+  const deleteTraining = useCallback(async (id: string) => {
+    await supabase.from('personal_trainings').delete().eq('id', id);
+    refresh();
+  }, [refresh]);
+
+  return { trainings, isLoading, addTraining, deleteTraining, refresh };
+}
+
+function dbToPersonalTraining(row: any): PersonalTraining {
+  return {
+    id: row.id,
+    playerId: row.player_id,
+    teamId: row.team_id,
+    date: row.date,
+    description: row.description ?? '',
+    duration: row.duration ?? 60,
+    rpeRating: row.rpe_rating,
+    createdAt: row.created_at,
+  };
 }

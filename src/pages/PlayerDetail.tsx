@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { usePlayers, useIDPs, useTestResults } from '@/hooks/useLocalStorage';
+import { usePlayers, useIDPs, useTestResults, useRPERatings, usePersonalTrainings } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
+import { useTeam } from '@/contexts/TeamContext';
 import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
 import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
 import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
@@ -13,10 +14,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Edit, Target, AlertTriangle, Plus, CalendarDays, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, Edit, Target, AlertTriangle, Plus, CalendarDays, AlertCircle, CheckCircle2, Mail, Activity, Dumbbell, Calendar, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TestResult, IndividualDevelopmentPlan } from '@/types';
 import { getIDPStatus, getIDPStatusVariant } from '@/lib/idpUtils';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PlayerDetail() {
   const { playerId } = useParams<{ playerId: string }>();
@@ -26,14 +32,22 @@ export default function PlayerDetail() {
   const { games } = useEnhancedGames();
   const { idps, addIDP, updateIDP, deleteIDP } = useIDPs();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
+  const { activeTeam, inviteCoach } = useTeam();
+  const { toast } = useToast();
+  
+  const player = players.find(p => p.id === playerId);
+  const { ratings } = useRPERatings(playerId);
+  const { trainings: personalTrainings } = usePersonalTrainings(playerId);
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [testDialogOpen, setTestDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TestResult | null>(null);
   const [idpDialogOpen, setIdpDialogOpen] = useState(false);
   const [selectedIDP, setSelectedIDP] = useState<IndividualDevelopmentPlan | null>(null);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteLoading, setInviteLoading] = useState(false);
   
-  const player = players.find(p => p.id === playerId);
   const playerIDPs = idps.filter(idp => idp.playerId === playerId);
   const playerTests = tests.filter(t => t.playerId === playerId);
   
@@ -125,6 +139,33 @@ export default function PlayerDetail() {
     const bCompleted = b.completed ? 1 : 0;
     return aCompleted - bCompleted;
   });
+
+  const handleInvitePlayer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeTeam || !player) return;
+    setInviteLoading(true);
+    try {
+      // Save invite email on the player record
+      await supabase.from('players').update({ invite_email: inviteEmail.toLowerCase() }).eq('id', player.id);
+      // Create a team_member entry with player role
+      const { error } = await inviteCoach(inviteEmail, 'player');
+      if (error) throw error;
+      toast({ title: 'Invite sent', description: `${inviteEmail} can now sign up and access their player portal.` });
+      setInviteDialogOpen(false);
+      setInviteEmail('');
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const getRPEColor = (rating: number) => {
+    if (rating <= 3) return 'text-green-500';
+    if (rating <= 6) return 'text-yellow-500';
+    if (rating <= 8) return 'text-orange-500';
+    return 'text-red-500';
+  };
   
   return (
     <AppLayout>
@@ -135,10 +176,24 @@ export default function PlayerDetail() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Player
-          </Button>
+          <div className="flex gap-2">
+            {!player.userId && (
+              <Button variant="outline" onClick={() => setInviteDialogOpen(true)}>
+                <Mail className="h-4 w-4 mr-2" />
+                {player.inviteEmail ? 'Invited' : 'Invite Player'}
+              </Button>
+            )}
+            {player.userId && (
+              <Badge variant="secondary" className="flex items-center gap-1 px-3">
+                <CheckCircle2 className="h-3 w-3" />
+                Has Login
+              </Badge>
+            )}
+            <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Player
+            </Button>
+          </div>
         </div>
         
         {/* Player Header Card */}
@@ -290,6 +345,51 @@ export default function PlayerDetail() {
             onTestClick={handleTestClick}
           />
         </div>
+
+        {/* RPE History */}
+        {ratings.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Activity className="h-5 w-5 text-primary" />
+              RPE Ratings
+            </h2>
+            <div className="space-y-2">
+              {[...ratings].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 10).map(r => (
+                <div key={r.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium capitalize">{r.sessionType}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <span className={`text-lg font-bold ${getRPEColor(r.rating)}`}>{r.rating}/10</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Personal Trainings */}
+        {personalTrainings.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Dumbbell className="h-5 w-5 text-primary" />
+              Personal Trainings
+            </h2>
+            <div className="space-y-2">
+              {personalTrainings.map(t => (
+                <div key={t.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium">{t.description || 'Personal Training'}</p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                      <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{t.date}</span>
+                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t.duration} min</span>
+                    </div>
+                  </div>
+                  <span className={`text-lg font-bold ${getRPEColor(t.rpeRating)}`}>{t.rpeRating}/10</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       
       <PlayerFormDialog
@@ -319,6 +419,37 @@ export default function PlayerDetail() {
         onDelete={deleteTest}
         defaultPlayerId={player.id}
       />
+
+      {/* Invite Player Dialog */}
+      <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invite {player.name} to the app</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleInvitePlayer} className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="invite-email">Player's email address</Label>
+              <Input
+                id="invite-email"
+                type="email"
+                value={inviteEmail}
+                onChange={e => setInviteEmail(e.target.value)}
+                placeholder="player@email.com"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                The player can sign up with this email to access their personal portal with stats, RPE tracking, and personal training log.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setInviteDialogOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={inviteLoading}>
+                {inviteLoading ? 'Sending...' : 'Send Invite'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }

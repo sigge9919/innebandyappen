@@ -2,11 +2,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTeam } from '@/contexts/TeamContext';
 import Login from '@/pages/Login';
 import TeamSetup from '@/pages/TeamSetup';
+import PlayerPortal from '@/pages/PlayerPortal';
 import { useLocation } from 'react-router-dom';
 
 export function AppGuard({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
-  const { activeTeam, loading: teamLoading } = useTeam();
+  const { activeTeam, activeRole, loading: teamLoading } = useTeam();
   const location = useLocation();
 
   if (authLoading || (user && teamLoading)) {
@@ -21,6 +22,11 @@ export function AppGuard({ children }: { children: React.ReactNode }) {
 
   if (!user) return <Login />;
   if (!activeTeam && location.pathname !== '/team-setup') return <TeamSetup />;
+
+  // Players get their own portal — they can't access coach pages
+  if (activeRole === 'player' && location.pathname !== '/player-portal') {
+    return <PlayerPortal />;
+  }
 
   return <>{children}</>;
 }

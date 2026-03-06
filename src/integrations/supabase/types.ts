@@ -195,11 +195,105 @@ export type Database = {
           },
         ]
       }
+      personal_trainings: {
+        Row: {
+          created_at: string
+          date: string
+          description: string | null
+          duration: number | null
+          id: string
+          player_id: string
+          rpe_rating: number
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          description?: string | null
+          duration?: number | null
+          id?: string
+          player_id: string
+          rpe_rating?: number
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string | null
+          duration?: number | null
+          id?: string
+          player_id?: string
+          rpe_rating?: number
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_trainings_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personal_trainings_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_rpe_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          player_id: string
+          rating: number
+          session_id: string
+          session_type: string
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_id: string
+          rating?: number
+          session_id: string
+          session_type: string
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_id?: string
+          rating?: number
+          session_id?: string
+          session_type?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_rpe_ratings_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_rpe_ratings_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       players: {
         Row: {
           created_at: string
           focus_flag: boolean
           id: string
+          invite_email: string | null
           jersey_number: number
           name: string
           notes: string | null
@@ -207,11 +301,13 @@ export type Database = {
           status: string
           stick_side: string
           team_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           focus_flag?: boolean
           id?: string
+          invite_email?: string | null
           jersey_number?: number
           name: string
           notes?: string | null
@@ -219,11 +315,13 @@ export type Database = {
           status?: string
           stick_side?: string
           team_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           focus_flag?: boolean
           id?: string
+          invite_email?: string | null
           jersey_number?: number
           name?: string
           notes?: string | null
@@ -231,6 +329,7 @@ export type Database = {
           status?: string
           stick_side?: string
           team_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -487,6 +586,7 @@ export type Database = {
     }
     Functions: {
       create_team: { Args: { _name: string }; Returns: string }
+      get_player_id_for_user: { Args: { _team_id: string }; Returns: string }
       get_user_team_role: {
         Args: { _team_id: string }
         Returns: Database["public"]["Enums"]["team_role"]
@@ -495,7 +595,12 @@ export type Database = {
       is_team_member: { Args: { _team_id: string }; Returns: boolean }
     }
     Enums: {
-      team_role: "head_coach" | "assistant_coach" | "stats_coach" | "viewer"
+      team_role:
+        | "head_coach"
+        | "assistant_coach"
+        | "stats_coach"
+        | "viewer"
+        | "player"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -623,7 +728,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      team_role: ["head_coach", "assistant_coach", "stats_coach", "viewer"],
+      team_role: [
+        "head_coach",
+        "assistant_coach",
+        "stats_coach",
+        "viewer",
+        "player",
+      ],
     },
   },
 } as const

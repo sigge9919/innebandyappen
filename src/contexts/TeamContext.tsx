@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 
-export type TeamRole = 'head_coach' | 'assistant_coach' | 'stats_coach' | 'viewer';
+export type TeamRole = 'head_coach' | 'assistant_coach' | 'stats_coach' | 'viewer' | 'player';
 
 export interface Team {
   id: string;

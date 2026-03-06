@@ -21,6 +21,7 @@ import Development from "./pages/Development";
 import TacticsBoard from "./pages/TacticsBoard";
 import TeamSettings from "./pages/TeamSettings";
 import TeamSetup from "./pages/TeamSetup";
+import PlayerPortal from "./pages/PlayerPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/development" element={<Development />} />
                 <Route path="/tactics" element={<TacticsBoard />} />
                 <Route path="/settings" element={<TeamSettings />} />
+                <Route path="/player-portal" element={<PlayerPortal />} />
                 <Route path="/team-setup" element={<TeamSetup />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
