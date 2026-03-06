@@ -32,12 +32,21 @@ export default function PlayerDetail() {
   const { games } = useEnhancedGames();
   const { idps, addIDP, updateIDP, deleteIDP } = useIDPs();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
+  const { activeTeam, inviteCoach } = useTeam();
+  const { toast } = useToast();
+  
+  const player = players.find(p => p.id === playerId);
+  const { ratings } = useRPERatings(playerId);
+  const { trainings: personalTrainings } = usePersonalTrainings(playerId);
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [testDialogOpen, setTestDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<TestResult | null>(null);
   const [idpDialogOpen, setIdpDialogOpen] = useState(false);
   const [selectedIDP, setSelectedIDP] = useState<IndividualDevelopmentPlan | null>(null);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteLoading, setInviteLoading] = useState(false);
   
   const player = players.find(p => p.id === playerId);
   const playerIDPs = idps.filter(idp => idp.playerId === playerId);
