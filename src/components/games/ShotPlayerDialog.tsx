@@ -60,39 +60,39 @@ export function ShotPlayerDialog({
         <div className="space-y-3 py-2">
           <label className="text-sm font-medium">Select Player</label>
 
-          {linePlayers.length > 0 && (
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Line players:</p>
-              <div className="flex flex-wrap gap-1.5">
-                {linePlayers.map(player => (
-                  <button
-                    key={player.id}
-                    onClick={() => handleSelect(player.id)}
-                    className="px-2 py-1.5 rounded text-sm transition-colors bg-muted hover:bg-primary hover:text-primary-foreground"
-                  >
-                    #{player.jerseyNumber} {player.name.split(' ')[0]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+           {linePlayers.length > 0 && (
+             <div className="space-y-1">
+               <p className="text-xs text-muted-foreground">Line players:</p>
+               <div className="flex flex-wrap gap-2">
+                 {linePlayers.map(player => (
+                   <button
+                     key={player.id}
+                     onClick={() => handleSelect(player.id)}
+                     className="px-4 py-3 rounded text-base font-medium transition-colors bg-muted hover:bg-primary hover:text-primary-foreground"
+                   >
+                     #{player.jerseyNumber} {player.name.split(' ')[0]}
+                   </button>
+                 ))}
+               </div>
+             </div>
+           )}
 
-          {otherPlayers.length > 0 && (
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Other players:</p>
-              <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
-                {otherPlayers.map(player => (
-                  <button
-                    key={player.id}
-                    onClick={() => handleSelect(player.id)}
-                    className="px-2 py-1.5 rounded text-sm transition-colors bg-muted/50 hover:bg-primary hover:text-primary-foreground"
-                  >
-                    #{player.jerseyNumber} {player.name.split(' ')[0]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+           {otherPlayers.length > 0 && (
+             <div className="space-y-1">
+               <p className="text-xs text-muted-foreground">Other players:</p>
+               <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                 {otherPlayers.map(player => (
+                   <button
+                     key={player.id}
+                     onClick={() => handleSelect(player.id)}
+                     className="px-4 py-3 rounded text-base font-medium transition-colors bg-muted/50 hover:bg-primary hover:text-primary-foreground"
+                   >
+                     #{player.jerseyNumber} {player.name.split(' ')[0]}
+                   </button>
+                 ))}
+               </div>
+             </div>
+           )}
         </div>
       </DialogContent>
     </Dialog>
