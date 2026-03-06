@@ -139,6 +139,33 @@ export default function PlayerDetail() {
     const bCompleted = b.completed ? 1 : 0;
     return aCompleted - bCompleted;
   });
+
+  const handleInvitePlayer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeTeam || !player) return;
+    setInviteLoading(true);
+    try {
+      // Save invite email on the player record
+      await supabase.from('players').update({ invite_email: inviteEmail.toLowerCase() }).eq('id', player.id);
+      // Create a team_member entry with player role
+      const { error } = await inviteCoach(inviteEmail, 'player');
+      if (error) throw error;
+      toast({ title: 'Invite sent', description: `${inviteEmail} can now sign up and access their player portal.` });
+      setInviteDialogOpen(false);
+      setInviteEmail('');
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const getRPEColor = (rating: number) => {
+    if (rating <= 3) return 'text-green-500';
+    if (rating <= 6) return 'text-yellow-500';
+    if (rating <= 8) return 'text-orange-500';
+    return 'text-red-500';
+  };
   
   return (
     <AppLayout>
