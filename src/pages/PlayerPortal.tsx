@@ -46,9 +46,9 @@ export default function PlayerPortal() {
     const ratedSessionIds = new Set(ratings.map(r => `${r.sessionType}-${r.sessionId}`));
     const pending: { type: 'game' | 'training'; id: string; label: string }[] = [];
 
-    // Check games this player attended
+    // Check games this player attended (Finished games)
     games.forEach(game => {
-      if (game.status === 'Played' && game.squadPlayerIds?.includes(myPlayer.id)) {
+      if (game.status === 'Finished' && game.squadPlayerIds?.includes(myPlayer.id)) {
         const key = `game-${game.id}`;
         if (!ratedSessionIds.has(key)) {
           pending.push({ type: 'game', id: game.id, label: `Game vs ${game.opponent} (${game.date})` });
