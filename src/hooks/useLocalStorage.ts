@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Player, TrainingSession, Drill, Play, IndividualDevelopmentPlan, TestResult } from '@/types';
+import { Player, TrainingSession, Drill, Play, IndividualDevelopmentPlan, TestResult, PlayerRPERating, PersonalTraining } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useTeam } from '@/contexts/TeamContext';
 
@@ -347,6 +347,8 @@ function dbToPlayer(row: any): Player {
     status: row.status ?? 'Active',
     notes: row.notes ?? '',
     focusFlag: row.focus_flag ?? false,
+    userId: row.user_id ?? undefined,
+    inviteEmail: row.invite_email ?? undefined,
   };
 }
 
@@ -361,6 +363,7 @@ function playerToDb(p: Player, teamId: string) {
     status: p.status,
     notes: p.notes,
     focus_flag: p.focusFlag,
+    invite_email: p.inviteEmail || null,
   };
 }
 
@@ -373,6 +376,7 @@ function playerUpdatesToDb(u: Partial<Player>) {
   if (u.status !== undefined) r.status = u.status;
   if (u.notes !== undefined) r.notes = u.notes;
   if (u.focusFlag !== undefined) r.focus_flag = u.focusFlag;
+  if (u.inviteEmail !== undefined) r.invite_email = u.inviteEmail;
   return r;
 }
 
