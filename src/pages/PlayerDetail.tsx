@@ -23,6 +23,7 @@ import { TestResult, IndividualDevelopmentPlan } from '@/types';
 import { getIDPStatus, getIDPStatusVariant } from '@/lib/idpUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { PlayerRPETrends } from '@/components/team/PlayerRPETrends';
 
 export default function PlayerDetail() {
   const { playerId } = useParams<{ playerId: string }>();
@@ -345,6 +346,17 @@ export default function PlayerDetail() {
             onTestClick={handleTestClick}
           />
         </div>
+
+        {/* RPE Trend Chart */}
+        {ratings.length >= 2 && (
+          <div className="mb-6">
+            <PlayerRPETrends
+              ratings={ratings}
+              sessions={sessions.map(s => ({ id: s.id, theme: s.theme, date: s.date }))}
+              games={games.map(g => ({ id: g.id, opponent: g.opponent, date: g.date }))}
+            />
+          </div>
+        )}
 
         {/* RPE History */}
         {ratings.length > 0 && (
