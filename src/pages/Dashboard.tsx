@@ -6,7 +6,8 @@ import { NextTrainingCard } from '@/components/dashboard/NextTrainingCard';
 import { PlayerAlerts } from '@/components/dashboard/PlayerAlerts';
 import { WeeklyFocusCard } from '@/components/dashboard/WeeklyFocusCard';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { usePlayers, useTrainingSessions, useWeeklyFocus, useCoachNotes } from '@/hooks/useLocalStorage';
+import { RPEAlertsCard } from '@/components/dashboard/RPEAlertsCard';
+import { usePlayers, useTrainingSessions, useWeeklyFocus, useCoachNotes, useRPERatings } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 
 export default function Dashboard() {
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const { sessions } = useTrainingSessions();
   const { focus, saveFocus } = useWeeklyFocus();
   const { notes, saveNotes } = useCoachNotes();
+  const { ratings: allRPERatings } = useRPERatings();
 
   const upcomingGame = games.find(g => g.status === 'Not Started');
   const lastPlayedGame = games
@@ -79,6 +81,11 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-4">
+            <RPEAlertsCard
+              ratings={allRPERatings}
+              players={players}
+              onPlayerClick={(player) => navigate(`/team/${player.id}`)}
+            />
             <PlayerAlerts players={players} onPlayerClick={(player) => navigate(`/team/${player.id}`)} />
           </div>
         </div>
