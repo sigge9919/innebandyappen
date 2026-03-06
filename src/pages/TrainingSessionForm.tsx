@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -247,7 +247,14 @@ export default function TrainingSessionForm() {
                     <div className="flex flex-wrap gap-1.5 pl-4">
                       {section.drillIds.map(drillId => (
                         <Badge key={drillId} variant="secondary" className="gap-1 text-xs">
-                          {getDrillName(drillId)}
+                          <Link
+                            to={`/training/drill/${drillId}`}
+                            state={{ from: `/training/session/${sessionId || 'new'}` }}
+                            className="hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {getDrillName(drillId)}
+                          </Link>
                           <button
                             type="button"
                             onClick={() => removeDrillFromSection(sIndex, drillId)}

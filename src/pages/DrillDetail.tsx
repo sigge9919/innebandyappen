@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useDrills } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,8 @@ import { PlayMediaGallery } from '@/components/playbook/PlayMediaGallery';
 export default function DrillDetail() {
   const { drillId } = useParams<{ drillId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const backPath = (location.state as any)?.from || '/training';
   const { drills, updateDrill, deleteDrill, addDrill } = useDrills();
   
   const isNew = drillId === 'new';
@@ -54,7 +56,7 @@ export default function DrillDetail() {
   const handleDialogClose = (open: boolean) => {
     setEditDialogOpen(open);
     if (!open && isNew) {
-      navigate('/training');
+      navigate(backPath);
     }
   };
 
@@ -63,7 +65,7 @@ export default function DrillDetail() {
       <AppLayout>
         <div className="page-container">
           <p className="text-muted-foreground">Drill not found</p>
-          <Button variant="outline" onClick={() => navigate('/training')}>
+          <Button variant="outline" onClick={() => navigate(backPath)}>
             Back to Training
           </Button>
         </div>
@@ -79,7 +81,7 @@ export default function DrillDetail() {
       <div className="page-container">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/training')}>
+          <Button variant="ghost" size="icon" onClick={() => navigate(backPath)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
