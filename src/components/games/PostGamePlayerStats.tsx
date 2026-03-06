@@ -200,49 +200,49 @@ export function PostGamePlayerStats({
                       <span className="text-muted-foreground">0</span>
                     )}
                   </td>
-                  <td className="py-2 px-1 text-center">
-                    <Input
-                      type="number"
-                      min="0"
-                      value={manualStats.shotsOnGoal || ''}
-                      onChange={(e) => handleStatChange(player.id, 'shotsOnGoal', e.target.value)}
-                      className="w-14 h-8 text-center text-sm px-1"
-                      placeholder="0"
-                    />
-                  </td>
-                  <td className="py-2 px-1 text-center">
-                    <Input
-                      type="number"
-                      min="0"
-                      value={manualStats.shotsOffGoal || ''}
-                      onChange={(e) => handleStatChange(player.id, 'shotsOffGoal', e.target.value)}
-                      className="w-14 h-8 text-center text-sm px-1"
-                      placeholder="0"
-                    />
-                  </td>
-                  <td className="py-2 px-1 text-center">
-                    <Input
-                      type="number"
-                      min="0"
-                      value={manualStats.shotsBlocked || ''}
-                      onChange={(e) => handleStatChange(player.id, 'shotsBlocked', e.target.value)}
-                      className="w-14 h-8 text-center text-sm px-1"
-                      placeholder="0"
-                    />
-                  </td>
-                  <td className="py-2 px-2 text-center tabular-nums font-semibold">
-                    {totalShots > 0 ? totalShots : <span className="text-muted-foreground">0</span>}
-                  </td>
-                  <td className="py-2 px-1 text-center">
-                    <Input
-                      type="number"
-                      min="0"
-                      value={manualStats.defensiveBlocks || ''}
-                      onChange={(e) => handleStatChange(player.id, 'defensiveBlocks', e.target.value)}
-                      className="w-14 h-8 text-center text-sm px-1"
-                      placeholder="0"
-                    />
-                  </td>
+                   <td className="py-2 px-1 text-center">
+                     <Input
+                       type="number"
+                       min="0"
+                       value={manualStats.shotsOnGoal || ''}
+                       onChange={(e) => handleStatChange(player.id, 'shotsOnGoal', e.target.value)}
+                       className="w-16 h-10 text-center text-base px-1"
+                       placeholder="0"
+                     />
+                   </td>
+                   <td className="py-2 px-1 text-center">
+                     <Input
+                       type="number"
+                       min="0"
+                       value={manualStats.shotsOffGoal || ''}
+                       onChange={(e) => handleStatChange(player.id, 'shotsOffGoal', e.target.value)}
+                       className="w-16 h-10 text-center text-base px-1"
+                       placeholder="0"
+                     />
+                   </td>
+                   <td className="py-2 px-1 text-center">
+                     <Input
+                       type="number"
+                       min="0"
+                       value={manualStats.shotsBlocked || ''}
+                       onChange={(e) => handleStatChange(player.id, 'shotsBlocked', e.target.value)}
+                       className="w-16 h-10 text-center text-base px-1"
+                       placeholder="0"
+                     />
+                   </td>
+                   <td className="py-2 px-2 text-center tabular-nums font-semibold">
+                     {totalShots > 0 ? totalShots : <span className="text-muted-foreground">0</span>}
+                   </td>
+                   <td className="py-2 px-1 text-center">
+                     <Input
+                       type="number"
+                       min="0"
+                       value={manualStats.defensiveBlocks || ''}
+                       onChange={(e) => handleStatChange(player.id, 'defensiveBlocks', e.target.value)}
+                       className="w-16 h-10 text-center text-base px-1"
+                       placeholder="0"
+                     />
+                   </td>
                   <td className="py-2 px-2 text-center tabular-nums">
                     {eventStats.penaltyMinutes > 0 ? (
                       <Badge variant="destructive" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
