@@ -377,17 +377,25 @@ function playerUpdatesToDb(u: Partial<Player>) {
 }
 
 function dbToTraining(row: any): TrainingSession {
+  // teams may be stored as last element of sections array with _type: 'teams_meta'
+  const rawSections = row.sections ?? [];
+  const teamsMeta = rawSections.find((s: any) => s._type === 'teams_meta');
+  const sections = rawSections.filter((s: any) => !s._type);
   return {
     id: row.id,
     date: row.date,
     theme: row.theme,
     duration: row.duration,
     playerIds: row.player_ids ?? [],
-    sections: row.sections ?? [],
+    sections,
+    teams: teamsMeta?.teams,
   };
 }
 
 function trainingToDb(s: TrainingSession, teamId: string) {
+  const sectionsWithMeta = s.teams && s.teams.length > 0
+    ? [...(s.sections as any), { _type: 'teams_meta', teams: s.teams }]
+    : s.sections as any;
   return {
     id: s.id,
     team_id: teamId,
@@ -395,7 +403,7 @@ function trainingToDb(s: TrainingSession, teamId: string) {
     theme: s.theme,
     duration: s.duration,
     player_ids: s.playerIds,
-    sections: s.sections as any,
+    sections: sectionsWithMeta,
   };
 }
 
@@ -405,7 +413,13 @@ function trainingUpdatesToDb(u: Partial<TrainingSession>) {
   if (u.theme !== undefined) r.theme = u.theme;
   if (u.duration !== undefined) r.duration = u.duration;
   if (u.playerIds !== undefined) r.player_ids = u.playerIds;
-  if (u.sections !== undefined) r.sections = u.sections;
+  if (u.sections !== undefined || u.teams !== undefined) {
+    const sections = u.sections ?? [];
+    const teams = u.teams;
+    r.sections = teams && teams.length > 0
+      ? [...(sections as any), { _type: 'teams_meta', teams }]
+      : sections;
+  }
   return r;
 }
 
