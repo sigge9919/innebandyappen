@@ -345,6 +345,51 @@ export default function PlayerDetail() {
             onTestClick={handleTestClick}
           />
         </div>
+
+        {/* RPE History */}
+        {ratings.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Activity className="h-5 w-5 text-primary" />
+              RPE Ratings
+            </h2>
+            <div className="space-y-2">
+              {[...ratings].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 10).map(r => (
+                <div key={r.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium capitalize">{r.sessionType}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <span className={`text-lg font-bold ${getRPEColor(r.rating)}`}>{r.rating}/10</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Personal Trainings */}
+        {personalTrainings.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Dumbbell className="h-5 w-5 text-primary" />
+              Personal Trainings
+            </h2>
+            <div className="space-y-2">
+              {personalTrainings.map(t => (
+                <div key={t.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium">{t.description || 'Personal Training'}</p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                      <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{t.date}</span>
+                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t.duration} min</span>
+                    </div>
+                  </div>
+                  <span className={`text-lg font-bold ${getRPEColor(t.rpeRating)}`}>{t.rpeRating}/10</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       
       <PlayerFormDialog
@@ -374,6 +419,37 @@ export default function PlayerDetail() {
         onDelete={deleteTest}
         defaultPlayerId={player.id}
       />
+
+      {/* Invite Player Dialog */}
+      <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invite {player.name} to the app</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleInvitePlayer} className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="invite-email">Player's email address</Label>
+              <Input
+                id="invite-email"
+                type="email"
+                value={inviteEmail}
+                onChange={e => setInviteEmail(e.target.value)}
+                placeholder="player@email.com"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                The player can sign up with this email to access their personal portal with stats, RPE tracking, and personal training log.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setInviteDialogOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={inviteLoading}>
+                {inviteLoading ? 'Sending...' : 'Send Invite'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
