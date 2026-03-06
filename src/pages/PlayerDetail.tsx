@@ -176,10 +176,24 @@ export default function PlayerDetail() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Player
-          </Button>
+          <div className="flex gap-2">
+            {!player.userId && (
+              <Button variant="outline" onClick={() => setInviteDialogOpen(true)}>
+                <Mail className="h-4 w-4 mr-2" />
+                {player.inviteEmail ? 'Invited' : 'Invite Player'}
+              </Button>
+            )}
+            {player.userId && (
+              <Badge variant="secondary" className="flex items-center gap-1 px-3">
+                <CheckCircle2 className="h-3 w-3" />
+                Has Login
+              </Badge>
+            )}
+            <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Player
+            </Button>
+          </div>
         </div>
         
         {/* Player Header Card */}
