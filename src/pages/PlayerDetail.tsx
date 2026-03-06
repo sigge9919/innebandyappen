@@ -48,7 +48,6 @@ export default function PlayerDetail() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
   
-  const player = players.find(p => p.id === playerId);
   const playerIDPs = idps.filter(idp => idp.playerId === playerId);
   const playerTests = tests.filter(t => t.playerId === playerId);
   
