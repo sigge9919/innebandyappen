@@ -14,6 +14,7 @@ import GameDetail from "./pages/GameDetail";
 import Stats from "./pages/Stats";
 import Training from "./pages/Training";
 import DrillDetail from "./pages/DrillDetail";
+import TrainingSessionForm from "./pages/TrainingSessionForm";
 import Playbook from "./pages/Playbook";
 import PlayDetail from "./pages/PlayDetail";
 import Development from "./pages/Development";
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/games/:gameId" element={<GameDetail />} />
                 <Route path="/stats" element={<Stats />} />
                 <Route path="/training" element={<Training />} />
+                <Route path="/training/session/:sessionId" element={<TrainingSessionForm />} />
                 <Route path="/training/drill/:drillId" element={<DrillDetail />} />
                 <Route path="/playbook" element={<Playbook />} />
                 <Route path="/playbook/:playId" element={<PlayDetail />} />

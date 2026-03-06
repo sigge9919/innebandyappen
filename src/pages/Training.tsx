@@ -3,21 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { TrainingCard } from '@/components/training/TrainingCard';
 import { DrillCard } from '@/components/training/DrillCard';
-import { TrainingFormDialog } from '@/components/forms/TrainingFormDialog';
 import { useTrainingSessions, usePlayers, useDrills } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Calendar, Dumbbell, Search } from 'lucide-react';
-import { TrainingSession, Drill } from '@/types';
+import { Drill } from '@/types';
 
 export default function Training() {
   const navigate = useNavigate();
-  const { sessions, addSession, updateSession, deleteSession } = useTrainingSessions();
+  const { sessions } = useTrainingSessions();
   const { players } = usePlayers();
   const { drills } = useDrills();
-  
-  const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<TrainingSession | null>(null);
 
   const [drillSearch, setDrillSearch] = useState('');
   const [drillFilter, setDrillFilter] = useState<string>('all');
@@ -29,7 +25,6 @@ export default function Training() {
     });
   };
 
-  // Collect all unique drill categories
   const allDrillCategories = Array.from(new Set(drills.flatMap(d => d.categories)));
 
   const filteredDrills = drills.filter(drill => {
@@ -39,30 +34,8 @@ export default function Training() {
     return matchesSearch && drill.categories.includes(drillFilter);
   });
 
-  const handleSessionClick = (session: TrainingSession) => {
-    setSelectedSession(session);
-    setSessionDialogOpen(true);
-  };
-
-  const handleAddSession = () => {
-    setSelectedSession(null);
-    setSessionDialogOpen(true);
-  };
-
-  const handleSaveSession = (session: TrainingSession) => {
-    if (selectedSession) {
-      updateSession(session.id, session);
-    } else {
-      addSession(session);
-    }
-  };
-
   const handleDrillClick = (drill: Drill) => {
     navigate(`/training/drill/${drill.id}`);
-  };
-
-  const handleAddDrill = () => {
-    navigate('/training/drill/new');
   };
 
   return (
@@ -76,7 +49,7 @@ export default function Training() {
               {sessions.length} sessions planned
             </p>
           </div>
-          <Button className="gap-2" onClick={handleAddSession}>
+          <Button className="gap-2" onClick={() => navigate('/training/session/new')}>
             <Plus className="h-4 w-4" />
             Create Session
           </Button>
@@ -93,7 +66,7 @@ export default function Training() {
             {sessions.map(session => (
               <div
                 key={session.id}
-                onClick={() => handleSessionClick(session)}
+                onClick={() => navigate(`/training/session/${session.id}`)}
                 className="cursor-pointer"
               >
                 <TrainingCard
@@ -108,14 +81,14 @@ export default function Training() {
             <div className="text-center py-12">
               <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
               <p className="text-muted-foreground">No sessions planned</p>
-              <Button variant="outline" className="mt-4" onClick={handleAddSession}>
+              <Button variant="outline" className="mt-4" onClick={() => navigate('/training/session/new')}>
                 Create your first session
               </Button>
             </div>
           )}
         </div>
 
-        {/* Drill Library — Playbook-style */}
+        {/* Drill Library */}
         <div>
           <div className="section-header">
             <div>
@@ -127,13 +100,12 @@ export default function Training() {
                 {drills.length} drills
               </p>
             </div>
-            <Button className="gap-2" onClick={handleAddDrill}>
+            <Button className="gap-2" onClick={() => navigate('/training/drill/new')}>
               <Plus className="h-4 w-4" />
               Add Drill
             </Button>
           </div>
 
-          {/* Search & Filters */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -165,7 +137,6 @@ export default function Training() {
             </div>
           </div>
 
-          {/* Drills Grid */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDrills.map(drill => (
               <DrillCard
@@ -180,24 +151,13 @@ export default function Training() {
             <div className="text-center py-12">
               <Dumbbell className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
               <p className="text-muted-foreground">No drills found</p>
-              <Button variant="outline" className="mt-4" onClick={handleAddDrill}>
+              <Button variant="outline" className="mt-4" onClick={() => navigate('/training/drill/new')}>
                 Add your first drill
               </Button>
             </div>
           )}
         </div>
       </div>
-
-      <TrainingFormDialog
-        open={sessionDialogOpen}
-        onOpenChange={setSessionDialogOpen}
-        session={selectedSession}
-        players={players}
-        drills={drills}
-        onSave={handleSaveSession}
-        onDelete={deleteSession}
-      />
-
     </AppLayout>
   );
 }
