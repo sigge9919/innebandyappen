@@ -185,7 +185,7 @@ export function TrainingFormDialog({
           <DialogTitle>{session ? 'Edit Training Session' : 'Create Training Session'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 space-y-4">
-          <ScrollArea className="flex-1 pr-4">
+          <ScrollArea className="flex-1 min-h-0 pr-4" style={{ maxHeight: 'calc(90vh - 180px)' }}>
             <div className="grid gap-4 pb-2">
               <div className="grid gap-2">
                 <Label htmlFor="theme">Theme</Label>
