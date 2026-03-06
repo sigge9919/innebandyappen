@@ -110,6 +110,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   const [opponentPlayerCount, setOpponentPlayerCount] = useState(1);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
   const [touchStartPos, setTouchStartPos] = useState<{x: number, y: number} | null>(null);
+  const lastTouchEndRef = useRef<number>(0);
   
   // Animation state
   const [mode, setMode] = useState<Mode>('edit');
@@ -512,7 +513,8 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   };
 
   const handleCanvasClick = (e: React.MouseEvent) => {
-    // Skip if this was triggered by a touch event (handled in handleTouchEnd)
+    // Skip if this click was generated from a touch event
+    if (Date.now() - lastTouchEndRef.current < 500) return;
     if (mode === 'animate' && isPlaying) return;
     
     const { x, y } = getCanvasCoords(e);
@@ -675,6 +677,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
         }
       }
       setTouchStartPos(null);
+      lastTouchEndRef.current = Date.now();
     }
 
     if (draggedControlPoint) {
