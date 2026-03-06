@@ -7,6 +7,7 @@ import { PlayerAlerts } from '@/components/dashboard/PlayerAlerts';
 import { WeeklyFocusCard } from '@/components/dashboard/WeeklyFocusCard';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RPEAlertsCard } from '@/components/dashboard/RPEAlertsCard';
+import { TeamRPECard } from '@/components/dashboard/TeamRPECard';
 import { usePlayers, useTrainingSessions, useWeeklyFocus, useCoachNotes, useRPERatings } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 
@@ -81,6 +82,7 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-4">
+            <TeamRPECard ratings={allRPERatings} players={players} />
             <RPEAlertsCard
               ratings={allRPERatings}
               players={players}
