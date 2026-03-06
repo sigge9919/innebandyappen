@@ -6,11 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { TrainingSession, Player, Drill, TrainingSection } from '@/types';
+import { TrainingSession, Player, Drill, TrainingSection, TrainingTeam } from '@/types';
 import { format } from 'date-fns';
-import { Plus, X, Clock, GripVertical } from 'lucide-react';
-
-const SECTION_TYPES: TrainingSection['type'][] = ['Warm-up', 'Main drills', 'Game-like drills', 'Cool-down'];
+import { Plus, X, Clock, Shuffle, Users } from 'lucide-react';
 
 const DEFAULT_SECTIONS: { type: TrainingSection['type']; duration: number }[] = [
   { type: 'Warm-up', duration: 15 },
@@ -54,6 +52,9 @@ export function TrainingFormDialog({
     DEFAULT_SECTIONS.map(s => ({ ...s, drillIds: [] }))
   );
 
+  const [teams, setTeams] = useState<TrainingTeam[]>([]);
+  const [teamCount, setTeamCount] = useState(2);
+
   useEffect(() => {
     if (session) {
       setFormData({
@@ -66,6 +67,7 @@ export function TrainingFormDialog({
         duration: s.duration,
         drillIds: s.drillIds || [],
       })));
+      setTeams(session.teams || []);
     } else {
       setFormData({
         date: format(new Date(), 'yyyy-MM-dd'),
@@ -73,6 +75,7 @@ export function TrainingFormDialog({
         playerIds: [],
       });
       setSections(DEFAULT_SECTIONS.map(s => ({ ...s, drillIds: [] })));
+      setTeams([]);
     }
   }, [session, open]);
 
@@ -91,6 +94,7 @@ export function TrainingFormDialog({
         duration: s.duration,
         drillIds: s.drillIds,
       })),
+      teams: teams.length > 0 ? teams : undefined,
     };
     onSave(newSession);
     onOpenChange(false);
@@ -102,6 +106,15 @@ export function TrainingFormDialog({
       playerIds: prev.playerIds.includes(playerId)
         ? prev.playerIds.filter(id => id !== playerId)
         : [...prev.playerIds, playerId]
+    }));
+  };
+
+  const selectAllPlayers = () => {
+    const activePlayers = players.filter(p => p.status === 'Active');
+    const allSelected = activePlayers.every(p => formData.playerIds.includes(p.id));
+    setFormData(prev => ({
+      ...prev,
+      playerIds: allSelected ? [] : activePlayers.map(p => p.id),
     }));
   };
 
@@ -132,18 +145,48 @@ export function TrainingFormDialog({
     return drills.find(d => d.id === drillId)?.name || 'Unknown';
   };
 
-  // Get drills not yet assigned to any section
   const allAssignedDrillIds = sections.flatMap(s => s.drillIds);
+
+  // Team setup helpers
+  const attendingFieldPlayers = players.filter(
+    p => formData.playerIds.includes(p.id) && !p.positions?.includes('Goalkeeper')
+  );
+
+  const randomizeTeams = () => {
+    const shuffled = [...attendingFieldPlayers].sort(() => Math.random() - 0.5);
+    const newTeams: TrainingTeam[] = Array.from({ length: teamCount }, (_, i) => ({
+      name: `Team ${i + 1}`,
+      playerIds: [],
+    }));
+    shuffled.forEach((player, idx) => {
+      newTeams[idx % teamCount].playerIds.push(player.id);
+    });
+    setTeams(newTeams);
+  };
+
+  const movePlayerToTeam = (playerId: string, targetTeamIndex: number) => {
+    setTeams(prev => prev.map((team, i) => ({
+      ...team,
+      playerIds: i === targetTeamIndex
+        ? [...team.playerIds.filter(id => id !== playerId), playerId]
+        : team.playerIds.filter(id => id !== playerId),
+    })));
+  };
+
+  const getPlayerName = (playerId: string) => {
+    const p = players.find(pl => pl.id === playerId);
+    return p ? `#${p.jerseyNumber} ${p.name.split(' ')[0]}` : '';
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[650px] max-h-[90vh]">
+      <DialogContent className="sm:max-w-[650px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{session ? 'Edit Training Session' : 'Create Training Session'}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="grid gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 space-y-4">
+          <ScrollArea className="flex-1 pr-4">
+            <div className="grid gap-4 pb-2">
               <div className="grid gap-2">
                 <Label htmlFor="theme">Theme</Label>
                 <Input
@@ -199,7 +242,6 @@ export function TrainingFormDialog({
                         </div>
                       </div>
 
-                      {/* Assigned drills */}
                       {section.drillIds.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 pl-4">
                           {section.drillIds.map(drillId => (
@@ -217,7 +259,6 @@ export function TrainingFormDialog({
                         </div>
                       )}
 
-                      {/* Add drills to section */}
                       {drills.length > 0 && (
                         <div className="pl-4">
                           <details className="group">
@@ -253,8 +294,15 @@ export function TrainingFormDialog({
                 </div>
               </div>
 
+              {/* Players Attending */}
               <div className="grid gap-2">
-                <Label>Players Attending</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Players Attending</Label>
+                  <Button type="button" variant="ghost" size="sm" className="text-xs h-7" onClick={selectAllPlayers}>
+                    {players.filter(p => p.status === 'Active').every(p => formData.playerIds.includes(p.id))
+                      ? 'Deselect All' : 'Select All'}
+                  </Button>
+                </div>
                 <div className="border rounded-md p-3 space-y-2 max-h-40 overflow-y-auto">
                   {players.filter(p => p.status === 'Active').map(player => (
                     <div key={player.id} className="flex items-center gap-2">
@@ -270,10 +318,76 @@ export function TrainingFormDialog({
                   ))}
                 </div>
               </div>
+
+              {/* Team Setup for Gameplay */}
+              {attendingFieldPlayers.length >= 4 && (
+                <div className="grid gap-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-1.5">
+                      <Users className="h-4 w-4" />
+                      Teams for Gameplay
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="teamCount" className="text-xs text-muted-foreground">Teams:</Label>
+                      <Input
+                        id="teamCount"
+                        type="number"
+                        min="2"
+                        max="4"
+                        value={teamCount}
+                        onChange={(e) => setTeamCount(Math.max(2, Math.min(4, parseInt(e.target.value) || 2)))}
+                        className="w-14 h-7 text-center text-xs"
+                      />
+                      <Button type="button" variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={randomizeTeams}>
+                        <Shuffle className="h-3 w-3" />
+                        Randomize
+                      </Button>
+                    </div>
+                  </div>
+
+                  {teams.length > 0 ? (
+                    <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${teams.length}, 1fr)` }}>
+                      {teams.map((team, tIndex) => (
+                        <div key={tIndex} className="border border-border rounded-md p-2 space-y-1.5">
+                          <Input
+                            value={team.name}
+                            onChange={(e) => setTeams(prev => prev.map((t, i) => i === tIndex ? { ...t, name: e.target.value } : t))}
+                            className="h-7 text-xs font-medium"
+                          />
+                          <div className="space-y-1 min-h-[2rem]">
+                            {team.playerIds.map(pid => (
+                              <div key={pid} className="flex items-center justify-between text-xs bg-muted rounded px-2 py-1">
+                                <span>{getPlayerName(pid)}</span>
+                                <div className="flex gap-0.5">
+                                  {teams.map((_, otherIdx) => otherIdx !== tIndex && (
+                                    <button
+                                      key={otherIdx}
+                                      type="button"
+                                      onClick={() => movePlayerToTeam(pid, otherIdx)}
+                                      className="text-muted-foreground hover:text-foreground text-[10px] px-1 rounded hover:bg-accent"
+                                      title={`Move to ${teams[otherIdx].name}`}
+                                    >
+                                      →{otherIdx + 1}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Click "Randomize" to split {attendingFieldPlayers.length} field players into teams
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </ScrollArea>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 shrink-0">
             {session && onDelete && (
               <Button
                 type="button"

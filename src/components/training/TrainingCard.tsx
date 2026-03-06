@@ -44,10 +44,26 @@ export function TrainingCard({ session, playerNames, onClick }: TrainingCardProp
                              index === 2 ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))'
             }} />
             <span className="text-sm text-muted-foreground flex-1">{section.type}</span>
-            <span className="text-sm font-medium text-foreground">{section.duration}min</span>
+            <span className="text-sm font-medium text-foreground">{section.duration} min</span>
           </div>
         ))}
       </div>
+
+      {session.teams && session.teams.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-border">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
+            <Users className="h-3 w-3" />
+            Gameplay Teams
+          </div>
+          <div className="flex gap-2">
+            {session.teams.map((team, i) => (
+              <Badge key={i} variant="outline" className="text-xs">
+                {team.name}: {team.playerIds.length}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

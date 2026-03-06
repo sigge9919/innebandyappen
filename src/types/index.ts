@@ -46,6 +46,12 @@ export interface TrainingSession {
   duration: number; // minutes
   playerIds: string[];
   sections: TrainingSection[];
+  teams?: TrainingTeam[];
+}
+
+export interface TrainingTeam {
+  name: string;
+  playerIds: string[];
 }
 
 export interface TrainingSection {
