@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { usePlayers, useIDPs, useTestResults, useRPERatings, usePersonalTrainings } from '@/hooks/useLocalStorage';
+import { usePlayers, useIDPs, useTestResults, useRPERatings, usePersonalTrainings, useTrainingSessions } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { useTeam } from '@/contexts/TeamContext';
 import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
