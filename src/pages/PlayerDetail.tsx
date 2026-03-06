@@ -32,6 +32,7 @@ export default function PlayerDetail() {
   const { players, updatePlayer, deletePlayer, isLoading: playersLoading } = usePlayers();
   const { games } = useEnhancedGames();
   const { idps, addIDP, updateIDP, deleteIDP } = useIDPs();
+  const { sessions } = useTrainingSessions();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
   const { activeTeam, inviteCoach } = useTeam();
   const { toast } = useToast();
