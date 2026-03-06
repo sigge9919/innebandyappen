@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { usePlayers, useIDPs, useTestResults, useRPERatings, usePersonalTrainings } from '@/hooks/useLocalStorage';
+import { usePlayers, useIDPs, useTestResults, useRPERatings, usePersonalTrainings, useTrainingSessions } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { useTeam } from '@/contexts/TeamContext';
 import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
@@ -23,6 +23,7 @@ import { TestResult, IndividualDevelopmentPlan } from '@/types';
 import { getIDPStatus, getIDPStatusVariant } from '@/lib/idpUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { PlayerRPETrends } from '@/components/team/PlayerRPETrends';
 
 export default function PlayerDetail() {
   const { playerId } = useParams<{ playerId: string }>();
@@ -31,6 +32,7 @@ export default function PlayerDetail() {
   const { players, updatePlayer, deletePlayer, isLoading: playersLoading } = usePlayers();
   const { games } = useEnhancedGames();
   const { idps, addIDP, updateIDP, deleteIDP } = useIDPs();
+  const { sessions } = useTrainingSessions();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
   const { activeTeam, inviteCoach } = useTeam();
   const { toast } = useToast();
@@ -345,6 +347,17 @@ export default function PlayerDetail() {
             onTestClick={handleTestClick}
           />
         </div>
+
+        {/* RPE Trend Chart */}
+        {ratings.length >= 2 && (
+          <div className="mb-6">
+            <PlayerRPETrends
+              ratings={ratings}
+              sessions={sessions.map(s => ({ id: s.id, theme: s.theme, date: s.date }))}
+              games={games.map(g => ({ id: g.id, opponent: g.opponent, date: g.date }))}
+            />
+          </div>
+        )}
 
         {/* RPE History */}
         {ratings.length > 0 && (
