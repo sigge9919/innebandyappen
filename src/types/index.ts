@@ -10,6 +10,30 @@ export interface Player {
   status: 'Active' | 'Injured';
   notes: string;
   focusFlag: boolean;
+  userId?: string;
+  inviteEmail?: string;
+}
+
+// RPE & Personal Training types
+export interface PlayerRPERating {
+  id: string;
+  playerId: string;
+  teamId: string;
+  sessionType: 'game' | 'training';
+  sessionId: string;
+  rating: number;
+  createdAt: string;
+}
+
+export interface PersonalTraining {
+  id: string;
+  playerId: string;
+  teamId: string;
+  date: string;
+  description: string;
+  duration: number;
+  rpeRating: number;
+  createdAt: string;
 }
 
 // Game types
