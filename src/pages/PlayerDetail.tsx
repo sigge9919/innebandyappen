@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { usePlayers, useIDPs, useTestResults } from '@/hooks/useLocalStorage';
+import { usePlayers, useIDPs, useTestResults, useRPERatings, usePersonalTrainings } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
+import { useTeam } from '@/contexts/TeamContext';
 import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
 import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
 import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
@@ -13,10 +14,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Edit, Target, AlertTriangle, Plus, CalendarDays, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, Edit, Target, AlertTriangle, Plus, CalendarDays, AlertCircle, CheckCircle2, Mail, Activity, Dumbbell, Calendar, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TestResult, IndividualDevelopmentPlan } from '@/types';
 import { getIDPStatus, getIDPStatusVariant } from '@/lib/idpUtils';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PlayerDetail() {
   const { playerId } = useParams<{ playerId: string }>();
