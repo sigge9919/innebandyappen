@@ -21,6 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function PlayerPortal() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const { activeTeam } = useTeam();
   const { players, isLoading: playersLoading } = usePlayers();
   const { games } = useEnhancedGames();
