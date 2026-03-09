@@ -612,13 +612,13 @@ export function useRPERatings(playerId?: string) {
 
   const addRating = useCallback(async (rating: Omit<PlayerRPERating, 'id' | 'createdAt'>) => {
     if (!activeTeam) return;
-    const { error } = await supabase.from('player_rpe_ratings').insert({
+    const { error } = await supabase.from('player_rpe_ratings').upsert({
       player_id: rating.playerId,
       team_id: activeTeam.id,
       session_type: rating.sessionType,
       session_id: rating.sessionId,
       rating: rating.rating,
-    });
+    }, { onConflict: 'player_id,session_type,session_id' });
     if (error) throw error;
     refresh();
   }, [activeTeam, refresh]);
