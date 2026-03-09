@@ -661,7 +661,7 @@ export function usePersonalTrainings(playerId?: string) {
 
   const addTraining = useCallback(async (training: Omit<PersonalTraining, 'id' | 'createdAt'>) => {
     if (!activeTeam) return;
-    await supabase.from('personal_trainings').insert({
+    const { error } = await supabase.from('personal_trainings').insert({
       player_id: training.playerId,
       team_id: activeTeam.id,
       date: training.date,
@@ -669,6 +669,7 @@ export function usePersonalTrainings(playerId?: string) {
       duration: training.duration,
       rpe_rating: training.rpeRating,
     });
+    if (error) throw error;
     refresh();
   }, [activeTeam, refresh]);
 
