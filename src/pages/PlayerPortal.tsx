@@ -83,7 +83,7 @@ export default function PlayerPortal() {
     try {
       await addRating({
         playerId: myPlayer.id,
-        teamId: myPlayer.id,
+        teamId: activeTeam!.id,
         sessionType: currentPending.type,
         sessionId: currentPending.id,
         rating: currentRPE,
