@@ -119,16 +119,21 @@ export default function PlayerPortal() {
   const handleAddPersonalTraining = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!myPlayer) return;
-    await addTraining({
-      playerId: myPlayer.id,
-      teamId: myPlayer.id,
-      date: ptForm.date,
-      description: ptForm.description,
-      duration: ptForm.duration,
-      rpeRating: ptForm.rpeRating,
-    });
-    setPtDialogOpen(false);
-    setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
+    try {
+      await addTraining({
+        playerId: myPlayer.id,
+        teamId: myPlayer.id,
+        date: ptForm.date,
+        description: ptForm.description,
+        duration: ptForm.duration,
+        rpeRating: ptForm.rpeRating,
+      });
+      toast({ title: 'Personal training saved!' });
+      setPtDialogOpen(false);
+      setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
+    } catch {
+      toast({ title: 'Failed to save training', variant: 'destructive' });
+    }
   };
 
   const getRPEColor = (rating: number) => {
