@@ -80,23 +80,27 @@ export default function PlayerPortal() {
 
   const handleSubmitRPE = async () => {
     if (!currentPending || !myPlayer) return;
-    await addRating({
-      playerId: myPlayer.id,
-      teamId: myPlayer.id, // will be overridden by hook
-      sessionType: currentPending.type,
-      sessionId: currentPending.id,
-      rating: currentRPE,
-    });
-    
-    const remaining = pendingSessions.filter(p => !(p.type === currentPending.type && p.id === currentPending.id));
-    setPendingSessions(remaining);
-    
-    if (remaining.length > 0) {
-      setCurrentPending(remaining[0]);
-      setCurrentRPE(5);
-    } else {
-      setRpeDialogOpen(false);
-      setCurrentPending(null);
+    try {
+      await addRating({
+        playerId: myPlayer.id,
+        teamId: myPlayer.id,
+        sessionType: currentPending.type,
+        sessionId: currentPending.id,
+        rating: currentRPE,
+      });
+      
+      const remaining = pendingSessions.filter(p => !(p.type === currentPending.type && p.id === currentPending.id));
+      setPendingSessions(remaining);
+      
+      if (remaining.length > 0) {
+        setCurrentPending(remaining[0]);
+        setCurrentRPE(5);
+      } else {
+        setRpeDialogOpen(false);
+        setCurrentPending(null);
+      }
+    } catch {
+      toast({ title: 'Failed to save RPE rating', variant: 'destructive' });
     }
   };
 
