@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { Activity, Dumbbell, TrendingUp, Calendar, Clock, Plus, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { PersonalTraining } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PlayerPortal() {
   const { user } = useAuth();
