@@ -17,9 +17,11 @@ import { format } from 'date-fns';
 import { Activity, Dumbbell, TrendingUp, Calendar, Clock, Plus, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { PersonalTraining } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PlayerPortal() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const { activeTeam } = useTeam();
   const { players, isLoading: playersLoading } = usePlayers();
   const { games } = useEnhancedGames();
@@ -78,23 +80,27 @@ export default function PlayerPortal() {
 
   const handleSubmitRPE = async () => {
     if (!currentPending || !myPlayer) return;
-    await addRating({
-      playerId: myPlayer.id,
-      teamId: myPlayer.id, // will be overridden by hook
-      sessionType: currentPending.type,
-      sessionId: currentPending.id,
-      rating: currentRPE,
-    });
-    
-    const remaining = pendingSessions.filter(p => !(p.type === currentPending.type && p.id === currentPending.id));
-    setPendingSessions(remaining);
-    
-    if (remaining.length > 0) {
-      setCurrentPending(remaining[0]);
-      setCurrentRPE(5);
-    } else {
-      setRpeDialogOpen(false);
-      setCurrentPending(null);
+    try {
+      await addRating({
+        playerId: myPlayer.id,
+        teamId: myPlayer.id,
+        sessionType: currentPending.type,
+        sessionId: currentPending.id,
+        rating: currentRPE,
+      });
+      
+      const remaining = pendingSessions.filter(p => !(p.type === currentPending.type && p.id === currentPending.id));
+      setPendingSessions(remaining);
+      
+      if (remaining.length > 0) {
+        setCurrentPending(remaining[0]);
+        setCurrentRPE(5);
+      } else {
+        setRpeDialogOpen(false);
+        setCurrentPending(null);
+      }
+    } catch {
+      toast({ title: 'Failed to save RPE rating', variant: 'destructive' });
     }
   };
 
@@ -113,16 +119,21 @@ export default function PlayerPortal() {
   const handleAddPersonalTraining = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!myPlayer) return;
-    await addTraining({
-      playerId: myPlayer.id,
-      teamId: myPlayer.id,
-      date: ptForm.date,
-      description: ptForm.description,
-      duration: ptForm.duration,
-      rpeRating: ptForm.rpeRating,
-    });
-    setPtDialogOpen(false);
-    setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
+    try {
+      await addTraining({
+        playerId: myPlayer.id,
+        teamId: myPlayer.id,
+        date: ptForm.date,
+        description: ptForm.description,
+        duration: ptForm.duration,
+        rpeRating: ptForm.rpeRating,
+      });
+      toast({ title: 'Personal training saved!' });
+      setPtDialogOpen(false);
+      setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
+    } catch {
+      toast({ title: 'Failed to save training', variant: 'destructive' });
+    }
   };
 
   const getRPEColor = (rating: number) => {
