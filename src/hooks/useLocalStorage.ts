@@ -436,6 +436,9 @@ function dbToDrill(row: any): Drill {
     videoUrl: row.video_url,
     linkedLayoutIds: row.linked_layout_ids ?? [],
     mediaFiles: row.media_files ?? [],
+    directVideoUrl: row.direct_video_url,
+    thumbnailUrl: row.thumbnail_url,
+    mediaFetched: row.media_fetched ?? false,
   };
 }
 
