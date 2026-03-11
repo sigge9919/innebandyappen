@@ -157,6 +157,7 @@ export default function Training() {
                 key={drill.id}
                 drill={drill}
                 onClick={() => handleDrillClick(drill)}
+                onToggleFavorite={handleToggleFavorite}
               />
             ))}
           </div>
