@@ -95,6 +95,7 @@ export interface Drill {
   directVideoUrl?: string;
   thumbnailUrl?: string;
   mediaFetched?: boolean;
+  isFavorite?: boolean;
 }
 
 // Playbook types

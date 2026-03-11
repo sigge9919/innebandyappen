@@ -13,7 +13,7 @@ export default function Training() {
   const navigate = useNavigate();
   const { sessions } = useTrainingSessions();
   const { players } = usePlayers();
-  const { drills } = useDrills();
+  const { drills, updateDrill } = useDrills();
 
   const [drillSearch, setDrillSearch] = useState('');
   const [drillFilter, setDrillFilter] = useState<string>('all');
