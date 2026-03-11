@@ -6,7 +6,7 @@ import { DrillCard } from '@/components/training/DrillCard';
 import { useTrainingSessions, usePlayers, useDrills } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Calendar, Dumbbell, Search } from 'lucide-react';
+import { Plus, Calendar, Dumbbell, Search, Star } from 'lucide-react';
 import { Drill } from '@/types';
 
 export default function Training() {
