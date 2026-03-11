@@ -11,15 +11,26 @@ export function DrillCard({ drill, onClick }: DrillCardProps) {
   return (
     <div
       onClick={onClick}
-      className="stat-card cursor-pointer hover:shadow-md transition-all duration-200"
+      className="stat-card cursor-pointer hover:shadow-md transition-all duration-200 overflow-hidden"
     >
+      {drill.thumbnailUrl && (
+        <div className="-mx-4 -mt-4 mb-3">
+          <img
+            src={drill.thumbnailUrl}
+            alt={drill.name}
+            className="w-full h-32 object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-3">
         <div className="flex flex-wrap gap-1.5">
           {drill.categories.slice(0, 2).map(cat => (
             <Badge key={cat} variant="secondary">{cat}</Badge>
           ))}
         </div>
-        {drill.videoUrl && <Video className="h-4 w-4 text-muted-foreground" />}
+        {(drill.videoUrl || drill.directVideoUrl) && <Video className="h-4 w-4 text-muted-foreground" />}
       </div>
 
       <h3 className="text-lg font-semibold text-foreground mb-3">{drill.name}</h3>

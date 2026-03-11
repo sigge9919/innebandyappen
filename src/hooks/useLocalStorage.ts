@@ -463,6 +463,9 @@ function drillUpdatesToDb(u: Partial<Drill>) {
   if (u.videoUrl !== undefined) r.video_url = u.videoUrl;
   if (u.linkedLayoutIds !== undefined) r.linked_layout_ids = u.linkedLayoutIds;
   if (u.mediaFiles !== undefined) r.media_files = u.mediaFiles;
+  if (u.directVideoUrl !== undefined) r.direct_video_url = u.directVideoUrl;
+  if (u.thumbnailUrl !== undefined) r.thumbnail_url = u.thumbnailUrl;
+  if (u.mediaFetched !== undefined) r.media_fetched = u.mediaFetched;
   return r;
 }
 
