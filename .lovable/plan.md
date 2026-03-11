@@ -1,50 +1,45 @@
 
 
-## Embed Videos and Images from Övningsbanken into Drills
+## Plan: Add Penalty Shot Situation
 
-### Problem
-Currently each seeded drill stores the innebandy.se page URL as `video_url`, which renders as a plain link. The actual content (Vimeo MP4 videos and thumbnail images) is embedded in the HTML of each drill page. The user wants these media assets extracted and displayed inline.
+Add a "Penalty Shot" option to the situation controls. When triggered, it opens a dialog to record the full penalty shot sequence: which team is shooting, player selection (if our team), and the outcome (scored/saved). No +/- is affected. Player and goalie stats are recorded.
 
-### Approach
-Create an edge function that scrapes each drill's source page on-demand, extracts the direct Vimeo MP4 URL and the thumbnail image URL, then caches both in the database. The DrillDetail page renders an inline `<video>` player and/or image.
+### Changes
 
-### Implementation Steps
+**1. `src/types/game.ts` — extend types**
+- Add `'PS'` to `GameSituation` type: `'5v5' | '5v4' | '4v5' | '6v5' | '5v6' | 'PS'`
+- Add `'PS'` label to `getSituationLabel`: `'PS': 'Penalty Shot'`
 
-**1. Database migration — add caching columns**
-- Add `direct_video_url text` column to `drills` table (cached MP4 URL)
-- Add `thumbnail_url text` column to `drills` table (cached image URL)
-- Add `media_fetched boolean DEFAULT false` to track whether scraping has been attempted
+**2. New component: `src/components/games/PenaltyShotDialog.tsx`**
+- Multi-step dialog:
+  - Step 1: Choose team shooting (Our Team / Opponent)
+  - Step 2 (if our team): Select the penalty taker from squad players (field players only)
+  - Step 3: Outcome — Scored or Saved
+- On confirm, calls back with `{ shootingTeam: Team, playerId?: string, scored: boolean }`
 
-**2. Create edge function `scrape-drill-media`**
-- Accepts a drill source URL (the `video_url` field pointing to innebandy.se)
-- Fetches the HTML page directly (no Firecrawl needed — simple fetch)
-- Extracts with regex:
-  - Video: `<source src="(https://player.vimeo.com/...mp4...)"` → direct MP4 URL
-  - Image: `<img class="...thumbnail..." src="(https://www.innebandy.se/media/...)"` → if not `placeholder-exercise.jpg`, use as thumbnail
-- Returns `{ videoSrc: string | null, thumbnailSrc: string | null }`
+**3. `src/components/games/LiveTracking.tsx` — add penalty shot flow**
+- Add a "Penalty Shot" button (separate from the situation row, perhaps below or between the two team columns as a full-width button, or in each team column)
+- Actually: add a single full-width "Penalty Shot" button below both team columns (since the dialog handles team selection)
+- On confirm from dialog:
+  - Record a `shot_on_goal` event with situation `'PS'` for the shooting team
+  - If scored: also record a `goal` event with situation `'PS'`
+  - If our team scored: increment scorer's `shotsOnGoal` and `goals` in manual playerStats (via `onUpdatePlayerStat`)
+  - If our team missed: increment scorer's `shotsOnGoal` only
+  - The goalie snapshot is captured automatically via existing `recordEvent` logic (goalieId on event)
 
-**3. Update `DrillDetail.tsx` — fetch and display media**
-- When a drill has a `video_url` pointing to innebandy.se and `media_fetched` is false:
-  - Call the edge function
-  - Update the drill record with the results (`direct_video_url`, `thumbnail_url`, `media_fetched = true`)
-- Render:
-  - If `direct_video_url` exists: inline `<video>` player with controls
-  - If `thumbnail_url` exists (and no video): display the image
-  - Fallback: link to source page
+**4. `src/lib/gameStorage.ts` — exclude PS from +/- calculation**
+- In `calculatePlayerStatsFromEvents`, the +/- loop already filters by `situation === '5v5'`, so penalty shot goals (`situation === 'PS'`) are automatically excluded. No change needed.
 
-**4. Update `DrillCard.tsx` — show thumbnail**
-- If `thumbnail_url` exists, show it as a small preview image on the card
+**5. No change to situation buttons row** — Penalty Shot is not a "game state" like 5v4; it's a discrete event. The situation selector stays as-is. The PS situation is only stamped on the events created during the penalty shot sequence.
 
-### Technical Details
-- Edge function: `supabase/functions/scrape-drill-media/index.ts`
-- Regex for video: `<source src="(https://player\.vimeo\.com/[^"]+\.mp4[^"]*)"`
-- Regex for image: `<img[^>]+src="(https://www\.innebandy\.se/media/[^"]+)"` (exclude placeholder)
-- Vimeo progressive URLs contain signatures and may expire — the `media_fetched` flag can be reset to re-scrape if needed
-- No external API keys required (direct HTTP fetch to public pages)
-
-### Files
-- **Database migration**: Add `direct_video_url`, `thumbnail_url`, `media_fetched` columns to `drills`
-- **New**: `supabase/functions/scrape-drill-media/index.ts`
-- **Modified**: `src/pages/DrillDetail.tsx` (fetch + render inline media)
-- **Modified**: `src/components/training/DrillCard.tsx` (optional thumbnail preview)
+### Flow Summary
+1. Coach taps "Penalty Shot" button
+2. Dialog asks: Our Team or Opponent?
+3. If Our Team: select player, then Scored/Saved
+4. If Opponent: just Scored/Saved
+5. Events recorded with `situation: 'PS'`:
+   - Always: `shot_on_goal` for shooting team (counted in team SOG and goalie SA)
+   - If scored: `goal` for shooting team (counted in team goals and goalie GA)
+   - If our player: manual playerStats updated (SOG, and goal if scored)
+6. No +/- impact (already excluded by existing 5v5 filter)
 

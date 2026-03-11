@@ -19,33 +19,42 @@ export type Database = {
           categories: string[] | null
           created_at: string
           description: string | null
+          direct_video_url: string | null
           id: string
           linked_layout_ids: string[] | null
+          media_fetched: boolean
           media_files: Json | null
           name: string
           team_id: string
+          thumbnail_url: string | null
           video_url: string | null
         }
         Insert: {
           categories?: string[] | null
           created_at?: string
           description?: string | null
+          direct_video_url?: string | null
           id?: string
           linked_layout_ids?: string[] | null
+          media_fetched?: boolean
           media_files?: Json | null
           name: string
           team_id: string
+          thumbnail_url?: string | null
           video_url?: string | null
         }
         Update: {
           categories?: string[] | null
           created_at?: string
           description?: string | null
+          direct_video_url?: string | null
           id?: string
           linked_layout_ids?: string[] | null
+          media_fetched?: boolean
           media_files?: Json | null
           name?: string
           team_id?: string
+          thumbnail_url?: string | null
           video_url?: string | null
         }
         Relationships: [

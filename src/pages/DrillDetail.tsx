@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useDrills } from '@/hooks/useLocalStorage';
@@ -12,12 +12,14 @@ import {
   Film,
   Image as ImageIcon,
   Layout,
-  Video
+  Video,
+  Loader2
 } from 'lucide-react';
 import { Drill } from '@/types';
 import { EditDrillDialog } from '@/components/forms/EditDrillDialog';
 import { TacticsBoardPreview } from '@/components/playbook/TacticsBoardPreview';
 import { PlayMediaGallery } from '@/components/playbook/PlayMediaGallery';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function DrillDetail() {
   const { drillId } = useParams<{ drillId: string }>();
@@ -30,12 +32,53 @@ export default function DrillDetail() {
   const existingDrill = drills.find(d => d.id === drillId);
   
   const [editDialogOpen, setEditDialogOpen] = useState(isNew);
+  const [fetchingMedia, setFetchingMedia] = useState(false);
+  const [localDrill, setLocalDrill] = useState<Drill | null>(null);
 
   useEffect(() => {
     if (isNew) {
       setEditDialogOpen(true);
     }
   }, [isNew]);
+
+  // Sync localDrill with existingDrill
+  useEffect(() => {
+    if (existingDrill) {
+      setLocalDrill(existingDrill);
+    }
+  }, [existingDrill]);
+
+  // On-demand media scraping for Övningsbanken drills
+  useEffect(() => {
+    const drill = localDrill;
+    if (!drill || isNew || fetchingMedia) return;
+    if (drill.mediaFetched) return;
+    if (!drill.videoUrl?.includes('innebandy.se')) return;
+
+    const fetchMedia = async () => {
+      setFetchingMedia(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('scrape-drill-media', {
+          body: { url: drill.videoUrl },
+        });
+        
+        const updates: Partial<Drill> = {
+          mediaFetched: true,
+          directVideoUrl: data?.videoSrc || undefined,
+          thumbnailUrl: data?.thumbnailSrc || undefined,
+        };
+        
+        await updateDrill(drill.id, updates);
+        setLocalDrill(prev => prev ? { ...prev, ...updates } : prev);
+      } catch (err) {
+        console.error('Failed to fetch drill media:', err);
+      } finally {
+        setFetchingMedia(false);
+      }
+    };
+
+    fetchMedia();
+  }, [localDrill?.id, localDrill?.mediaFetched, isNew]);
 
   const handleSave = (drill: Drill) => {
     if (isNew) {
@@ -73,8 +116,9 @@ export default function DrillDetail() {
     );
   }
 
-  const drill = existingDrill;
+  const drill = localDrill || existingDrill;
   const hasContent = (drill?.linkedLayoutIds?.length || 0) > 0 || (drill?.mediaFiles?.length || 0) > 0;
+  const hasScrapedMedia = !!drill?.directVideoUrl || !!drill?.thumbnailUrl;
 
   return (
     <AppLayout>
@@ -118,8 +162,45 @@ export default function DrillDetail() {
           </div>
         )}
 
-        {/* Video URL */}
-        {drill?.videoUrl && (
+        {/* Scraped Media (video/image from Övningsbanken) */}
+        {fetchingMedia && (
+          <div className="mb-6 flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">Hämtar media...</span>
+          </div>
+        )}
+
+        {drill?.directVideoUrl && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Video className="h-5 w-5 text-primary" />
+              <h2 className="font-semibold">Video</h2>
+            </div>
+            <video
+              src={drill.directVideoUrl}
+              controls
+              playsInline
+              className="w-full max-w-2xl rounded-lg border bg-black"
+            />
+          </div>
+        )}
+
+        {drill?.thumbnailUrl && !drill?.directVideoUrl && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ImageIcon className="h-5 w-5 text-primary" />
+              <h2 className="font-semibold">Bild</h2>
+            </div>
+            <img
+              src={drill.thumbnailUrl}
+              alt={drill.name}
+              className="w-full max-w-2xl rounded-lg border"
+            />
+          </div>
+        )}
+
+        {/* Video URL fallback (non-innebandy or no scraped media) */}
+        {drill?.videoUrl && !drill?.directVideoUrl && !fetchingMedia && (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Video className="h-5 w-5 text-primary" />
@@ -163,7 +244,7 @@ export default function DrillDetail() {
         )}
 
         {/* Empty State */}
-        {!hasContent && !drill?.description && !drill?.videoUrl && !isNew && (
+        {!hasContent && !hasScrapedMedia && !drill?.description && !drill?.videoUrl && !isNew && !fetchingMedia && (
           <Card>
             <CardContent className="py-12 text-center">
               <Layout className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-30" />
