@@ -30,9 +30,14 @@ export default function Training() {
   const filteredDrills = drills.filter(drill => {
     const matchesSearch = drill.name.toLowerCase().includes(drillSearch.toLowerCase()) ||
                          drill.description.toLowerCase().includes(drillSearch.toLowerCase());
-    if (drillFilter === 'all') return matchesSearch;
-    return matchesSearch && drill.categories.includes(drillFilter);
+    const matchesFilter = drillFilter === 'all' || 
+                          (drillFilter === 'favorites' ? drill.isFavorite : drill.categories.includes(drillFilter));
+    return matchesSearch && matchesFilter;
   });
+
+  const handleToggleFavorite = (drillId: string, isFavorite: boolean) => {
+    updateDrill(drillId, { isFavorite });
+  };
 
   const handleDrillClick = (drill: Drill) => {
     navigate(`/training/drill/${drill.id}`);
