@@ -129,6 +129,15 @@ export default function Training() {
               >
                 All
               </Button>
+              <Button
+                variant={drillFilter === 'favorites' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setDrillFilter(drillFilter === 'favorites' ? 'all' : 'favorites')}
+                className="gap-1"
+              >
+                <Star className={`h-3.5 w-3.5 ${drillFilter === 'favorites' ? 'fill-current' : ''}`} />
+                Favoriter
+              </Button>
               {allDrillCategories.map(cat => (
                 <Button
                   key={cat}
