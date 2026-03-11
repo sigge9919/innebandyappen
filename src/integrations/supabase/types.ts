@@ -593,6 +593,7 @@ export type Database = {
       }
       is_head_coach: { Args: { _team_id: string }; Returns: boolean }
       is_team_member: { Args: { _team_id: string }; Returns: boolean }
+      seed_default_drills: { Args: { _team_id: string }; Returns: undefined }
     }
     Enums: {
       team_role:

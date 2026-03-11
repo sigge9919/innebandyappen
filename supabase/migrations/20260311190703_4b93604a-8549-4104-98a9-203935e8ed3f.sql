@@ -1,0 +1,150 @@
+
+-- Create seed_default_drills function
+CREATE OR REPLACE FUNCTION public.seed_default_drills(_team_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+BEGIN
+  INSERT INTO public.drills (team_id, name, description, categories, video_url) VALUES
+    (_team_id, '3 mot 3 med väggar - Skjuta - snabba avslut', 'Spel på begränsad yta med möjlighet till väggspel hos vilande spelare. I denna övning vill vi uppmuntra många avslut på olika sätt.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/3-mot-3-med-vaggar-skjuta-snabba-avslut'),
+    (_team_id, '360 kontroll - 1 v 1', 'Övningen syftar till att röra sig i alla olika riktningar med olika hastigheter och god bollkontroll.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/360-kontroll-1-v-1'),
+    (_team_id, '360 kontroll - Innebandykull', 'Att kunna röra sig i alla olika riktningar med olika hastigheter och god bollkontroll kommer att hjälpa bollförare att navigera i den ständigt förändrade miljö som ett matchspel innebär. Också viktigt att ha en uppfattning om vad som händer runt dig och var motståndare som vill ta bollen av dig finns.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/360-kontroll-innebandykull'),
+    (_team_id, '360 kontroll - spegeln', 'Övningen syftar till att röra sig i alla olika riktningar med olika hastigheter och god bollkontroll.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/360-kontroll-spegeln'),
+    (_team_id, 'Armhävning', 'Tränar i första hand styrkan i bröstmusklerna och triceps (armarnas baksida).', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/armhavning'),
+    (_team_id, 'Avslut - 1 v 1 + 1', 'Avslutsträning centralt i banan för att lära sig hitta lösningar och alternativ för avslut inne centralt i banan.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/avslut-1-v-1-plus-1'),
+    (_team_id, 'Avslut - Markan', 'Att träna avslut och när avslut ska tas är en viktig del i innebandy. Här jobbar vi med avslut kopplat till olika spelsituationer i varierande svårighetsgrad.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/avslut-markan'),
+    (_team_id, 'Avslut - skottormen', 'Driva boll i fart under lite stress (nästa spelare ska starta när du är halvvägs genom konerna) samt att skjuta mot mål i fart.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/avslut-skottormen'),
+    (_team_id, 'Balansera över bänkar', 'Bollkontroll och grundteknik. Lär dig att hantera boll och klubba i olika typer av rörelser.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/balansera-over-bankar'),
+    (_team_id, 'Benböj', 'Tränar styrkan i benens muskler och bidrar till att spelaren kan utveckla mer kraft i olika rörelser. Bidrar till minskad risk för skador.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/benboj'),
+    (_team_id, 'British Bulldogs', 'Övningen är i grunden en lek, men som också syftar till att kunna driva boll och samtidigt ha koll på vad som händer runt sig. I detta fall, var är jägaren och hur tar jag mig förbi utan att min svans blir tagen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/british-bulldogs'),
+    (_team_id, 'Bålsträckning med boll', 'Tränar i första hand bålens muskulatur och förmågan att ha god bålkontroll. Bidrar till förbättrad förmåga att utföra olika rörelser med god kontroll. Förebygger skador.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/balstrackning-med-boll'),
+    (_team_id, 'Copenhagen Hip', 'Tränar i första hand excentrisk styrka i ljumskens muskler. Används främst för att förebygga skador i ljumsken. Kan användas för att minska skillnaderna när benen har olika excentrisk styrka.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/copenhagen-hip'),
+    (_team_id, 'Direktskott', 'Bollkontroll och grundteknik. Träna i lugnt tempo på att skjuta direktskott genom att släpa bladet i marken innan du träffar bollen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/direktskott'),
+    (_team_id, 'Dragpassningar', 'Grundteknik när det gäller att dra iväg passningar, men även att ta emot passningar med kontroll.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/dragpassningar'),
+    (_team_id, 'Driva boll - 4 målsmatchen', 'Driva med boll är en central egenskap för att erövra ytor, utmana och ta sig förbi motståndare samt skapa nya passnings/avslutsmöjligheter.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/driva-boll-4-malsmatchen'),
+    (_team_id, 'Driva boll - färgbollen', 'Driva med boll är en central egenskap för att erövra ytor, utmana och ta sig förbi motståndare samt skapa nya passnings/avslutsmöjligheter. Behålla bollen inom laget.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/driva-boll-fargbollen'),
+    (_team_id, 'Driva boll - gatloppet', 'Driva boll på yta, utmana och ta sig förbi motståndare.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/driva-boll-gatloppet'),
+    (_team_id, 'Driva boll - Jaktlek', 'Driva boll i fart. Ta avslut i stressad situation.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/driva-boll-jaktlek'),
+    (_team_id, 'Duell och direktpass', 'I denna övning jobbar vi växelvis med passningar och att utmana sin motståndare.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/duell-och-direktpass'),
+    (_team_id, 'Duellspel - 3 v 2', 'Att spela ett aktivt presspel innebär att målsättningen är att minska bollförande lags tid och spelytor.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/duellspel-3-v-2'),
+    (_team_id, 'Etablerat anfall & försvar A', 'Öva på etablerat anfall och försvar på normalstor plan. Öva på att komma till avslut respektive förhindra avslut.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/etablerat-anfall-forsvar-a'),
+    (_team_id, 'Etablerat anfall & försvar B', 'Spelövning där försvarande lag eller anfallande lag spelar med en backjoker. Öva på etablerat anfall och försvar på normalstor plan. Öva på att komma till avslut respektive förhindra avslut.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/etablerat-anfall-forsvar-b'),
+    (_team_id, 'Etablerat anfall & försvar C', 'Spelövning på halvplan som syftar till att öva på etablerat anfallsspel och försvarsspel på normalstor planhalva. Öva på att komma till avslut respektive förhindra avslut.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/etablerat-anfall-forsvar-c'),
+    (_team_id, 'Evighetsstafett', 'Fysfokus under tävlingsform.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/evighetsstafett'),
+    (_team_id, 'Gyllene Kvadraten', 'I denna övning jobbar vi att ha kontroll på bollen samtidigt som du stöter på olika utmaningar, exempelvis i form av press från en motståndare.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/gyllene-kvadraten'),
+    (_team_id, 'Hamstring curl på boll', 'Tränar i första hand styrkan i lårens baksida och i sätesmusklerna. Bidrar till förbättrad förmåga att utveckla kraft i olika rörelser, bland annat i sprinter. Förebygger skador. Kan med fördel användas för att minska skillnaderna när benen är olika starka.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/hamstring-curl-pa-boll'),
+    (_team_id, 'Handledsskott', 'Bollkontroll och grundteknik. Träna i lugnt tempo på att skjuta handledsskott.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/handledsskott'),
+    (_team_id, 'Hantelpress med en arm', 'Tränar i första hand styrkan i bröstmusklerna, triceps (armens baksida) och axelmusklerna.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/hantelpress-med-en-arm'),
+    (_team_id, 'Hantelrodd', 'Tränar i första hand styrkan i ryggens övre muskler, biceps (armarnas framsida) och axlarna. Kan göras med en arm och bidrar då till att minska skillnaderna i styrka mellan kroppens sidor.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/hantelrodd'),
+    (_team_id, 'Hinderbana', 'Att bygga upp en hinderbana till uppvärmningen uppmuntrar barn att röra på sig på ett roligt och lekfullt sätt.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/hinderbana'),
+    (_team_id, 'Hängande rodd', 'Tränar i första hand styrkan i ryggens övre muskler, biceps (armarnas framsida) och axlarna.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/hangande-rodd'),
+    (_team_id, 'Jag och bollen', 'I denna övning jobbar vi att ha kontroll på bollen genom att spegla rörelsen som din tränare framför dig gör.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/jag-och-bollen'),
+    (_team_id, 'Kast i sidled med medicinboll', 'Tränar i första hand bålens muskulatur och förmågan att utveckla kraft i rotationer. Bidrar till förbättrad förmåga att utföra olika rörelser med god kontroll. Förebygger skador.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/kast-i-sidled-med-medicinboll'),
+    (_team_id, 'Knäkontrollen', 'Starta med övningarna redan i de yngre åldrarna, genom att välja ut lättare övningar och övningar med lekfulla inslag, och sedan från ca 10-12 års ålder införa programmet i sin helhet. Detta för att göra den skadeförebyggande träningen till en naturlig del av innebandyn tidigt.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/knakontroll'),
+    (_team_id, 'Kon-kaos', 'Lek eller uppvärmningsövning som innehåller tävlingsmoment!', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/kon-kaos'),
+    (_team_id, 'Kontringar - stora coast to coast', 'Genom att ställa om snabbt till kontring efter bollvinst vill vi såra våra motståndare innan de hunnit strukturera sig. Lära sig att utnyttja obalans i motståndarnas försvarsspel och således kunna komma till avslut och göra mål.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/kontringar-stora-coast-to-coast'),
+    (_team_id, 'Krabb-boll', 'Lek eller uppvärmningsövning som innehåller tävlingsmoment!', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/krabb-boll'),
+    (_team_id, 'Målvakten och laget - inbågningar', 'Rädda skott från ficka. Förflyttning från stolpe ut mot skytt.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvakten-och-laget-inbagningar'),
+    (_team_id, 'Målvakten och laget - inspel från hörn, skanna', 'Inspel från hörn till avslutare som ska skjuta direktskott. Jobba med att skanna uppåt i banan minst två gånger!', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvakten-och-laget-inspel-fran-horn-skanna'),
+    (_team_id, 'Målvakten och laget - läsa spelet, intentioner', 'Övning som ger flera avslutsalternativ och syftar till att utmana målvakten att läsa vad den tror att bollförare kommer att göra.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvakten-och-laget-lasa-spelet-intentioner'),
+    (_team_id, 'Målvaktsövning - följa John', 'Övning där målvakterna får träna olika typer av förflyttningar.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvaktsovning-folja-john'),
+    (_team_id, 'Målvaktsövning - hand-öga koordination - parövning Kast', 'Övning där målvakterna får träna på sin hand-öga koordination.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvaktsovning-hand-oga-koordination-parovning-kast'),
+    (_team_id, 'Målvaktsövning - hand-öga koordination - under förflyttning parövning', 'Övning där målvakterna får träna på sin hand-öga koordination.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvaktsovning-hand-oga-koordination-under-forflyttning-parovning'),
+    (_team_id, 'Målvaktsövning - hand-öga koordination med skott', 'Övning där målvakterna får träna på sin hand-öga koordination.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvaktsovning-hand-oga-koordination-med-skott'),
+    (_team_id, 'Målvaktsövning - returkontroll', 'Övning där målvakterna får träna på sin returkontroll. Att snabbt uppfatta var bollen tar vägen och ta kontroll på bollen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvaktsovning-returkontroll'),
+    (_team_id, 'Målvaktsövning - returkontroll under förflyttning', 'Övning där målvakterna får träna på sin returkontroll efter de gjort en kort förflyttning. Att snabbt uppfatta var bollen tar vägen och ta kontroll på bollen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/malvaktsovning-returkontroll-under-forflyttning'),
+    (_team_id, 'Nordisk hamstring', 'Tränar i första hand excentrisk styrka i lårens baksida. Bidrar till förbättrad styrkan och förmåga att utveckla kraft i olika rörelser, bland annat i sprinter. Förebygger effektivt skador i lårens baksida.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/nordisk-hamstring'),
+    (_team_id, 'Omställning A', 'Träna spelarnas färdigheter utifrån de spelbeteenden som krävs kopplat till omställningsspelet (både offensiva och defensiva omställningar).', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/omstallning-a'),
+    (_team_id, 'Omställning B', 'Träna spelarnas färdigheter utifrån de spelbeteenden som krävs kopplat till omställningsspelet (både offensiva och defensiva omställningar). Öva på etablerat anfall och försvar samt öva på att komma till avslut och att förhindra avslut.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/omstallning-b'),
+    (_team_id, 'Pallof press', 'Tränar i första hand bålens muskulatur och förmågan att ha god bålkontroll genom att motstå rotationer. Bidrar till förbättrad förmåga att utföra olika rörelser med god kontroll. Förebygger skador.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/pallof-press'),
+    (_team_id, 'Passa - 4 v 1', 'Träna på passningar, hitta passningsvägar och göra sig spelbar utan bollen. Intensivt presspel utan boll för att kunna vinna boll och snabbt attackera något av målen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/passa-4-v-1'),
+    (_team_id, 'Passa - 4 v 2', 'Träna på passningar, hitta passningsvägar och göra sig spelbar utan bollen. Intensivt presspel utan boll för att kunna vinna boll och snabbt attackera något av målen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/passa-4-v-2'),
+    (_team_id, 'Passa - passningsleken', 'Träna passningar och kommunikation i rörelse.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/passa-passningsleken'),
+    (_team_id, 'Passa - passningsleken Steg 2', 'Träna passningar och kommunikation i rörelse. Undvik att bli av med bollen till motståndare.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/passa-passningsleken-steg-2'),
+    (_team_id, 'Passa och mottagning - Basketbollen', 'Träna på passningar under rörelse, titta upp och kommunicera med medspelare.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/passa-och-mottagning-basketbollen'),
+    (_team_id, 'Passning & spelbarhet - Zon till zon', 'Spelövning som syftar till att ge bollhållaren passningsalternativ. Jobba med att göra sig spelbar och fundera kring vilka förutsättningar du ger din medspelare när du slår dina passningar. Behålla bollen inom laget.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/passning-spelbarhet-zon-till-zon'),
+    (_team_id, 'Passning till nedfälld bänk', 'Bollkontroll och passningsteknik i fart. I denna övning jobbar vi med att slå passningar och skjuta direktskott.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/passning-till-nedfalld-bank'),
+    (_team_id, 'Passningar - Ajax leken', 'Övningen har två syften. Dels som bollförare jobba med att göra dig spelbar för medspelare och sedan leverera passningar till kompisar som har bra förutsättningar att ta emot bollen. Som försvarare gäller det att jobba med att snabbt sätta press på bollförare, vinna boll och sedan gå på avslut mot något av målen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/passningar-ajax-leken'),
+    (_team_id, 'Pressa - 1 v 2 & 2 v 1', 'Övning som syftar till att träna på strategier för att hindra motståndaren från att göra mål vid numerärt underläge.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/pressa-1-v-2-2-v-1'),
+    (_team_id, 'Pressa - Pressen', 'Spelövning som syftar till att träna på att förhindra speluppbyggnad.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/pressa-pressen'),
+    (_team_id, 'Pressa - Sargduellen', 'Att spela ett aktivt presspel innebär att snabbt minska avståndet till motståndare och ta sig in i kroppen och bromsa dennes fart.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/pressa-sargduellen'),
+    (_team_id, 'Pressa - Tampa Deluxe', 'Att spela ett aktivt presspel innebär att snabbt minska avståndet till motståndare och ta sig in i kroppen och bromsa dennes fart.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/pressa-tampa-deluxe'),
+    (_team_id, 'Pressa, Markera - 3 v 5', 'Träna på att förhindra och rädda avslut. Genom att aktivt pressa och markera motståndare försvåra för dem att få bollen samt att försvåra avslut.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/pressa-markera-3-v-5'),
+    (_team_id, 'Raka marklyft', 'Tränar i första hand styrkan i lårens baksida och i sätesmusklerna. Bidrar till förbättrad förmåga att utveckla kraft i olika rörelser, bland annat i sprinter. Förebygger skador. Kan med fördel användas för att minska skillnaderna när benen är olika starka.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/raka-marklyft'),
+    (_team_id, 'Reflexen', 'Lek som innehåller tävlingsmoment!', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/reflexen'),
+    (_team_id, 'Skivstångsrodd', 'Tränar i första hand styrkan i ryggens övre muskler, biceps (armarnas framsida) och axlarna.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/skivstangsrodd'),
+    (_team_id, 'Skjuta - Målen i mitten', 'Träna på att hitta avslutsmöjligheter samt lära sig försvara mot just avsluten. Avsluten i denna övning är inte spelsystemsberoende utan mängden avslut är i fokus.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/skjuta-malen-i-mitten'),
+    (_team_id, 'Snurr med boll - rockringar', 'Grundteknik när det gäller att snurra med bollen. Vi tränar på att göra det med både forehand och backhand och i stegrande fart.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/snurr-med-boll-rockringar'),
+    (_team_id, 'Snurr med boll grundteknik', 'Grundteknik när det gäller att snurra med bollen. Vi tränar på att göra det med både forehand och backhand och i stegrande fart.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/snurr-med-boll-grundteknik'),
+    (_team_id, 'Spelavstånd 3 v 2', 'Övningen syftar till att lära sig hitta ytor för ge bollhållaren ett passningsalternativ. Att kunna visa sig för bollhållaren är väsentligt för att kunna länka samman och på så sätt utnyttja medspelarna.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelavstand-3-v-2'),
+    (_team_id, 'Spelbarhet - 2 v 2 + 2', 'Spelövning som syftar till att träna på speluppbyggnad samt etablerat anfall. Jobba med dina beslut med bollen och att behålla bollen inom laget.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelbarhet-2-v-2-plus-2'),
+    (_team_id, 'Spelbarhet - centervändningen', 'Att jobba med att flytta bollen från sida till sida för att skapa möjligheter att ta sig förbi sina motståndare. Genom rörelse utan bollen göra sig spelbar och redo att kunna attackera framåt.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelbarhet-centervandningen'),
+    (_team_id, 'Spelbarhet - innebandydoppboll', 'Att kunna implementera tanken kring att man som spelare ska passa bollen och hitta en ny yta för att kunna få tillbaka bollen är en viktig del i spelet innebandy.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelbarhet-innebandydoppboll'),
+    (_team_id, 'Speldjup - jokerpoint', 'Syftar till att behålla bollen inom laget och så småningom anfalla och göra mål. Jobba med att göra sig spelbar. Ge bollhållaren passningsalternativ framåt, bakåt och diagonalt.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/speldjup-jokerpoint'),
+    (_team_id, 'Speldjup - spelövning 8 Zonerna', 'Ge bollhållaren passningsalternativ framåt, bakåt och diagonalt. Utnyttja obalans i motståndarlaget. Hur ger jag mina anfallande medspelare bra förutsättningar i samband med speluppbyggnad.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/speldjup-spelovning-8-zonerna'),
+    (_team_id, 'Spelövning - Anfall A', 'Öva speluppbyggnad och offensiva principer. Speluppbyggnad är den fas i spelet då spelarna med sina färdigheter och lagets principer tar sig till fasen komma till avslut och göra mål. I den här övningen gäller det framför allt att öva på att komma till så farliga ytor som möjligt för att få bästa möjliga avslutsläge.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-anfall-a'),
+    (_team_id, 'Spelövning - Anfall B', 'Öva speluppbyggnad och offensiva principer. Speluppbyggnad är den fas i spelet då spelarna med sina färdigheter och lagets principer tar sig till fasen komma till avslut och göra mål. I den här övningen gäller det framför allt att öva på att komma till så farliga ytor som möjligt för att få bästa möjliga avslutsläge.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-anfall-b'),
+    (_team_id, 'Spelövning - Anfall C', 'Öva speluppbyggnad och offensiva principer. Speluppbyggnad är den fas i spelet då spelarna med sina färdigheter och lagets principer tar sig till fasen komma till avslut och göra mål. I den här övningen gäller det framför allt att öva på att komma till så farliga ytor som möjligt för att få bästa möjliga avslutsläge.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-anfall-c'),
+    (_team_id, 'Spelövning - Avslut 1A', 'Komma till avslut och göra mål! Öva avslut. Goda kunskaper om avslut är viktiga för att kunna göra mål och minst lika viktiga för att kunna förhindra avslut.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-avslut-1a'),
+    (_team_id, 'Spelövning - Avslut 1B', 'Komma till avslut och göra mål! Öva avslut. Goda kunskaper om avslut är viktiga för att kunna göra mål och minst lika viktiga för att kunna förhindra avslut.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-avslut-1b'),
+    (_team_id, 'Spelövning - Avslut 1C', 'Öva avslut. Goda kunskaper om avslut är viktiga för att kunna göra mål och minst lika viktiga för att kunna förhindra avslut.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-avslut-1c'),
+    (_team_id, 'Spelövning - Avslut 2A', 'Syftar till att komma till avslut och göra mål samt speglingen förhindra avslut och rädda mål.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-avslut-2a'),
+    (_team_id, 'Spelövning - Avslut 2B', 'Öva på att komma till avslut respektive förhindra avslut och rädda mål.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-avslut-2b'),
+    (_team_id, 'Spelövning - Avslut 2C', 'Öva på att komma till avslut respektive förhindra avslut och rädda mål.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-avslut-2c'),
+    (_team_id, 'Spelövning - Passa - Spanska kvadraten', 'Hålla bollen inom laget genom passningsspel och rörelse utan bollen (spelbar). Viktigt att kommunicera och berätta när du vill ha boll.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-passa-spanska-kvadraten'),
+    (_team_id, 'Spelövning - Ytterzonen', 'Spelövning som syftar till att träna beteenden kopplat till etablerat anfall och omställningar.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/spelovning-ytterzonen'),
+    (_team_id, 'Split squat', 'Tränar styrkan i benens muskler och ökar förmågan att utveckla kraft i olika rörelser. Minskar risken för skador. Specifik övning som med fördel användas för att minska skillnader i styrka mellan de olika benen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/split-squat'),
+    (_team_id, 'Step up', 'Tränar styrkan i benens muskler och ökar förmågan att utveckla kraft i olika rörelser. Minskar risken för skador. Specifik övning som med fördel användas för att minska skillnader i styrka mellan de olika benen.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/step-up'),
+    (_team_id, 'Teknikbana', 'Jobba med teknik i olika former som en del av er ordinarie träning. Passar perfekt som en station att kombinera med andra moment på träning.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/teknikbana'),
+    (_team_id, 'The glider', 'Tränar i första hand excentrisk styrka i lårens baksida. Bidrar till att förebygga skador i muskulaturen i lårens baksida. Kan användas för att minska skillnaderna när benen har olika excentrisk styrka.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/the-glider'),
+    (_team_id, 'Tjuva koner', 'Syftar till att på ett lekfullt och tävlingsinriktat sätt jobba med att öka din uthållighet. Förbättra förmågan att upprepa korta intensiva intervaller under längre tid. Utveckla rumsuppfattning.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/tjuva-koner'),
+    (_team_id, 'Utmana, finta, dribbla - alla mot alla', 'Träna på att passera en motståndare med boll under kontroll.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/utmana-finta-dribbla-alla-mot-alla'),
+    (_team_id, 'Utmana, finta, dribbla - Trillingmatchen', 'Träna på att slå sin motståndare 1 mot 1 med boll och göra mål.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/utmana-finta-dribbla-trillingmatchen'),
+    (_team_id, 'Utmana, finta, dribbla - Utmaningen', 'Genom smålagsspel 3-3 träna på att äga bollen inom sitt lag.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/utmana-finta-dribbla-utmaningen'),
+    (_team_id, 'Vickningar', 'Grundteknik när det gäller att flytta bollen fram och tillbaka på sin forehandsida.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/vickningar'),
+    (_team_id, 'Vända - Jaktlek', 'Ta sig bort från motståndaren och hitta lediga spelytor.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/vanda-jaktlek'),
+    (_team_id, 'Vända - vägg till vägg', 'Att kunna röra sig i alla olika riktningar med olika hastigheter och god bollkontroll.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/vanda-vagg-till-vagg'),
+    (_team_id, 'Vända - Vändningen', 'Förbättra bollbehandling och jobba med vändningar och byta riktning.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/vanda-vandningen'),
+    (_team_id, 'Växlingar', 'Grundteknik när det gäller att flytta bollen från sida till sida. Forehand till backhand.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/vaxlingar'),
+    (_team_id, 'Walkout i plankposition', 'Tränar i första hand bålens muskulatur och förmågan att ha god bålkontroll. Bidrar till förbättrad förmåga att utföra olika rörelser med god kontroll. Förebygger skador.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/walkout-i-plankposition'),
+    (_team_id, 'Woodchoppers', 'Tränar i första hand bålens muskulatur och de muskler som är aktiva vid rotationer. Bidrar till förbättrad förmåga att utföra olika rörelser med god kontroll. Förebygger skador.', '{Övningsbanken}', 'https://www.innebandy.se/ovningsbanken/woodchoppers');
+END;
+$$;
+
+-- Update create_team to call seed_default_drills
+CREATE OR REPLACE FUNCTION public.create_team(_name text)
+ RETURNS uuid
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $$
+DECLARE
+  _team_id uuid;
+  _user_id uuid;
+BEGIN
+  _user_id := auth.uid();
+  IF _user_id IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  -- Insert team
+  INSERT INTO public.teams (name, created_by)
+  VALUES (_name, _user_id)
+  RETURNING id INTO _team_id;
+
+  -- Add creator as head coach
+  INSERT INTO public.team_members (team_id, user_id, role)
+  VALUES (_team_id, _user_id, 'head_coach');
+
+  -- Create default team settings
+  INSERT INTO public.team_settings (team_id)
+  VALUES (_team_id);
+
+  -- Seed default drills from Övningsbanken
+  PERFORM public.seed_default_drills(_team_id);
+
+  RETURN _team_id;
+END;
+$$;
