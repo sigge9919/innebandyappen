@@ -9,8 +9,6 @@ interface TeamRPECardProps {
 }
 
 export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
-  if (ratings.length === 0) return null;
-
   const { latestSessionAvg, last7DaysAvg, dailyTrend, trendDirection } = useMemo(() => {
     const now = new Date();
     const sevenDaysAgo = new Date(now);
