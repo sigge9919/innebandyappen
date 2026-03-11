@@ -65,6 +65,8 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
     return { latestSessionAvg, last7DaysAvg, dailyTrend, trendDirection };
   }, [ratings]);
 
+  if (ratings.length === 0) return null;
+
   const getLevel = (v: number) => {
     if (v <= 3) return { label: 'Fresh', color: 'text-green-500', bg: 'bg-green-500' };
     if (v <= 5) return { label: 'Good', color: 'text-emerald-500', bg: 'bg-emerald-500' };
