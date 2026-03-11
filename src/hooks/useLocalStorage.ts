@@ -439,6 +439,7 @@ function dbToDrill(row: any): Drill {
     directVideoUrl: row.direct_video_url,
     thumbnailUrl: row.thumbnail_url,
     mediaFetched: row.media_fetched ?? false,
+    isFavorite: row.is_favorite ?? false,
   };
 }
 
