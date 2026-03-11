@@ -21,6 +21,7 @@ export type Database = {
           description: string | null
           direct_video_url: string | null
           id: string
+          is_favorite: boolean
           linked_layout_ids: string[] | null
           media_fetched: boolean
           media_files: Json | null
@@ -35,6 +36,7 @@ export type Database = {
           description?: string | null
           direct_video_url?: string | null
           id?: string
+          is_favorite?: boolean
           linked_layout_ids?: string[] | null
           media_fetched?: boolean
           media_files?: Json | null
@@ -49,6 +51,7 @@ export type Database = {
           description?: string | null
           direct_video_url?: string | null
           id?: string
+          is_favorite?: boolean
           linked_layout_ids?: string[] | null
           media_fetched?: boolean
           media_files?: Json | null
