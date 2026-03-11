@@ -439,6 +439,7 @@ function dbToDrill(row: any): Drill {
     directVideoUrl: row.direct_video_url,
     thumbnailUrl: row.thumbnail_url,
     mediaFetched: row.media_fetched ?? false,
+    isFavorite: row.is_favorite ?? false,
   };
 }
 
@@ -466,6 +467,7 @@ function drillUpdatesToDb(u: Partial<Drill>) {
   if (u.directVideoUrl !== undefined) r.direct_video_url = u.directVideoUrl;
   if (u.thumbnailUrl !== undefined) r.thumbnail_url = u.thumbnailUrl;
   if (u.mediaFetched !== undefined) r.media_fetched = u.mediaFetched;
+  if (u.isFavorite !== undefined) r.is_favorite = u.isFavorite;
   return r;
 }
 
