@@ -105,7 +105,7 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
-          No game statistics available yet
+          Ingen matchstatistik tillgänglig ännu
         </CardContent>
       </Card>
     );
