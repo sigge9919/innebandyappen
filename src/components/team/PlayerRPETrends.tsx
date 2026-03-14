@@ -107,18 +107,18 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
           </ResponsiveContainer>
         </div>
         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-500" /> 1-3 Fresh
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-yellow-500" /> 4-6 Moderate
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-orange-500" /> 7-8 Tired
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-red-500" /> 9-10 Exhausted
-          </span>
+           <span className="flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-green-500" /> 1-3 Pigg
+           </span>
+           <span className="flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-yellow-500" /> 4-6 Måttlig
+           </span>
+           <span className="flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-orange-500" /> 7-8 Trött
+           </span>
+           <span className="flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-red-500" /> 9-10 Utmattad
+           </span>
         </div>
       </CardContent>
     </Card>

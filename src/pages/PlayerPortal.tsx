@@ -100,7 +100,7 @@ export default function PlayerPortal() {
         setCurrentPending(null);
       }
     } catch {
-      toast({ title: 'Failed to save RPE rating', variant: 'destructive' });
+      toast({ title: 'Kunde inte spara RPE-betyg', variant: 'destructive' });
     }
   };
 

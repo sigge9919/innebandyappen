@@ -53,7 +53,7 @@ export function PlayerCard({ player, onClick }: PlayerCardProps) {
         'status-badge shrink-0',
         player.status === 'Active' ? 'status-active' : 'status-injured'
       )}>
-        {player.status}
+        {player.status === 'Active' ? 'Aktiv' : player.status === 'Injured' ? 'Skadad' : player.status}
       </span>
     </div>
   );

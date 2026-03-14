@@ -24,5 +24,5 @@ export function getIDPStatusVariant(status: IDPStatus): 'default' | 'destructive
 }
 
 export function isIDPActive(idp: IndividualDevelopmentPlan): boolean {
-  return getIDPStatus(idp) !== 'Completed';
+   return getIDPStatus(idp) !== 'Slutförd';
 }

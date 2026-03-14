@@ -455,9 +455,9 @@ export default function PlayerDetail() {
               </p>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setInviteDialogOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setInviteDialogOpen(false)}>Avbryt</Button>
               <Button type="submit" disabled={inviteLoading}>
-                {inviteLoading ? 'Sending...' : 'Send Invite'}
+                {inviteLoading ? 'Skickar...' : 'Skicka inbjudan'}
               </Button>
             </DialogFooter>
           </form>

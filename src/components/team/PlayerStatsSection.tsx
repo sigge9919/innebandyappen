@@ -136,7 +136,7 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
         <Card>
           <CardContent className="pt-4 pb-4 text-center">
             <p className="text-2xl font-bold text-primary">{stats.points}</p>
-            <p className="text-xs text-muted-foreground">Points</p>
+            <p className="text-xs text-muted-foreground">Poäng</p>
           </CardContent>
         </Card>
         <Card>
