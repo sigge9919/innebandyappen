@@ -285,7 +285,7 @@ export default function PlayerDetail() {
                             handleToggleComplete(idp);
                           }}
                         >
-                          {status === 'Completed' ? 'Reactivate' : 'Complete'}
+                          {status === 'Completed' ? 'Återaktivera' : 'Slutför'}
                         </Button>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
