@@ -199,7 +199,7 @@ export function TrainingFormDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="date">Datum</Label>
                 <Input
                   id="date"
                   type="date"
