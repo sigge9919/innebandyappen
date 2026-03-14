@@ -28,15 +28,18 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useTeam } from '@/contexts/TeamContext';
 
-export function useEnhancedGames() {
+export function useEnhancedGames(seasonId?: string | null) {
   const [games, setGames] = useState<EnhancedGame[]>([]);
-  const { activeTeam } = useTeam();
+  const { activeTeam, selectedSeasonId: ctxSeasonId } = useTeam();
+  const effectiveSeasonId = seasonId !== undefined ? seasonId : ctxSeasonId;
 
   const refresh = useCallback(async () => {
     if (!activeTeam) { setGames([]); return; }
-    const { data } = await supabase.from('games').select('*').eq('team_id', activeTeam.id);
+    let query = supabase.from('games').select('*').eq('team_id', activeTeam.id);
+    if (effectiveSeasonId) query = query.eq('season_id', effectiveSeasonId);
+    const { data } = await query;
     setGames((data ?? []).map(dbToEnhancedGame));
-  }, [activeTeam]);
+  }, [activeTeam, effectiveSeasonId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
