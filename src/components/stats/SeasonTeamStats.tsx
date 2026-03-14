@@ -92,7 +92,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
           <p className="metric-value text-2xl">
             {ppOpportunities > 0 ? `${ppEfficiency.toFixed(1)}%` : '-'}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">Goals per opportunity</p>
+          <p className="text-xs text-muted-foreground mt-1">Mål per tillfälle</p>
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-2">
