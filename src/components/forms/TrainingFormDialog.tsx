@@ -142,7 +142,7 @@ export function TrainingFormDialog({
   };
 
   const getDrillName = (drillId: string) => {
-    return drills.find(d => d.id === drillId)?.name || 'Unknown';
+    return drills.find(d => d.id === drillId)?.name || 'Okänd';
   };
 
   const allAssignedDrillIds = sections.flatMap(s => s.drillIds);
