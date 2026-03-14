@@ -1113,7 +1113,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             
             <Button variant="outline" size="sm" onClick={clearDrawing}>
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear Drawing
+              Rensa ritning
             </Button>
             <Button variant="outline" size="sm" onClick={() => setZones([])}>
               <Trash2 className="h-4 w-4 mr-2" />
