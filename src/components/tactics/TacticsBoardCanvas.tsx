@@ -683,7 +683,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
           if (!hasBall) {
             setPlayers(prev => [...prev, { id: `ball-${Date.now()}`, x, y, type: 'ball' }]);
           } else {
-            toast.info('Ball already on the field - drag it to move');
+            toast.info('Bollen finns redan på planen - dra för att flytta');
           }
         }
       }
