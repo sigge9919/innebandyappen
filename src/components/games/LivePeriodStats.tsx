@@ -53,11 +53,11 @@ export function LivePeriodStats({
       <div className="border border-border rounded-lg p-3 bg-primary/5">
         {/* Column Headers */}
         <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground mb-2">
-          <div className="text-center">Game</div>
+          <div className="text-center">Match</div>
           <div className="text-center text-primary font-medium">Period</div>
           <div></div>
           <div className="text-center text-primary font-medium">Period</div>
-          <div className="text-center">Game</div>
+          <div className="text-center">Match</div>
         </div>
         
         {/* Stats Rows */}
