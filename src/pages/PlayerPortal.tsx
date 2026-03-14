@@ -339,8 +339,8 @@ export default function PlayerPortal() {
               <Input id="pt-date" type="date" value={ptForm.date} onChange={e => setPtForm(p => ({ ...p, date: e.target.value }))} required />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="pt-desc">Description</Label>
-              <Textarea id="pt-desc" value={ptForm.description} onChange={e => setPtForm(p => ({ ...p, description: e.target.value }))} placeholder="What did you work on?" />
+               <Label htmlFor="pt-desc">Beskrivning</Label>
+               <Textarea id="pt-desc" value={ptForm.description} onChange={e => setPtForm(p => ({ ...p, description: e.target.value }))} placeholder="Vad tränade du på?" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="pt-dur">Duration (minutes)</Label>
