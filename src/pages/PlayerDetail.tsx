@@ -152,7 +152,7 @@ export default function PlayerDetail() {
       // Create a team_member entry with player role
       const { error } = await inviteCoach(inviteEmail, 'player');
       if (error) throw error;
-      toast({ title: 'Invite sent', description: `${inviteEmail} can now sign up and access their player portal.` });
+      toast({ title: 'Inbjudan skickad', description: `${inviteEmail} kan nu registrera sig och komma åt sin spelarportal.` });
       setInviteDialogOpen(false);
       setInviteEmail('');
     } catch (err: any) {
