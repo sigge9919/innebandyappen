@@ -433,12 +433,12 @@ export function LiveTracking({
           {advancedMode ? 'Avancerad statistik' : 'Enkel statistik'}
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Simple</span>
+          <span className="text-xs text-muted-foreground">Enkel</span>
           <Switch
             checked={advancedMode}
             onCheckedChange={setAdvancedMode}
           />
-          <span className="text-xs text-muted-foreground">Advanced</span>
+          <span className="text-xs text-muted-foreground">Avancerad</span>
         </div>
       </div>
       {advancedMode && (
