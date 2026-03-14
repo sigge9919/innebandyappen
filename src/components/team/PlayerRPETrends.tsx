@@ -38,8 +38,8 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary" />
-          RPE Trend
-          <span className="text-sm font-normal text-muted-foreground ml-auto">Avg: {avg}</span>
+           RPE-trend
+           <span className="text-sm font-normal text-muted-foreground ml-auto">Snitt: {avg}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
