@@ -125,8 +125,8 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <StatsRow label="Our Team" stats={homeStats} isHighlight />
-              <StatsRow label="Opponents (combined)" stats={opponentStats} />
+              <StatsRow label="Vårt lag" stats={homeStats} isHighlight />
+              <StatsRow label="Motståndare (kombinerat)" stats={opponentStats} />
             </TableBody>
           </Table>
         </div>
