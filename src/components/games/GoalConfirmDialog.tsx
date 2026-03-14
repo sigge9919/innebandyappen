@@ -110,7 +110,7 @@ export function GoalConfirmDialog({
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {isHomeGoal ? 'Line on Ice' : 'Line that Conceded'}
+              {isHomeGoal ? 'Kedja på plan' : 'Kedja som släppte in'}
             </label>
             <div className="flex flex-wrap gap-2">
               {availableLines.map(line => (
