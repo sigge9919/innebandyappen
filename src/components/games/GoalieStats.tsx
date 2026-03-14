@@ -24,7 +24,7 @@ export function GoalieStats({
   if (goalies.length === 0) {
     return (
       <div className="text-sm text-muted-foreground italic py-4 text-center">
-        No goalkeepers in squad
+        Inga målvakter i truppen
       </div>
     );
   }
