@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Player } from '@/types';
 import { GameEvent, GameLine, PenaltyEvent, PlayerGameStats, TeamStats } from '@/types/game';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Lock, AlertTriangle, Shield } from 'lucide-react';
+import { Lock, AlertTriangle, Shield, Pencil, Check } from 'lucide-react';
 import { calculatePlayerStatsFromEvents, CalculatedPlayerStats } from '@/lib/gameStorage';
 
 interface PostGamePlayerStatsProps {
@@ -30,6 +32,8 @@ export function PostGamePlayerStats({
   onUpdatePlayerStat,
 }: PostGamePlayerStatsProps) {
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+
   // Calculate event-driven stats (goals, assists, PIM, +/-)
   const eventDrivenStats = calculatePlayerStatsFromEvents(
     events,
@@ -51,7 +55,6 @@ export function PostGamePlayerStats({
     };
   };
 
-  // Get manually entered shot stats
   const getManualStats = (playerId: string): PlayerGameStats => {
     return playerStats.find(ps => ps.playerId === playerId) || {
       playerId,
@@ -65,22 +68,18 @@ export function PostGamePlayerStats({
     };
   };
 
-  // Calculate totals from player stats
   const totalSOG = playerStats.reduce((sum, ps) => sum + (ps.shotsOnGoal || 0), 0);
   const totalMiss = playerStats.reduce((sum, ps) => sum + (ps.shotsOffGoal || 0), 0);
   const totalBlk = playerStats.reduce((sum, ps) => sum + (ps.shotsBlocked || 0), 0);
   const totalDef = playerStats.reduce((sum, ps) => sum + (ps.defensiveBlocks || 0), 0);
 
-  // Get opponent's blocked shots from team stats for Def comparison
   const opponentBlockedShots = events.filter(e => e.team === 'opponent' && e.type === 'shot_blocked').length;
 
-  // Check mismatches with team stats
   const sogMismatch = totalSOG !== teamStats.shotsOnGoal;
   const missMismatch = totalMiss !== teamStats.shotsOffGoal;
   const blkMismatch = totalBlk !== teamStats.shotsBlocked;
   const defMismatch = totalDef !== opponentBlockedShots;
 
-  // Calculate per-goalie stats using event snapshots
   const getGoalieStats = (goalieId: string) => {
     let goalsAgainst = 0;
     let shotsAgainst = 0;
@@ -100,17 +99,41 @@ export function PostGamePlayerStats({
   };
 
   const MismatchWarning = ({ current, expected }: { current: number; expected: number }) => (
-    <span className="text-amber-500 text-xs ml-1" title={`Player total: ${current}, Team stats: ${expected}`}>
+    <span className="text-amber-500 text-xs ml-1" title={`Spelartotal: ${current}, Lagstatistik: ${expected}`}>
       <AlertTriangle className="h-3 w-3 inline" />
     </span>
+  );
+
+  const ReadOnlyCell = ({ value }: { value: number }) => (
+    <span className={value > 0 ? 'tabular-nums' : 'text-muted-foreground tabular-nums'}>{value}</span>
   );
 
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs text-muted-foreground mb-4">
-          M, A, UM, +/- beräknas automatiskt från händelser. Skott kan anges manuellt.
-        </p>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-xs text-muted-foreground">
+            M, A, UM, +/- beräknas automatiskt från händelser.{isEditing ? ' Redigera skottstatistik nedan.' : ' Tryck Ändra för att redigera skott.'}
+          </p>
+          <Button
+            variant={isEditing ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setIsEditing(!isEditing)}
+            className="ml-2 shrink-0"
+          >
+            {isEditing ? (
+              <>
+                <Check className="h-4 w-4 mr-1" />
+                Klar
+              </>
+            ) : (
+              <>
+                <Pencil className="h-4 w-4 mr-1" />
+                Ändra
+              </>
+            )}
+          </Button>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -118,8 +141,8 @@ export function PostGamePlayerStats({
               <tr className="border-b border-border">
                 <th className="py-2 px-2 text-left font-medium text-muted-foreground">Spelare</th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                    <span className="flex items-center justify-center gap-1">
-                      M <Lock className="h-3 w-3" />
+                  <span className="flex items-center justify-center gap-1">
+                    M <Lock className="h-3 w-3" />
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
@@ -129,17 +152,17 @@ export function PostGamePlayerStats({
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
-                    SOG {sogMismatch && <MismatchWarning current={totalSOG} expected={teamStats.shotsOnGoal} />}
+                    SOG {isEditing && sogMismatch && <MismatchWarning current={totalSOG} expected={teamStats.shotsOnGoal} />}
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
-                    Miss {missMismatch && <MismatchWarning current={totalMiss} expected={teamStats.shotsOffGoal} />}
+                    Miss {isEditing && missMismatch && <MismatchWarning current={totalMiss} expected={teamStats.shotsOffGoal} />}
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
-                    Blk {blkMismatch && <MismatchWarning current={totalBlk} expected={teamStats.shotsBlocked} />}
+                    Blk {isEditing && blkMismatch && <MismatchWarning current={totalBlk} expected={teamStats.shotsBlocked} />}
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
@@ -149,7 +172,7 @@ export function PostGamePlayerStats({
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
-                    Def {defMismatch && <MismatchWarning current={totalDef} expected={opponentBlockedShots} />}
+                    Def {isEditing && defMismatch && <MismatchWarning current={totalDef} expected={opponentBlockedShots} />}
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
@@ -165,111 +188,127 @@ export function PostGamePlayerStats({
               </tr>
             </thead>
             <tbody>
-            {squadPlayers.map(player => {
-              const eventStats = getEventStats(player.id);
-              const manualStats = getManualStats(player.id);
-              const totalShots = manualStats.shotsOnGoal + manualStats.shotsOffGoal + manualStats.shotsBlocked;
-              return (
-                <tr key={player.id} className="border-b border-border">
-                  <td className="py-2 px-2">
-                    <div 
-                      className="flex items-center gap-2 cursor-pointer hover:underline"
-                      onClick={() => navigate(`/team/${player.id}`)}
-                    >
-                      <Badge variant="outline" className="text-xs">
-                        #{player.jerseyNumber}
-                      </Badge>
-                      <span className="font-medium truncate max-w-[80px]">
-                        {player.name.split(' ')[0]}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-2 px-2 text-center tabular-nums">
-                    {eventStats.goals > 0 ? (
-                      <Badge variant="default" className="bg-success/20 text-success border-success/30">
-                        {eventStats.goals}
-                      </Badge>
-                    ) : (
-                      <span className="text-muted-foreground">0</span>
-                    )}
-                  </td>
-                  <td className="py-2 px-2 text-center tabular-nums">
-                    {eventStats.assists > 0 ? (
-                      <Badge variant="secondary">{eventStats.assists}</Badge>
-                    ) : (
-                      <span className="text-muted-foreground">0</span>
-                    )}
-                  </td>
-                   <td className="py-2 px-1 text-center">
-                     <Input
-                       type="number"
-                       min="0"
-                       value={manualStats.shotsOnGoal || ''}
-                       onChange={(e) => handleStatChange(player.id, 'shotsOnGoal', e.target.value)}
-                       className="w-16 h-10 text-center text-base px-1"
-                       placeholder="0"
-                     />
-                   </td>
-                   <td className="py-2 px-1 text-center">
-                     <Input
-                       type="number"
-                       min="0"
-                       value={manualStats.shotsOffGoal || ''}
-                       onChange={(e) => handleStatChange(player.id, 'shotsOffGoal', e.target.value)}
-                       className="w-16 h-10 text-center text-base px-1"
-                       placeholder="0"
-                     />
-                   </td>
-                   <td className="py-2 px-1 text-center">
-                     <Input
-                       type="number"
-                       min="0"
-                       value={manualStats.shotsBlocked || ''}
-                       onChange={(e) => handleStatChange(player.id, 'shotsBlocked', e.target.value)}
-                       className="w-16 h-10 text-center text-base px-1"
-                       placeholder="0"
-                     />
-                   </td>
-                   <td className="py-2 px-2 text-center tabular-nums font-semibold">
-                     {totalShots > 0 ? totalShots : <span className="text-muted-foreground">0</span>}
-                   </td>
-                   <td className="py-2 px-1 text-center">
-                     <Input
-                       type="number"
-                       min="0"
-                       value={manualStats.defensiveBlocks || ''}
-                       onChange={(e) => handleStatChange(player.id, 'defensiveBlocks', e.target.value)}
-                       className="w-16 h-10 text-center text-base px-1"
-                       placeholder="0"
-                     />
-                   </td>
-                  <td className="py-2 px-2 text-center tabular-nums">
-                    {eventStats.penaltyMinutes > 0 ? (
-                      <Badge variant="destructive" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
-                        {eventStats.penaltyMinutes}
-                      </Badge>
-                    ) : (
-                      <span className="text-muted-foreground">0</span>
-                    )}
-                  </td>
-                  <td className="py-2 px-2 text-center tabular-nums font-semibold">
-                    {eventStats.plusMinus5v5 > 0 ? (
-                      <span className="text-success">+{eventStats.plusMinus5v5}</span>
-                    ) : eventStats.plusMinus5v5 < 0 ? (
-                      <span className="text-destructive">{eventStats.plusMinus5v5}</span>
-                    ) : (
-                      <span className="text-muted-foreground">0</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <p className="text-xs text-muted-foreground mt-3">
-        M = Mål, A = Assist, SOG = Skott på mål, Miss = Missade skott, Blk = Blockerade skott (av motståndare), Tot = Totala skott, Def = Defensiva blockeringar, UM = Utvisningsminuter, +/− = Plus/Minus (5v5)
-      </p>
+              {squadPlayers.map(player => {
+                const eventStats = getEventStats(player.id);
+                const manualStats = getManualStats(player.id);
+                const totalShots = manualStats.shotsOnGoal + manualStats.shotsOffGoal + manualStats.shotsBlocked;
+                return (
+                  <tr key={player.id} className="border-b border-border">
+                    <td className="py-2 px-2">
+                      <div
+                        className="flex items-center gap-2 cursor-pointer hover:underline"
+                        onClick={() => navigate(`/team/${player.id}`)}
+                      >
+                        <Badge variant="outline" className="text-xs">
+                          #{player.jerseyNumber}
+                        </Badge>
+                        <span className="font-medium truncate max-w-[80px]">
+                          {player.name.split(' ')[0]}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2 px-2 text-center tabular-nums">
+                      {eventStats.goals > 0 ? (
+                        <Badge variant="default" className="bg-success/20 text-success border-success/30">
+                          {eventStats.goals}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">0</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-2 text-center tabular-nums">
+                      {eventStats.assists > 0 ? (
+                        <Badge variant="secondary">{eventStats.assists}</Badge>
+                      ) : (
+                        <span className="text-muted-foreground">0</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-1 text-center">
+                      {isEditing ? (
+                        <Input
+                          type="number"
+                          min="0"
+                          value={manualStats.shotsOnGoal || ''}
+                          onChange={(e) => handleStatChange(player.id, 'shotsOnGoal', e.target.value)}
+                          className="w-16 h-10 text-center text-base px-1"
+                          placeholder="0"
+                        />
+                      ) : (
+                        <ReadOnlyCell value={manualStats.shotsOnGoal} />
+                      )}
+                    </td>
+                    <td className="py-2 px-1 text-center">
+                      {isEditing ? (
+                        <Input
+                          type="number"
+                          min="0"
+                          value={manualStats.shotsOffGoal || ''}
+                          onChange={(e) => handleStatChange(player.id, 'shotsOffGoal', e.target.value)}
+                          className="w-16 h-10 text-center text-base px-1"
+                          placeholder="0"
+                        />
+                      ) : (
+                        <ReadOnlyCell value={manualStats.shotsOffGoal} />
+                      )}
+                    </td>
+                    <td className="py-2 px-1 text-center">
+                      {isEditing ? (
+                        <Input
+                          type="number"
+                          min="0"
+                          value={manualStats.shotsBlocked || ''}
+                          onChange={(e) => handleStatChange(player.id, 'shotsBlocked', e.target.value)}
+                          className="w-16 h-10 text-center text-base px-1"
+                          placeholder="0"
+                        />
+                      ) : (
+                        <ReadOnlyCell value={manualStats.shotsBlocked} />
+                      )}
+                    </td>
+                    <td className="py-2 px-2 text-center tabular-nums font-semibold">
+                      {totalShots > 0 ? totalShots : <span className="text-muted-foreground">0</span>}
+                    </td>
+                    <td className="py-2 px-1 text-center">
+                      {isEditing ? (
+                        <Input
+                          type="number"
+                          min="0"
+                          value={manualStats.defensiveBlocks || ''}
+                          onChange={(e) => handleStatChange(player.id, 'defensiveBlocks', e.target.value)}
+                          className="w-16 h-10 text-center text-base px-1"
+                          placeholder="0"
+                        />
+                      ) : (
+                        <ReadOnlyCell value={manualStats.defensiveBlocks} />
+                      )}
+                    </td>
+                    <td className="py-2 px-2 text-center tabular-nums">
+                      {eventStats.penaltyMinutes > 0 ? (
+                        <Badge variant="destructive" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                          {eventStats.penaltyMinutes}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">0</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-2 text-center tabular-nums font-semibold">
+                      {eventStats.plusMinus5v5 > 0 ? (
+                        <span className="text-success">+{eventStats.plusMinus5v5}</span>
+                      ) : eventStats.plusMinus5v5 < 0 ? (
+                        <span className="text-destructive">{eventStats.plusMinus5v5}</span>
+                      ) : (
+                        <span className="text-muted-foreground">0</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          M = Mål, A = Assist, SOG = Skott på mål, Miss = Missade skott, Blk = Blockerade skott (av motståndare), Tot = Totala skott, Def = Defensiva blockeringar, UM = Utvisningsminuter, +/− = Plus/Minus (5v5)
+        </p>
       </div>
 
       {/* Goaltender Statistics */}
@@ -296,14 +335,14 @@ export function PostGamePlayerStats({
                   const isActive = goalie.id === activeGoalieId;
                   const { goalsAgainst, shotsAgainst } = getGoalieStats(goalie.id);
                   const saves = shotsAgainst - goalsAgainst;
-                  const savePercentage = shotsAgainst > 0 
-                    ? (saves / shotsAgainst) * 100 
+                  const savePercentage = shotsAgainst > 0
+                    ? (saves / shotsAgainst) * 100
                     : 0;
 
                   return (
                     <tr key={goalie.id} className="border-b border-border">
                       <td className="py-3 px-2">
-                        <div 
+                        <div
                           className="flex items-center gap-2 cursor-pointer hover:underline"
                           onClick={() => navigate(`/team/${goalie.id}`)}
                         >
