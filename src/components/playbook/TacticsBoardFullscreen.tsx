@@ -241,7 +241,7 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleOpenInEditor}>
               <ExternalLink className="h-4 w-4 mr-2" />
-              Open in Editor
+              Öppna i redigeraren
             </Button>
             <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
               <X className="h-5 w-5" />
