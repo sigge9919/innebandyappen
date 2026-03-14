@@ -42,7 +42,7 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
     <div className="space-y-6">
       {/* Skater Stats */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Skater Statistics</h3>
+        <h3 className="text-lg font-semibold mb-3">Utespelarstatistik</h3>
         <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
