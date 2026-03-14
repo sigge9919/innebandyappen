@@ -325,10 +325,10 @@ export function TrainingFormDialog({
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-1.5">
                       <Users className="h-4 w-4" />
-                      Teams for Gameplay
+                      Lag för spelövningar
                     </Label>
                     <div className="flex items-center gap-2">
-                      <Label htmlFor="teamCount" className="text-xs text-muted-foreground">Teams:</Label>
+                      <Label htmlFor="teamCount" className="text-xs text-muted-foreground">Lag:</Label>
                       <Input
                         id="teamCount"
                         type="number"
