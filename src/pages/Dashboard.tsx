@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { useTeam } from '@/contexts/TeamContext';
+import { SeasonSelector } from '@/components/SeasonSelector';
 import { NextGameCard } from '@/components/dashboard/NextGameCard';
 import { LastGameCard } from '@/components/dashboard/LastGameCard';
 import { NextTrainingCard } from '@/components/dashboard/NextTrainingCard';
