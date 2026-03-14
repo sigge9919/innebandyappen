@@ -234,7 +234,7 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
             <h2 className="font-semibold text-lg">{layout.name}</h2>
             {hasAnimation && (
               <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                {layout.keyframes.length} keyframes
+                {layout.keyframes.length} nyckelrutor
               </span>
             )}
           </div>
