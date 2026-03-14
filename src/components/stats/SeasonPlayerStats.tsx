@@ -67,7 +67,7 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
               {skaterStats.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={14} className="text-center text-muted-foreground py-8">
-                    No player statistics available
+                    Ingen spelarstatistik tillgänglig
                   </TableCell>
                 </TableRow>
               ) : (
