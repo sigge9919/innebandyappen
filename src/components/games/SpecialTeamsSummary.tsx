@@ -23,7 +23,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
     return (
       <div className="text-center py-8 text-muted-foreground">
         <Zap className="h-8 w-8 mx-auto mb-2 opacity-50" />
-        <p>No special teams situations recorded</p>
+        <p>Inga specialteam-situationer registrerade</p>
       </div>
     );
   }
