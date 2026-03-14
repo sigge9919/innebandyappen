@@ -21,9 +21,9 @@ export default function TacticsBoard() {
               </Button>
             )}
             <div>
-              <h1 className="section-title">Tactics Board</h1>
+              <h1 className="section-title">Taktiktavla</h1>
               <p className="text-muted-foreground mt-1">
-                Plan formations, plays, and strategies
+                Planera formationer, spelsystem och strategier
               </p>
             </div>
           </div>

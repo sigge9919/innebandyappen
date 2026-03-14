@@ -128,7 +128,7 @@ export default function TeamSettings() {
                     </Select>
                   </div>
                   <Button type="submit" disabled={loading}>
-                    {loading ? 'Inviting…' : 'Send Invite'}
+                    {loading ? 'Bjuder in…' : 'Skicka inbjudan'}
                   </Button>
                 </form>
               </CardContent>
