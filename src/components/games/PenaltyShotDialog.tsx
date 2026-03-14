@@ -102,7 +102,7 @@ export function PenaltyShotDialog({
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            Penalty Shot
+            Straffslag
           </DialogTitle>
         </DialogHeader>
 
