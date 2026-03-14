@@ -137,7 +137,7 @@ function LineCard({
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             className="flex-1"
-            placeholder="Line name"
+            placeholder="Kedjenamn"
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSaveName();
               if (e.key === 'Escape') handleCancelName();
