@@ -213,12 +213,12 @@ export default function PlayerDetail() {
                     className="text-xs"
                   >
                     {player.status === 'Injured' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                    {player.status}
+                    {player.status === 'Active' ? 'Aktiv' : player.status === 'Injured' ? 'Skadad' : player.status}
                   </Badge>
                   {player.focusFlag && (
                     <Badge variant="secondary" className="text-xs">
                       <Target className="h-3 w-3 mr-1" />
-                      Focus
+                      Fokus
                     </Badge>
                   )}
                 </div>
