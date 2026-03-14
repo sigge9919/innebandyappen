@@ -216,7 +216,7 @@ export function GoalConfirmDialog({
 
                 {otherPlayers.filter(p => p.id !== selectedScorer).length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Other players:</p>
+                    <p className="text-xs text-muted-foreground">Övriga spelare:</p>
                     <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                       {otherPlayers.filter(p => p.id !== selectedScorer).map(player => (
                         <button
