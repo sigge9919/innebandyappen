@@ -242,7 +242,7 @@ export default function PlayerPortal() {
               })}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No RPE ratings yet</p>
+            <p className="text-sm text-muted-foreground">Inga RPE-betyg ännu</p>
           )}
         </div>
 
