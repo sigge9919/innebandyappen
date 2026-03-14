@@ -351,7 +351,7 @@ export function LiveTracking({
           />
           <EventButton
             icon={XCircle}
-            label="Shot Off"
+            label="Utanför"
             variant="muted"
             onClick={() => handleShotClick('shot_off_goal', 'home')}
           />
