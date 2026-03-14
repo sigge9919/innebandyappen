@@ -132,7 +132,7 @@ export function PenaltyShotDialog({
 
         {step === 'player' && (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Select the penalty taker</p>
+            <p className="text-sm text-muted-foreground">Välj straffskjutare</p>
             <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
               {fieldPlayers.map(player => (
                 <Button
