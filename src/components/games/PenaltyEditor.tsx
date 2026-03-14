@@ -50,7 +50,7 @@ export function PenaltyEditor({
                       </Badge>
                       <Badge variant="secondary">P{penalty.period}</Badge>
                       <span className="text-sm text-muted-foreground">
-                        Penalty #{index + 1}
+                        Utvisning #{index + 1}
                       </span>
                     </div>
                   </div>
