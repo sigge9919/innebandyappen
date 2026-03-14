@@ -80,7 +80,7 @@ export function PostGameTeamStats({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="py-2 px-3 text-left font-medium text-muted-foreground">Stat</th>
+                  <th className="py-2 px-3 text-left font-medium text-muted-foreground">Statistik</th>
                   <th className="py-2 px-3 text-center font-medium">{homeTeamName}</th>
                   <th className="py-2 px-3 text-center font-medium">{opponentName}</th>
                 </tr>
