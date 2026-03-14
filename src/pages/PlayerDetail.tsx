@@ -290,7 +290,7 @@ export default function PlayerDetail() {
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <CalendarDays className="h-3.5 w-3.5" />
-                        {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
+                        {new Date(idp.startDate).toLocaleDateString('sv-SE')} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString('sv-SE') : 'Pågående'}
                       </div>
                       {idp.focusAreas.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
