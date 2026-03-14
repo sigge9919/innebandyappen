@@ -321,7 +321,7 @@ export default function PlayerDetail() {
           ) : (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                No development plans yet
+                Inga utvecklingsplaner ännu
               </CardContent>
             </Card>
           )}
