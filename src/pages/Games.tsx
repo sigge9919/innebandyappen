@@ -18,6 +18,7 @@ type GameFilterType = 'all' | 'not_started' | 'live' | 'finished';
 export default function Games() {
   const navigate = useNavigate();
   const { games, addEnhancedGame } = useEnhancedGames();
+  const { seasons, selectedSeasonId, setSelectedSeasonId } = useTeam();
   const [gameFilter, setGameFilter] = useState<GameFilterType>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
 
