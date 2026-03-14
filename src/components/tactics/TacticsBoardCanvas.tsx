@@ -1068,7 +1068,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               className={cn(selectedTool !== 'addBall' && 'border-orange-500 text-orange-500 hover:bg-orange-500/10')}
             >
               <CircleDot className="h-4 w-4 mr-2" />
-              Add Ball
+              Boll
             </Button>
             <Button
               variant={selectedTool === 'delete' ? 'destructive' : 'outline'}
