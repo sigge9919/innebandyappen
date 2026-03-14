@@ -253,7 +253,7 @@ export function LiveTracking({
       {/* Active Line & Situation */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-sm">Active Line</span>
+          <span className="font-semibold text-sm">Aktiv kedja</span>
           <div className="flex items-center gap-2">
             {activeLine && (
               <Badge variant="default" className="text-xs">{activeLine.name}</Badge>
