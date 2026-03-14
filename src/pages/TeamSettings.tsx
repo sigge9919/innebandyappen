@@ -45,7 +45,7 @@ export default function TeamSettings() {
   const handleRemove = async (memberId: string) => {
     const { error } = await removeMember(memberId);
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
     }
   };
 
