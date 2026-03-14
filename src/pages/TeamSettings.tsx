@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Trash2, Shield } from 'lucide-react';
+import { UserPlus, Trash2, Shield, CalendarDays, Plus } from 'lucide-react';
 import {
   usePermissions,
   APP_SECTIONS,
