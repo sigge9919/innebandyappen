@@ -63,10 +63,10 @@ export function PenaltyEditor({
                     }}
                   >
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select player" />
+                      <SelectValue placeholder="Välj spelare" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>Not assigned</SelectItem>
+                      <SelectItem value={NONE_VALUE}>Ej tilldelad</SelectItem>
                       {squadPlayers.map(player => (
                         <SelectItem key={player.id} value={player.id}>
                           #{player.jerseyNumber} {player.name.split(' ')[0]}
