@@ -31,7 +31,7 @@ export function GoalDetailsEditor({
   return (
     <div>
       <p className="text-sm text-muted-foreground mb-4">
-        Assign goal scorers and assists (0-1 assistant per goal).
+        Tilldela målskyttar och assister (0–1 assist per mål).
       </p>
       
       <div className="space-y-4">
