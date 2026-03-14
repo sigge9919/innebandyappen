@@ -296,7 +296,7 @@ export default function PlayerPortal() {
       <Dialog open={rpeDialogOpen} onOpenChange={setRpeDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>How tired are you feeling?</DialogTitle>
+            <DialogTitle>Hur trött känner du dig?</DialogTitle>
           </DialogHeader>
           {currentPending && (
             <div className="space-y-4">
