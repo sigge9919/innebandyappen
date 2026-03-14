@@ -211,7 +211,7 @@ export default function PlayerPortal() {
 
         {/* Season Stats */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">My Season Stats</h2>
+          <h2 className="text-lg font-semibold mb-4">Min säsongsstatistik</h2>
           <PlayerStatsSection player={myPlayer} games={games} />
         </div>
 
