@@ -366,7 +366,7 @@ export function LiveTracking({
             className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"
           >
             <AlertOctagon className="h-8 w-8" />
-            <span className="font-semibold text-sm">2 min Penalty</span>
+            <span className="font-semibold text-sm">2 min utvisning</span>
           </button>
         </div>
 
