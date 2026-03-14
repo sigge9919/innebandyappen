@@ -310,7 +310,7 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
                 </Button>
 
                 <div className="ml-6 flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Speed:</span>
+                  <span className="text-sm text-muted-foreground">Hastighet:</span>
                   {[0.5, 1, 1.5, 2].map(speed => (
                     <Button
                       key={speed}

@@ -1313,23 +1313,23 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
 
       {/* Instructions */}
       <Card className="p-4 bg-muted/50">
-        <h3 className="font-semibold mb-2">How to use</h3>
+        <h3 className="font-semibold mb-2">Så använder du tavlan</h3>
         {mode === 'edit' ? (
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• <strong>Add Home/Opponent:</strong> Click on the rink to place players</li>
-            <li>• <strong>Select/Move:</strong> Drag players to reposition them</li>
-            <li>• <strong>Draw:</strong> Draw arrows, lines, or annotations</li>
-            <li>• <strong>Shadow Zone:</strong> Click and drag to mark a highlighted area on the field</li>
-            <li>• <strong>Animation Mode:</strong> Switch to create movement animations</li>
+            <li>• <strong>Hemmalag/Motståndare:</strong> Klicka på planen för att placera spelare</li>
+            <li>• <strong>Välj/Flytta:</strong> Dra spelare för att flytta dem</li>
+            <li>• <strong>Rita:</strong> Rita pilar, linjer eller anteckningar</li>
+            <li>• <strong>Skuggzon:</strong> Klicka och dra för att markera ett område på planen</li>
+            <li>• <strong>Animeringsläge:</strong> Byt läge för att skapa rörliga animationer</li>
           </ul>
         ) : (
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• <strong>Add Keyframe:</strong> Record current player positions as a keyframe</li>
-            <li>• <strong>Move Players:</strong> Drag players to new positions between keyframes</li>
-            <li>• <strong>Curved Paths:</strong> Drag the diamond handles on movement trails to curve paths</li>
-            <li>• <strong>Play:</strong> Watch players animate along curved or straight paths</li>
-            <li>• <strong>Save:</strong> Save your animation for later use</li>
-            <li>• <strong>Tip:</strong> Add at least 2 keyframes to create an animation</li>
+            <li>• <strong>Lägg till nyckelruta:</strong> Spara spelarnas positioner som en nyckelruta</li>
+            <li>• <strong>Flytta spelare:</strong> Dra spelare till nya positioner mellan nyckelrutor</li>
+            <li>• <strong>Kurvade banor:</strong> Dra diamanthandtagen på rörelsebanorna för att kurva banorna</li>
+            <li>• <strong>Spela:</strong> Se spelarna animeras längs kurvade eller raka banor</li>
+            <li>• <strong>Spara:</strong> Spara din animation för senare användning</li>
+            <li>• <strong>Tips:</strong> Lägg till minst 2 nyckelrutor för att skapa en animation</li>
           </ul>
         )}
       </Card>
