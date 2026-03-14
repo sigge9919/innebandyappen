@@ -77,7 +77,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
           <p className="metric-value text-destructive">{losses}</p>
         </div>
         <div className="stat-card text-center">
-          <p className="metric-label">Win Rate</p>
+          <p className="metric-label">Vinstprocent</p>
           <p className="metric-value">{winRate.toFixed(0)}%</p>
         </div>
       </div>
