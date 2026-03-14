@@ -155,7 +155,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Team</TableHead>
+                      <TableHead>Lag</TableHead>
                       <TableHead className="text-center">G</TableHead>
                       <TableHead className="text-center">SOG</TableHead>
                       <TableHead className="text-center">Miss</TableHead>
