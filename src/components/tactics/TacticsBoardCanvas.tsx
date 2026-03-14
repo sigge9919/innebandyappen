@@ -1125,7 +1125,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             </Button>
             <Button variant="outline" size="sm" onClick={resetAll}>
               <RotateCcw className="h-4 w-4 mr-2" />
-              Reset All
+              Återställ allt
             </Button>
           </div>
         </Card>
