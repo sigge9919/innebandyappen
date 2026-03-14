@@ -155,7 +155,7 @@ export function TrainingFormDialog({
   const randomizeTeams = () => {
     const shuffled = [...attendingFieldPlayers].sort(() => Math.random() - 0.5);
     const newTeams: TrainingTeam[] = Array.from({ length: teamCount }, (_, i) => ({
-      name: `Team ${i + 1}`,
+      name: `Lag ${i + 1}`,
       playerIds: [],
     }));
     shuffled.forEach((player, idx) => {
