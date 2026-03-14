@@ -280,7 +280,7 @@ export function TrainingFormDialog({
                                   >
                                     {drill.name}
                                     {allAssignedDrillIds.includes(drill.id) && !section.drillIds.includes(drill.id) && (
-                                      <span className="text-muted-foreground ml-1">(used)</span>
+                                      <span className="text-muted-foreground ml-1">(använd)</span>
                                     )}
                                   </label>
                                 </div>
