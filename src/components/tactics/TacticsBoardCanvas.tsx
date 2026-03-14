@@ -982,7 +982,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <FolderOpen className="h-4 w-4 mr-2" />
-                Load
+                Ladda
               </Button>
             </DialogTrigger>
             <DialogContent>
