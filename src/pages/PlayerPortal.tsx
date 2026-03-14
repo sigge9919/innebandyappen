@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTeam } from '@/contexts/TeamContext';
 import { usePlayers, useRPERatings, usePersonalTrainings, useTrainingSessions } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
+import { usePendingRPE } from '@/hooks/usePendingRPE';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PlayerStatsSection } from '@/components/team/PlayerStatsSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,8 +14,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
-import { Activity, Dumbbell, TrendingUp, Calendar, Clock, Plus, X } from 'lucide-react';
+import { Activity, Dumbbell, TrendingUp, Calendar, Clock, Plus, X, Bell } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { PersonalTraining } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -27,11 +29,11 @@ export default function PlayerPortal() {
   const { games } = useEnhancedGames();
   const { sessions } = useTrainingSessions();
 
-  const myPlayer = players.find(p => p.userId === user?.id);
+  const { pendingSessions: initialPending, myPlayer } = usePendingRPE();
   const { ratings, addRating } = useRPERatings(myPlayer?.id);
   const { trainings, addTraining, deleteTraining } = usePersonalTrainings(myPlayer?.id);
 
-  // RPE prompt state
+  // RPE prompt state — seeded from the shared hook
   const [pendingSessions, setPendingSessions] = useState<{ type: 'game' | 'training'; id: string; label: string }[]>([]);
   const [currentRPE, setCurrentRPE] = useState(5);
   const [rpeDialogOpen, setRpeDialogOpen] = useState(false);
@@ -41,42 +43,10 @@ export default function PlayerPortal() {
   const [ptDialogOpen, setPtDialogOpen] = useState(false);
   const [ptForm, setPtForm] = useState({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
 
-  // Calculate pending RPE ratings on load
+  // Sync pending from hook
   useEffect(() => {
-    if (!myPlayer || !ratings) return;
-
-    const ratedSessionIds = new Set(ratings.map(r => `${r.sessionType}-${r.sessionId}`));
-    const pending: { type: 'game' | 'training'; id: string; label: string }[] = [];
-
-    // Check games this player attended (Finished games)
-    games.forEach(game => {
-      if (game.status === 'Finished' && game.squadPlayerIds?.includes(myPlayer.id)) {
-        const key = `game-${game.id}`;
-        if (!ratedSessionIds.has(key)) {
-          pending.push({ type: 'game', id: game.id, label: `Game vs ${game.opponent} (${game.date})` });
-        }
-      }
-    });
-
-    // Check training sessions this player attended
-    sessions.forEach(session => {
-      if (session.playerIds.includes(myPlayer.id)) {
-        const key = `training-${session.id}`;
-        if (!ratedSessionIds.has(key)) {
-          pending.push({ type: 'training', id: session.id, label: `Training: ${session.theme} (${session.date})` });
-        }
-      }
-    });
-
-    setPendingSessions(pending);
-
-    // Auto-open first pending
-    if (pending.length > 0 && !rpeDialogOpen) {
-      setCurrentPending(pending[0]);
-      setCurrentRPE(5);
-      setRpeDialogOpen(true);
-    }
-  }, [myPlayer, ratings, games, sessions]);
+    setPendingSessions(initialPending);
+  }, [initialPending]);
 
   const handleSubmitRPE = async () => {
     if (!currentPending || !myPlayer) return;
