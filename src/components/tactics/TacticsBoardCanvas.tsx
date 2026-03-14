@@ -1225,7 +1225,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
-                Keyframe {keyframes.length > 0 ? currentKeyframeIndex + 1 : 0} of {keyframes.length}
+                Nyckelruta {keyframes.length > 0 ? currentKeyframeIndex + 1 : 0} av {keyframes.length}
               </span>
               <span className="text-muted-foreground">
                 {isPlaying ? `Playing: ${Math.round(playbackPosition)}%` : 'Stopped'}
