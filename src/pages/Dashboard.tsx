@@ -15,6 +15,7 @@ import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { seasons, selectedSeasonId, setSelectedSeasonId, selectedSeason } = useTeam();
   const { players } = usePlayers();
   const { games } = useEnhancedGames();
   const { sessions } = useTrainingSessions();
