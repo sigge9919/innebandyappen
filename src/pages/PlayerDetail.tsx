@@ -156,7 +156,7 @@ export default function PlayerDetail() {
       setInviteDialogOpen(false);
       setInviteEmail('');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast({ title: 'Fel', description: err.message, variant: 'destructive' });
     } finally {
       setInviteLoading(false);
     }
