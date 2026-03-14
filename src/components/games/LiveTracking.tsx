@@ -443,7 +443,7 @@ export function LiveTracking({
       </div>
       {advancedMode && (
         <p className="text-xs text-muted-foreground text-center -mt-2">
-          Shots will be attributed to individual players
+          Skott kommer att kopplas till enskilda spelare
         </p>
       )}
     </div>
