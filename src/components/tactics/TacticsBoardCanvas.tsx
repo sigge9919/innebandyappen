@@ -1050,7 +1050,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               className={cn(selectedTool !== 'addHome' && 'border-primary text-primary hover:bg-primary/10')}
             >
               <Users className="h-4 w-4 mr-2" />
-              Add Home
+              Hemmalag
             </Button>
             <Button
               variant={selectedTool === 'addOpponent' ? 'destructive' : 'outline'}
