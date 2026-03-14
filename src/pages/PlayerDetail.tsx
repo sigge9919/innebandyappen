@@ -391,7 +391,7 @@ export default function PlayerDetail() {
               {personalTrainings.map(t => (
                 <div key={t.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                   <div>
-                    <p className="text-sm font-medium">{t.description || 'Personal Training'}</p>
+                    <p className="text-sm font-medium">{t.description || 'Personlig träning'}</p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                       <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{t.date}</span>
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t.duration} min</span>
