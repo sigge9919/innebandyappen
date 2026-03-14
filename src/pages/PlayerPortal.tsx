@@ -303,9 +303,9 @@ export default function PlayerPortal() {
               <p className="text-sm text-muted-foreground">{currentPending.label}</p>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">1 = Fresh</span>
+                  <span className="text-sm text-muted-foreground">1 = Pigg</span>
                   <span className={`text-3xl font-bold ${getRPEColor(currentRPE)}`}>{currentRPE}</span>
-                  <span className="text-sm text-muted-foreground">10 = Exhausted</span>
+                  <span className="text-sm text-muted-foreground">10 = Utmattad</span>
                 </div>
                 <Slider
                   value={[currentRPE]}
