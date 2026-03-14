@@ -26,7 +26,7 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
     return {
       label,
       rating: r.rating,
-      date: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      date: new Date(r.createdAt).toLocaleDateString('sv-SE', { month: 'short', day: 'numeric' }),
       type: r.sessionType,
     };
   });
