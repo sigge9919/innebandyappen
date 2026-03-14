@@ -44,7 +44,9 @@ export default function TeamSettings() {
   const [loading, setLoading] = useState(false);
   const [newSeasonName, setNewSeasonName] = useState('');
   const [seasonLoading, setSeasonLoading] = useState(false);
+  const [seasonConfirmOpen, setSeasonConfirmOpen] = useState(false);
   const isHeadCoach = activeRole === 'head_coach';
+  const currentActiveSeason = seasons.find(s => s.isActive);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
