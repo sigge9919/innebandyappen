@@ -160,7 +160,7 @@ export function PenaltyShotDialog({
                 onClick={() => handleOutcome(true)}
               >
                 <CircleDot className="h-6 w-6" />
-                <span className="font-semibold">Goal!</span>
+                <span className="font-semibold">Mål!</span>
               </Button>
               <Button
                 variant="outline"
