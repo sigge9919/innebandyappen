@@ -84,7 +84,7 @@ export function PenaltyEditor({
         {opponentPenalties.length > 0 && (
           <div>
             <h4 className="text-sm font-semibold text-muted-foreground mb-3">
-              Opponent Penalties ({opponentPenalties.length})
+              Motståndarens utvisningar ({opponentPenalties.length})
             </h4>
             <div className="space-y-2">
               {opponentPenalties.map((penalty, index) => (
