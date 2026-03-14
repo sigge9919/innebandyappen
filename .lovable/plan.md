@@ -1,72 +1,45 @@
 
 
-## Plan: Säsongsbaserad statistik
+## Plan: Add Penalty Shot Situation
 
-### Översikt
-Introducera ett säsongskoncept så att all statistik (matcher, träningar, RPE etc.) kopplas till en aktiv säsong. Tränare kan starta en ny säsong, varvid all ny data kopplas dit. Tidigare säsongers data finns kvar och kan visas via en säsongsväljare.
+Add a "Penalty Shot" option to the situation controls. When triggered, it opens a dialog to record the full penalty shot sequence: which team is shooting, player selection (if our team), and the outcome (scored/saved). No +/- is affected. Player and goalie stats are recorded.
 
-### Databasändringar
+### Changes
 
-**Ny tabell: `seasons`**
-- `id` (uuid, PK)
-- `team_id` (uuid, NOT NULL)
-- `name` (text, NOT NULL) — t.ex. "2025/2026"
-- `is_active` (boolean, default false)
-- `start_date` (text)
-- `end_date` (text, nullable)
-- `created_at` (timestamptz, default now())
-- RLS: team members can CRUD
+**1. `src/types/game.ts` — extend types**
+- Add `'PS'` to `GameSituation` type: `'5v5' | '5v4' | '4v5' | '6v5' | '5v6' | 'PS'`
+- Add `'PS'` label to `getSituationLabel`: `'PS': 'Penalty Shot'`
 
-**Ny kolumn på `games`**: `season_id` (uuid, nullable) — kopplar matcher till en säsong.
+**2. New component: `src/components/games/PenaltyShotDialog.tsx`**
+- Multi-step dialog:
+  - Step 1: Choose team shooting (Our Team / Opponent)
+  - Step 2 (if our team): Select the penalty taker from squad players (field players only)
+  - Step 3: Outcome — Scored or Saved
+- On confirm, calls back with `{ shootingTeam: Team, playerId?: string, scored: boolean }`
 
-**Ny kolumn på `training_sessions`**: `season_id` (uuid, nullable).
+**3. `src/components/games/LiveTracking.tsx` — add penalty shot flow**
+- Add a "Penalty Shot" button (separate from the situation row, perhaps below or between the two team columns as a full-width button, or in each team column)
+- Actually: add a single full-width "Penalty Shot" button below both team columns (since the dialog handles team selection)
+- On confirm from dialog:
+  - Record a `shot_on_goal` event with situation `'PS'` for the shooting team
+  - If scored: also record a `goal` event with situation `'PS'`
+  - If our team scored: increment scorer's `shotsOnGoal` and `goals` in manual playerStats (via `onUpdatePlayerStat`)
+  - If our team missed: increment scorer's `shotsOnGoal` only
+  - The goalie snapshot is captured automatically via existing `recordEvent` logic (goalieId on event)
 
-**Ny kolumn på `player_rpe_ratings`**: `season_id` (uuid, nullable).
+**4. `src/lib/gameStorage.ts` — exclude PS from +/- calculation**
+- In `calculatePlayerStatsFromEvents`, the +/- loop already filters by `situation === '5v5'`, so penalty shot goals (`situation === 'PS'`) are automatically excluded. No change needed.
 
-En migration skapar tabellen, lägger till kolumnerna, och skapar en initial aktiv säsong per team som alla befintliga rader kopplas till.
+**5. No change to situation buttons row** — Penalty Shot is not a "game state" like 5v4; it's a discrete event. The situation selector stays as-is. The PS situation is only stamped on the events created during the penalty shot sequence.
 
-### Kodändringar
-
-**1. Ny hook: `src/hooks/useSeasons.ts`**
-- CRUD för säsonger, hämta aktiv säsong, byta aktiv säsong, starta ny säsong.
-- `startNewSeason(name)`: sätter alla befintliga säsonger till `is_active = false`, skapar en ny med `is_active = true`.
-
-**2. Säsongskontext/väljare i `TeamContext` eller separat**
-- Exponera `activeSeason` och `selectedSeasonId` (kan vara en annan än aktiv, för att titta på historik).
-- En global säsongsväljare-komponent (dropdown) som visas i headern eller på Stats/Games-sidorna.
-
-**3. Filtrera data per säsong**
-- `useEnhancedGames`: lägg till `season_id`-filter i Supabase-queryn baserat på vald säsong.
-- `useTrainingSessions`: samma filter.
-- `useRPERatings`: samma filter.
-- Vid skapande av ny match/träning/RPE: sätt `season_id` till den aktiva säsongen automatiskt.
-
-**4. UI-ändringar**
-- **TeamSettings**: Sektion "Säsongshantering" — visa alla säsonger, knapp "Starta ny säsong" med namnfält. Markera aktiv säsong.
-- **Stats-sidan**: Säsongsväljare (dropdown) ovanför statistiken, så man kan bläddra mellan säsonger.
-- **Games-sidan**: Visa enbart matcher från vald säsong.
-- **PlayerDetail**: Statistiksektionen filtreras per vald säsong. Eventuellt en säsongsväljare lokalt.
-- **Dashboard**: Visar enbart data från aktiv säsong.
-
-**5. "Starta ny säsong"-flödet**
-1. Tränaren klickar "Starta ny säsong" i inställningar.
-2. Anger namn (t.ex. "2026/2027").
-3. Föregående säsong stängs (is_active = false, end_date sätts).
-4. Ny säsong skapas med is_active = true.
-5. Alla nya matcher/träningar kopplas till den nya säsongen.
-6. Befintlig data förblir orörd — filtrera bara bort den i UI.
-
-### Filändringar
-1. **Migration SQL** — ny tabell `seasons`, nya kolumner på `games`, `training_sessions`, `player_rpe_ratings`, initial data-migrering
-2. **`src/hooks/useSeasons.ts`** (ny) — CRUD + aktiv säsong
-3. **`src/contexts/TeamContext.tsx`** — exponera `activeSeason` + `selectedSeasonId`
-4. **`src/hooks/useEnhancedGames.ts`** — filtrera per säsong
-5. **`src/hooks/useLocalStorage.ts`** — filtrera träningar och RPE per säsong
-6. **`src/pages/TeamSettings.tsx`** — sektion för säsongshantering
-7. **`src/pages/Stats.tsx`** — säsongsväljare
-8. **`src/pages/Games.tsx`** — filtrera per säsong
-9. **`src/pages/PlayerDetail.tsx`** — filtrera statistik per säsong
-10. **`src/pages/Dashboard.tsx`** — filtrera per aktiv säsong
-11. **`src/components/stats/SeasonPlayerStats.tsx`** — inga strukturella ändringar, tar emot filtrerad data
-12. **Ny komponent: `src/components/SeasonSelector.tsx`** — dropdown för att välja säsong
+### Flow Summary
+1. Coach taps "Penalty Shot" button
+2. Dialog asks: Our Team or Opponent?
+3. If Our Team: select player, then Scored/Saved
+4. If Opponent: just Scored/Saved
+5. Events recorded with `situation: 'PS'`:
+   - Always: `shot_on_goal` for shooting team (counted in team SOG and goalie SA)
+   - If scored: `goal` for shooting team (counted in team goals and goalie GA)
+   - If our player: manual playerStats updated (SOG, and goal if scored)
+6. No +/- impact (already excluded by existing 5v5 filter)
 

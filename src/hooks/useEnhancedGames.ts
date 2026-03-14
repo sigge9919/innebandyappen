@@ -28,23 +28,28 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useTeam } from '@/contexts/TeamContext';
 
-export function useEnhancedGames() {
+export function useEnhancedGames(seasonId?: string | null) {
   const [games, setGames] = useState<EnhancedGame[]>([]);
-  const { activeTeam } = useTeam();
+  const { activeTeam, selectedSeasonId: ctxSeasonId } = useTeam();
+  const effectiveSeasonId = seasonId !== undefined ? seasonId : ctxSeasonId;
 
   const refresh = useCallback(async () => {
     if (!activeTeam) { setGames([]); return; }
-    const { data } = await supabase.from('games').select('*').eq('team_id', activeTeam.id);
+    let query = supabase.from('games').select('*').eq('team_id', activeTeam.id);
+    if (effectiveSeasonId) query = query.eq('season_id', effectiveSeasonId);
+    const { data } = await query;
     setGames((data ?? []).map(dbToEnhancedGame));
-  }, [activeTeam]);
+  }, [activeTeam, effectiveSeasonId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const addEnhancedGame = useCallback(async (game: EnhancedGame) => {
     if (!activeTeam) return;
-    await supabase.from('games').insert(enhancedGameToDb(game, activeTeam.id));
+    const dbGame = enhancedGameToDb(game, activeTeam.id);
+    if (effectiveSeasonId) (dbGame as any).season_id = effectiveSeasonId;
+    await supabase.from('games').insert(dbGame);
     refresh();
-  }, [activeTeam, refresh]);
+  }, [activeTeam, effectiveSeasonId, refresh]);
 
   const updateEnhancedGame = useCallback(async (id: string, updates: Partial<EnhancedGame>) => {
     await supabase.from('games').update(enhancedGameUpdatesToDb(updates)).eq('id', id);

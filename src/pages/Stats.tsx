@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { usePlayers } from '@/hooks/useLocalStorage';
+import { useTeam } from '@/contexts/TeamContext';
+import { SeasonSelector } from '@/components/SeasonSelector';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Users, TrendingUp } from 'lucide-react';
 import { getFinishedGames } from '@/lib/seasonStats';
@@ -17,6 +19,7 @@ type TrendsSubView = 'team' | 'player';
 export default function Stats() {
   const { games } = useEnhancedGames();
   const { players } = usePlayers();
+  const { seasons, selectedSeasonId, setSelectedSeasonId, selectedSeason } = useTeam();
   const [statsView, setStatsView] = useState<StatsViewType>('player');
   const [statsPeriod, setStatsPeriod] = useState<StatsPeriodType>('season');
   const [trendsSubView, setTrendsSubView] = useState<TrendsSubView>('team');
@@ -34,9 +37,11 @@ export default function Stats() {
           <div>
             <h1 className="section-title">Statistik</h1>
             <p className="text-muted-foreground mt-1">
-              Säsongsstatistik från {finishedGamesCount} avslutad{finishedGamesCount !== 1 ? 'e' : ''} match{finishedGamesCount !== 1 ? 'er' : ''}
+              {selectedSeason ? `${selectedSeason.name} — ` : ''}
+              {finishedGamesCount} avslutad{finishedGamesCount !== 1 ? 'e' : ''} match{finishedGamesCount !== 1 ? 'er' : ''}
             </p>
           </div>
+          <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
         </div>
 
         {finishedGamesCount === 0 ? (

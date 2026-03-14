@@ -75,25 +75,30 @@ export function useGames() {
   return { games, isLoading, addGame, updateGame, deleteGame, refresh };
 }
 
-export function useTrainingSessions() {
+export function useTrainingSessions(seasonId?: string | null) {
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { activeTeam } = useTeam();
+  const { activeTeam, selectedSeasonId: ctxSeasonId } = useTeam();
+  const effectiveSeasonId = seasonId !== undefined ? seasonId : ctxSeasonId;
 
   const refresh = useCallback(async () => {
     if (!activeTeam) { setSessions([]); setIsLoading(false); return; }
-    const { data } = await supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id);
+    let query = supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id);
+    if (effectiveSeasonId) query = query.eq('season_id', effectiveSeasonId);
+    const { data } = await query;
     setSessions((data ?? []).map(dbToTraining));
     setIsLoading(false);
-  }, [activeTeam]);
+  }, [activeTeam, effectiveSeasonId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const addSession = useCallback(async (session: TrainingSession) => {
     if (!activeTeam) return;
-    await supabase.from('training_sessions').insert(trainingToDb(session, activeTeam.id));
+    const dbSession = trainingToDb(session, activeTeam.id);
+    if (effectiveSeasonId) (dbSession as any).season_id = effectiveSeasonId;
+    await supabase.from('training_sessions').insert(dbSession);
     refresh();
-  }, [activeTeam, refresh]);
+  }, [activeTeam, effectiveSeasonId, refresh]);
 
   const updateSession = useCallback(async (id: string, updates: Partial<TrainingSession>) => {
     await supabase.from('training_sessions').update(trainingUpdatesToDb(updates)).eq('id', id);
@@ -599,10 +604,11 @@ function testResultUpdatesToDb(u: Partial<TestResult>) {
 
 // ── RPE Ratings ──────────────────────────────────────────────
 
-export function useRPERatings(playerId?: string) {
+export function useRPERatings(playerId?: string, seasonId?: string | null) {
   const [ratings, setRatings] = useState<PlayerRPERating[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { activeTeam } = useTeam();
+  const { activeTeam, selectedSeasonId: ctxSeasonId } = useTeam();
+  const effectiveSeasonId = seasonId !== undefined ? seasonId : ctxSeasonId;
 
   const refresh = useCallback(async () => {
     if (!activeTeam) { setRatings([]); setIsLoading(false); return; }
@@ -611,25 +617,28 @@ export function useRPERatings(playerId?: string) {
       .select('*')
       .eq('team_id', activeTeam.id);
     if (playerId) query = query.eq('player_id', playerId);
+    if (effectiveSeasonId) query = query.eq('season_id', effectiveSeasonId);
     const { data } = await query;
     setRatings((data ?? []).map(dbToRPE));
     setIsLoading(false);
-  }, [activeTeam, playerId]);
+  }, [activeTeam, playerId, effectiveSeasonId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const addRating = useCallback(async (rating: Omit<PlayerRPERating, 'id' | 'createdAt'>) => {
     if (!activeTeam) return;
-    const { error } = await supabase.from('player_rpe_ratings').upsert({
+    const row: any = {
       player_id: rating.playerId,
       team_id: activeTeam.id,
       session_type: rating.sessionType,
       session_id: rating.sessionId,
       rating: rating.rating,
-    }, { onConflict: 'player_id,session_type,session_id' });
+    };
+    if (effectiveSeasonId) row.season_id = effectiveSeasonId;
+    const { error } = await supabase.from('player_rpe_ratings').upsert(row, { onConflict: 'player_id,session_type,session_id' });
     if (error) throw error;
     refresh();
-  }, [activeTeam, refresh]);
+  }, [activeTeam, effectiveSeasonId, refresh]);
 
   return { ratings, isLoading, addRating, refresh };
 }

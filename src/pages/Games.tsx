@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NewGameDialog } from '@/components/games/NewGameDialog';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
+import { useTeam } from '@/contexts/TeamContext';
+import { SeasonSelector } from '@/components/SeasonSelector';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trophy, Calendar, MapPin, Play, CheckCircle, Clock } from 'lucide-react';
@@ -16,6 +18,7 @@ type GameFilterType = 'all' | 'not_started' | 'live' | 'finished';
 export default function Games() {
   const navigate = useNavigate();
   const { games, addEnhancedGame } = useEnhancedGames();
+  const { seasons, selectedSeasonId, setSelectedSeasonId } = useTeam();
   const [gameFilter, setGameFilter] = useState<GameFilterType>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -66,10 +69,13 @@ export default function Games() {
               )}
             </p>
           </div>
-          <Button className="gap-2" onClick={() => setDialogOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Lägg till match
-          </Button>
+          <div className="flex items-center gap-3">
+            <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
+            <Button className="gap-2" onClick={() => setDialogOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Lägg till match
+            </Button>
+          </div>
         </div>
 
         {/* Stats Banner */}
