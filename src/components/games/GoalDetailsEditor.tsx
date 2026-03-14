@@ -53,7 +53,7 @@ export function GoalDetailsEditor({
               {/* Goal Scorer */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Goal Scorer</label>
+                  <label className="text-sm font-medium">Målskytt</label>
                   <Select
                     value={event.playerId || NONE_VALUE}
                     onValueChange={(value) => {
