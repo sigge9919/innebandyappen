@@ -842,7 +842,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   // Save current layout
   const handleSaveLayout = () => {
     if (!layoutName.trim()) {
-      toast.error('Please enter a name for the layout');
+      toast.error('Ange ett namn för uppställningen');
       return;
     }
 
