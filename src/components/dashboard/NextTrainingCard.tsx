@@ -1,5 +1,6 @@
 import { TrainingSession } from '@/types';
 import { format } from 'date-fns';
+import { sv } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 
 interface NextTrainingCardProps {
@@ -11,16 +12,15 @@ export function NextTrainingCard({ session, playerCount }: NextTrainingCardProps
   return (
     <div className="stat-card">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="metric-label">Next Training</h3>
-        <span className="status-badge bg-warning/10 text-warning border-warning/20">Scheduled</span>
+        <h3 className="metric-label">Nästa träning</h3>
+        <span className="status-badge bg-warning/10 text-warning border-warning/20">Planerad</span>
       </div>
 
       <p className="text-base font-semibold text-foreground">{session.theme}</p>
       <p className="text-xs text-muted-foreground mt-1">
-        {format(new Date(session.date), 'EEE, MMM d')} &middot; {session.duration} min &middot; {playerCount} players
+        {format(new Date(session.date), 'EEE d MMM', { locale: sv })} &middot; {session.duration} min &middot; {playerCount} spelare
       </p>
 
-      {/* Section bar */}
       <div className="flex gap-px mt-3">
         {session.sections.map((section, index) => (
           <div
@@ -37,7 +37,7 @@ export function NextTrainingCard({ session, playerCount }: NextTrainingCardProps
       </div>
 
       <Link to="/training" className="block mt-3 text-xs font-medium text-primary hover:underline">
-        View training plan
+        Visa träningsplan
       </Link>
     </div>
   );

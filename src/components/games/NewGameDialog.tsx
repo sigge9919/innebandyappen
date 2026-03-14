@@ -25,7 +25,6 @@ export function NewGameDialog({ open, onOpenChange, onSave }: NewGameDialogProps
     const game = createEnhancedGame(opponent.trim(), date, location);
     onSave(game);
     
-    // Reset form
     setOpponent('');
     setDate(format(new Date(), 'yyyy-MM-dd'));
     setLocation('Home');
@@ -36,23 +35,23 @@ export function NewGameDialog({ open, onOpenChange, onSave }: NewGameDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>New Game</DialogTitle>
+          <DialogTitle>Ny match</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="opponent">Opponent</Label>
+            <Label htmlFor="opponent">Motståndare</Label>
             <Input
               id="opponent"
               value={opponent}
               onChange={(e) => setOpponent(e.target.value)}
-              placeholder="Enter opponent team name"
+              placeholder="Ange motståndarlagets namn"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="date">Date</Label>
+              <Label htmlFor="date">Datum</Label>
               <Input
                 id="date"
                 type="date"
@@ -62,14 +61,14 @@ export function NewGameDialog({ open, onOpenChange, onSave }: NewGameDialogProps
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">Plats</Label>
               <Select value={location} onValueChange={(v) => setLocation(v as 'Home' | 'Away')}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Home">Home</SelectItem>
-                  <SelectItem value="Away">Away</SelectItem>
+                  <SelectItem value="Home">Hemma</SelectItem>
+                  <SelectItem value="Away">Borta</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -77,9 +76,9 @@ export function NewGameDialog({ open, onOpenChange, onSave }: NewGameDialogProps
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
-            <Button type="submit">Create Game</Button>
+            <Button type="submit">Skapa match</Button>
           </DialogFooter>
         </form>
       </DialogContent>

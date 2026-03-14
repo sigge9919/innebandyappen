@@ -30,12 +30,11 @@ export default function Stats() {
   return (
     <AppLayout>
       <div className="page-container">
-        {/* Header */}
         <div className="section-header">
           <div>
-            <h1 className="section-title">Stats</h1>
+            <h1 className="section-title">Statistik</h1>
             <p className="text-muted-foreground mt-1">
-              Season statistics from {finishedGamesCount} finished game{finishedGamesCount !== 1 ? 's' : ''}
+              Säsongsstatistik från {finishedGamesCount} avslutad{finishedGamesCount !== 1 ? 'e' : ''} match{finishedGamesCount !== 1 ? 'er' : ''}
             </p>
           </div>
         </div>
@@ -43,95 +42,57 @@ export default function Stats() {
         {finishedGamesCount === 0 ? (
           <div className="text-center py-12">
             <BarChart3 className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">No finished games to analyze</p>
+            <p className="text-muted-foreground">Inga avslutade matcher att analysera</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Complete some games to see statistics
+              Spela klart matcher för att se statistik
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Stats Controls */}
             <div className="flex flex-wrap items-center gap-4">
-              {/* View Toggle */}
               <div className="flex gap-2">
-                <Button
-                  variant={statsView === 'player' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setStatsView('player')}
-                  className="gap-2"
-                >
+                <Button variant={statsView === 'player' ? 'default' : 'outline'} size="sm" onClick={() => setStatsView('player')} className="gap-2">
                   <Users className="h-4 w-4" />
-                  Player Stats
+                  Spelarstatistik
                 </Button>
-                <Button
-                  variant={statsView === 'team' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setStatsView('team')}
-                  className="gap-2"
-                >
+                <Button variant={statsView === 'team' ? 'default' : 'outline'} size="sm" onClick={() => setStatsView('team')} className="gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  Team Stats
+                  Lagstatistik
                 </Button>
-                <Button
-                  variant={statsView === 'trends' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setStatsView('trends')}
-                  className="gap-2"
-                >
+                <Button variant={statsView === 'trends' ? 'default' : 'outline'} size="sm" onClick={() => setStatsView('trends')} className="gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  Trends
+                  Trender
                 </Button>
               </div>
 
-              {/* Period Toggle */}
               <div className="flex gap-2">
-                <Button
-                  variant={statsPeriod === 'season' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setStatsPeriod('season')}
-                >
-                  Full Season
+                <Button variant={statsPeriod === 'season' ? 'default' : 'outline'} size="sm" onClick={() => setStatsPeriod('season')}>
+                  Hela säsongen
                 </Button>
-                <Button
-                  variant={statsPeriod === 'last3' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setStatsPeriod('last3')}
-                >
-                  Last 3 Games
+                <Button variant={statsPeriod === 'last3' ? 'default' : 'outline'} size="sm" onClick={() => setStatsPeriod('last3')}>
+                  Senaste 3 matcherna
                 </Button>
               </div>
             </div>
 
-            {/* Stats Period Info */}
             <p className="text-sm text-muted-foreground">
-              Showing stats from {statsGames.length} finished game{statsGames.length !== 1 ? 's' : ''}
+              Visar statistik från {statsGames.length} avslutad{statsGames.length !== 1 ? 'e' : ''} match{statsGames.length !== 1 ? 'er' : ''}
             </p>
 
-            {/* Stats Content */}
             {statsView === 'player' ? (
               <SeasonPlayerStats games={statsGames} players={players} />
             ) : statsView === 'team' ? (
               <SeasonTeamStats games={statsGames} />
             ) : (
               <div className="space-y-4">
-                {/* Trends Sub-Toggle */}
                 <div className="flex gap-2">
-                  <Button
-                    variant={trendsSubView === 'team' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setTrendsSubView('team')}
-                  >
-                    Team Trends
+                  <Button variant={trendsSubView === 'team' ? 'default' : 'outline'} size="sm" onClick={() => setTrendsSubView('team')}>
+                    Lagtrender
                   </Button>
-                  <Button
-                    variant={trendsSubView === 'player' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setTrendsSubView('player')}
-                  >
-                    Player Trends
+                  <Button variant={trendsSubView === 'player' ? 'default' : 'outline'} size="sm" onClick={() => setTrendsSubView('player')}>
+                    Spelartrender
                   </Button>
                 </div>
-
                 {trendsSubView === 'team' ? (
                   <TeamTrends games={statsGames} />
                 ) : (

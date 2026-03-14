@@ -12,11 +12,11 @@ import { useToast } from '@/hooks/use-toast';
 import { UserPlus, Trash2 } from 'lucide-react';
 
 const ROLE_LABELS: Record<TeamRole, string> = {
-  head_coach: 'Head Coach',
-  assistant_coach: 'Assistant Coach',
-  stats_coach: 'Stats Coach',
-  viewer: 'Viewer',
-  player: 'Player',
+  head_coach: 'Huvudtränare',
+  assistant_coach: 'Assisterande tränare',
+  stats_coach: 'Statistikansvarig',
+  viewer: 'Åskådare',
+  player: 'Spelare',
 };
 
 export default function TeamSettings() {
@@ -54,7 +54,7 @@ export default function TeamSettings() {
       <div className="page-container">
         <div className="section-header">
           <div>
-            <h1 className="section-title">Team Settings</h1>
+            <h1 className="section-title">Laginställningar</h1>
             <p className="text-muted-foreground mt-1">{activeTeam?.name}</p>
           </div>
         </div>
@@ -63,7 +63,7 @@ export default function TeamSettings() {
           {/* Members */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Team Members</CardTitle>
+              <CardTitle className="text-lg">Lagmedlemmar</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {members.map(m => (
@@ -88,7 +88,7 @@ export default function TeamSettings() {
                 </div>
               ))}
               {members.length === 0 && (
-                <p className="text-sm text-muted-foreground">No members yet.</p>
+                <p className="text-sm text-muted-foreground">Inga medlemmar ännu.</p>
               )}
             </CardContent>
           </Card>
@@ -98,13 +98,13 @@ export default function TeamSettings() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <UserPlus className="h-5 w-5" /> Invite Coach
+                  <UserPlus className="h-5 w-5" /> Bjud in tränare
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleInvite} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="inviteEmail">Email</Label>
+                    <Label htmlFor="inviteEmail">E-post</Label>
                     <Input
                       id="inviteEmail"
                       type="email"
@@ -115,20 +115,20 @@ export default function TeamSettings() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Role</Label>
+                    <Label>Roll</Label>
                     <Select value={role} onValueChange={v => setRole(v as TeamRole)}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="assistant_coach">Assistant Coach</SelectItem>
-                        <SelectItem value="stats_coach">Stats Coach</SelectItem>
-                        <SelectItem value="viewer">Viewer</SelectItem>
+                        <SelectItem value="assistant_coach">Assisterande tränare</SelectItem>
+                        <SelectItem value="stats_coach">Statistikansvarig</SelectItem>
+                        <SelectItem value="viewer">Åskådare</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <Button type="submit" disabled={loading}>
-                    {loading ? 'Inviting…' : 'Send Invite'}
+                    {loading ? 'Bjuder in…' : 'Skicka inbjudan'}
                   </Button>
                 </form>
               </CardContent>

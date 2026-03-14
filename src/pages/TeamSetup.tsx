@@ -23,7 +23,7 @@ export default function TeamSetup() {
     const { error } = await createTeam(teamName.trim());
     setLoading(false);
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -35,12 +35,12 @@ export default function TeamSetup() {
             <span className="text-primary-foreground font-bold text-xl">C</span>
           </div>
           <CardTitle className="text-xl">
-            {mode === 'create' ? 'Create Your Team' : 'Select a Team'}
+            {mode === 'create' ? 'Skapa ditt lag' : 'Välj ett lag'}
           </CardTitle>
           <CardDescription>
             {mode === 'create'
-              ? 'Give your team a name to get started'
-              : 'Choose which team to manage'}
+              ? 'Ge ditt lag ett namn för att komma igång'
+              : 'Välj vilket lag du vill hantera'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -65,7 +65,7 @@ export default function TeamSetup() {
                 className="w-full"
                 onClick={() => setMode('create')}
               >
-                + Create new team
+                + Skapa nytt lag
               </Button>
             </>
           )}
@@ -74,22 +74,22 @@ export default function TeamSetup() {
             <>
               <form onSubmit={handleCreate} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="teamName">Team Name</Label>
+                  <Label htmlFor="teamName">Lagnamn</Label>
                   <Input
                     id="teamName"
                     value={teamName}
                     onChange={e => setTeamName(e.target.value)}
-                    placeholder="e.g. Thunderbolts FC"
+                    placeholder="t.ex. Thunderbolts FC"
                     required
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Creating…' : 'Create Team'}
+                  {loading ? 'Skapar…' : 'Skapa lag'}
                 </Button>
               </form>
               {teams.length > 0 && (
                 <Button variant="ghost" className="w-full" onClick={() => setMode('choose')}>
-                  ← Back to team list
+                  ← Tillbaka till laglistan
                 </Button>
               )}
             </>
@@ -101,7 +101,7 @@ export default function TeamSetup() {
             className="w-full text-muted-foreground"
             onClick={signOut}
           >
-            <LogOut className="h-4 w-4 mr-2" /> Sign out
+            <LogOut className="h-4 w-4 mr-2" /> Logga ut
           </Button>
         </CardContent>
       </Card>

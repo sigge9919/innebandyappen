@@ -35,27 +35,27 @@ export default function Dashboard() {
     <AppLayout>
       <div className="page-container">
         <div className="section-header">
-          <h1 className="section-title">Dashboard</h1>
+          <h1 className="section-title">Översikt</h1>
         </div>
 
         {/* Stats row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border mb-6 border border-border">
           <div onClick={() => navigate('/team')} className="cursor-pointer">
-            <StatCard title="Active Players" value={activePlayers} subtitle={`of ${players.length}`} />
+            <StatCard title="Aktiva spelare" value={activePlayers} subtitle={`av ${players.length}`} />
           </div>
           <div onClick={() => navigate('/games')} className="cursor-pointer">
-            <StatCard title="Games Played" value={gamesPlayed} subtitle="this season" />
+            <StatCard title="Spelade matcher" value={gamesPlayed} subtitle="denna säsong" />
           </div>
           <div onClick={() => navigate('/games')} className="cursor-pointer">
             <StatCard
-              title="Win Rate"
+              title="Vinstprocent"
               value={gamesPlayed > 0 ? `${Math.round((gamesWon / gamesPlayed) * 100)}%` : 'N/A'}
-              subtitle={`${gamesWon}W ${gamesPlayed - gamesWon}L`}
+              subtitle={`${gamesWon}V ${gamesPlayed - gamesWon}F`}
               variant="success"
             />
           </div>
           <div onClick={() => navigate('/training')} className="cursor-pointer">
-            <StatCard title="Sessions" value={sessions.length} subtitle="scheduled" />
+            <StatCard title="Träningar" value={sessions.length} subtitle="planerade" />
           </div>
         </div>
 
