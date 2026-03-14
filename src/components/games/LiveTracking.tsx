@@ -340,7 +340,7 @@ export function LiveTracking({
           <h4 className="text-center font-semibold text-foreground">Vårt lag</h4>
           <EventButton
             icon={CircleDot}
-            label="Goal"
+            label="Mål"
             variant="success"
             onClick={() => handleGoalClick('home')}
           />
