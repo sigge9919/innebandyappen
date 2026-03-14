@@ -1149,7 +1149,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               {isPlaying ? (
                 <Button variant="default" size="sm" onClick={stopAnimation}>
                   <Pause className="h-4 w-4 mr-2" />
-                  Stop
+                   Stopp
                 </Button>
               ) : (
                 <Button 
