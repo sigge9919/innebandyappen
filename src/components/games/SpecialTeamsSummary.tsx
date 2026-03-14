@@ -39,7 +39,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
         )}>
           <div className="flex items-center gap-2 mb-3">
             <Zap className="h-5 w-5 text-success" />
-            <h4 className="font-semibold">Power Play (5v4)</h4>
+            <h4 className="font-semibold">Powerplay (5v4)</h4>
             <Badge variant="secondary" className="ml-auto">
               {powerPlay.opportunities} PP
             </Badge>
