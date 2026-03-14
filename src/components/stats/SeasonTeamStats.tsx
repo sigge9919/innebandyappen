@@ -177,7 +177,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">Opponents</TableCell>
+                      <TableCell className="font-medium">Motståndare</TableCell>
                       <TableCell className="text-center font-semibold">{opponent.goals}</TableCell>
                       <TableCell className="text-center">{opponent.shotsOnGoal}</TableCell>
                       <TableCell className="text-center">{opponent.shotsOffGoal}</TableCell>

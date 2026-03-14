@@ -98,7 +98,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
 
       {trendData.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">
-          No game data for this player
+          Ingen matchdata för denna spelare
         </p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">

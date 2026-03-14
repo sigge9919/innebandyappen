@@ -358,7 +358,7 @@ export function PostGamePlayerStats({
           </div>
 
           <p className="text-xs text-muted-foreground mt-3">
-            GA = Goals Against, SA = Shots Against, SV = Saves, SV% = Save Percentage
+            GA = Insläppta mål, SA = Skott mot, SV = Räddningar, SV% = Räddningsprocent
           </p>
         </div>
       )}

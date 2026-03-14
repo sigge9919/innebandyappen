@@ -70,69 +70,69 @@ export function TeamTrends({ games }: TeamTrendsProps) {
 
   const dualCharts = [
     {
-      title: 'Goals',
+      title: 'Mål',
       keys: ['ourGoals', 'oppGoals'] as const,
       config: {
-        ourGoals: { label: 'Our Goals', color: GREEN },
-        oppGoals: { label: 'Opponent Goals', color: RED },
+        ourGoals: { label: 'Våra mål', color: GREEN },
+        oppGoals: { label: 'Motståndarens mål', color: RED },
       },
     },
     {
-      title: 'Shots on Goal',
+      title: 'Skott på mål',
       keys: ['ourSog', 'oppSog'] as const,
       config: {
-        ourSog: { label: 'Our SOG', color: GREEN },
-        oppSog: { label: 'Opp SOG', color: RED },
+        ourSog: { label: 'Våra SOG', color: GREEN },
+        oppSog: { label: 'Mot. SOG', color: RED },
       },
     },
     {
       title: 'SOG %',
       keys: ['ourSogPct', 'oppSogPct'] as const,
       config: {
-        ourSogPct: { label: 'Our SOG %', color: GREEN },
-        oppSogPct: { label: 'Opp SOG %', color: RED },
+        ourSogPct: { label: 'Vår SOG %', color: GREEN },
+        oppSogPct: { label: 'Mot. SOG %', color: RED },
       },
       domain: [0, 100] as [number, number],
     },
     {
-      title: 'Shots Off Goal',
+      title: 'Skott utanför',
       keys: ['ourShotsOff', 'oppShotsOff'] as const,
       config: {
-        ourShotsOff: { label: 'Our Off Goal', color: GREEN },
-        oppShotsOff: { label: 'Opp Off Goal', color: RED },
+        ourShotsOff: { label: 'Våra utanför', color: GREEN },
+        oppShotsOff: { label: 'Mot. utanför', color: RED },
       },
     },
     {
-      title: 'Shots Blocked',
+      title: 'Blockerade skott',
       keys: ['ourBlk', 'oppBlk'] as const,
       config: {
-        ourBlk: { label: 'Our Blocked', color: GREEN },
-        oppBlk: { label: 'Opp Blocked', color: RED },
+        ourBlk: { label: 'Våra blockerade', color: GREEN },
+        oppBlk: { label: 'Mot. blockerade', color: RED },
       },
     },
     {
       title: 'BLK %',
       keys: ['ourBlkPct', 'oppBlkPct'] as const,
       config: {
-        ourBlkPct: { label: 'Our BLK %', color: GREEN },
-        oppBlkPct: { label: 'Opp BLK %', color: RED },
+        ourBlkPct: { label: 'Vår BLK %', color: GREEN },
+        oppBlkPct: { label: 'Mot. BLK %', color: RED },
       },
       domain: [0, 100] as [number, number],
     },
     {
-      title: 'Defensive Blocks',
+      title: 'Defensiva blockeringar',
       keys: ['ourDef', 'oppDef'] as const,
       config: {
-        ourDef: { label: 'Our Def Blocks', color: GREEN },
-        oppDef: { label: 'Opp Def Blocks', color: RED },
+        ourDef: { label: 'Våra def. blk', color: GREEN },
+        oppDef: { label: 'Mot. def. blk', color: RED },
       },
     },
     {
-      title: 'Total Shots',
+      title: 'Totala skott',
       keys: ['ourTotalShots', 'oppTotalShots'] as const,
       config: {
-        ourTotalShots: { label: 'Our Total Shots', color: GREEN },
-        oppTotalShots: { label: 'Opp Total Shots', color: RED },
+        ourTotalShots: { label: 'Våra totala skott', color: GREEN },
+        oppTotalShots: { label: 'Mot. totala skott', color: RED },
       },
     },
   ];

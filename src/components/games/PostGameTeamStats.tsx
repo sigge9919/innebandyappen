@@ -120,7 +120,7 @@ export function PostGameTeamStats({
                   onOpponentChange={(v) => handleStatChange('opponent', 'shotsBlocked', v)}
                 />
                 <tr className="border-t border-border bg-muted/30">
-                  <td className="py-2 px-3 font-semibold">Total Shots</td>
+                  <td className="py-2 px-3 font-semibold">Totala skott</td>
                   <td className="py-2 px-3 text-center font-semibold">{getTotalShots(homeStats)}</td>
                   <td className="py-2 px-3 text-center font-semibold">{getTotalShots(opponentStats)}</td>
                 </tr>

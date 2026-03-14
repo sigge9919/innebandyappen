@@ -125,7 +125,7 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
                 {allGoalieStats.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                      No goaltender statistics available
+                      Ingen målvaktsstatistik tillgänglig
                     </TableCell>
                   </TableRow>
                 ) : (
