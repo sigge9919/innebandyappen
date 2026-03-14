@@ -98,7 +98,7 @@ export default function TeamSettings() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <UserPlus className="h-5 w-5" /> Invite Coach
+                  <UserPlus className="h-5 w-5" /> Bjud in tränare
                 </CardTitle>
               </CardHeader>
               <CardContent>
