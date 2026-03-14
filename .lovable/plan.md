@@ -1,45 +1,69 @@
 
 
-## Plan: Add Penalty Shot Situation
+## Översätt hela appen till svenska
 
-Add a "Penalty Shot" option to the situation controls. When triggered, it opens a dialog to record the full penalty shot sequence: which team is shooting, player selection (if our team), and the outcome (scored/saved). No +/- is affected. Player and goalie stats are recorded.
+### Omfattning
+Alla synliga engelska strängar i appen ska översättas till svenska. Detta inkluderar navigering, sidtitlar, knappar, filter, formulär, dialogrutor, felmeddelanden, statustexter och tomma tillstånd.
 
-### Changes
+### Tillvägagångssätt
+Direkt strängbyte i varje fil — ingen i18n-ramverk behövs då appen bara ska finnas på svenska.
 
-**1. `src/types/game.ts` — extend types**
-- Add `'PS'` to `GameSituation` type: `'5v5' | '5v4' | '4v5' | '6v5' | '5v6' | 'PS'`
-- Add `'PS'` label to `getSituationLabel`: `'PS': 'Penalty Shot'`
+### Filer som behöver ändras
 
-**2. New component: `src/components/games/PenaltyShotDialog.tsx`**
-- Multi-step dialog:
-  - Step 1: Choose team shooting (Our Team / Opponent)
-  - Step 2 (if our team): Select the penalty taker from squad players (field players only)
-  - Step 3: Outcome — Scored or Saved
-- On confirm, calls back with `{ shootingTeam: Team, playerId?: string, scored: boolean }`
+**Navigering & Layout:**
+- `src/components/layout/AppSidebar.tsx` — Nav labels: Dashboard→Översikt, Team→Lag, Games→Matcher, Stats→Statistik, Training→Träning, Playbook→Spelbok, Development→Utveckling, Tactics Board→Taktiktavla, Settings→Inställningar, Sign Out→Logga ut, "Create new team"→"Skapa nytt lag"
 
-**3. `src/components/games/LiveTracking.tsx` — add penalty shot flow**
-- Add a "Penalty Shot" button (separate from the situation row, perhaps below or between the two team columns as a full-width button, or in each team column)
-- Actually: add a single full-width "Penalty Shot" button below both team columns (since the dialog handles team selection)
-- On confirm from dialog:
-  - Record a `shot_on_goal` event with situation `'PS'` for the shooting team
-  - If scored: also record a `goal` event with situation `'PS'`
-  - If our team scored: increment scorer's `shotsOnGoal` and `goals` in manual playerStats (via `onUpdatePlayerStat`)
-  - If our team missed: increment scorer's `shotsOnGoal` only
-  - The goalie snapshot is captured automatically via existing `recordEvent` logic (goalieId on event)
+**Inloggning & Lagsetup:**
+- `src/pages/Login.tsx` — Sign in, Create Account, Email, Password, etc.
+- `src/pages/TeamSetup.tsx` — Create Your Team, Team Name, etc.
 
-**4. `src/lib/gameStorage.ts` — exclude PS from +/- calculation**
-- In `calculatePlayerStatsFromEvents`, the +/- loop already filters by `situation === '5v5'`, so penalty shot goals (`situation === 'PS'`) are automatically excluded. No change needed.
+**Sidor (pages):**
+- `src/pages/Dashboard.tsx` — Active Players→Aktiva spelare, Games Played→Spelade matcher, Win Rate→Vinstprocent, Sessions→Träningar
+- `src/pages/Team.tsx` — Add Player, Search players, All, Active, Injured, Focus, etc.
+- `src/pages/Games.tsx` — Add Game, All Games, Not Started, Live, Finished, Wins, Draws, Losses, total games, etc.
+- `src/pages/GameDetail.tsx` — Period labels, Start Game, End Game, Victory/Defeat/Draw, Squad, Line Setup, Starting Goalie, section titles
+- `src/pages/Stats.tsx` — Player Stats, Team Stats, Trends, Full Season, Last 3 Games
+- `src/pages/Training.tsx` — (delvis redan på svenska med "Favoriter"), Create Session, Upcoming Sessions, Drill Library, Add Drill, Search drills
+- `src/pages/TrainingSessionForm.tsx` — Section types (Warm-up, Main drills, etc.), Create Session, Save Changes, team-delnings-text
+- `src/pages/Development.tsx` — Active Plans, With Plan, Without Plan, Recent Tests, Add Test, Complete, Edit, etc.
+- `src/pages/Playbook.tsx` — Add Play, All Plays, Search plays, Category
+- `src/pages/PlayDetail.tsx` — Edit, Back to Playbook, Tactics Board Layouts, Photos & Videos, No content
+- `src/pages/DrillDetail.tsx` — Edit, Video, Back to Training, No content, Add Content
+- `src/pages/PlayerDetail.tsx` — Back, Edit Player, Invite Player, Season Statistics, Development Plans, Test Results, RPE Ratings, Personal Trainings
+- `src/pages/PlayerPortal.tsx` — My Season Stats, RPE History, Personal Trainings, How tired are you feeling?, Fresh/Exhausted
+- `src/pages/TacticsBoard.tsx` — Plan formations, plays, and strategies
+- `src/pages/TeamSettings.tsx` — Team Members, Invite Coach, roles (Head Coach, Assistant Coach, etc.)
 
-**5. No change to situation buttons row** — Penalty Shot is not a "game state" like 5v4; it's a discrete event. The situation selector stays as-is. The PS situation is only stamped on the events created during the penalty shot sequence.
+**Dashboard-komponenter:**
+- `src/components/dashboard/NextGameCard.tsx` — Next Game, Upcoming, View details
+- `src/components/dashboard/LastGameCard.tsx` — Last Game, View all games
+- `src/components/dashboard/NextTrainingCard.tsx` — Next Training, Scheduled, View training plan
+- `src/components/dashboard/WeeklyFocusCard.tsx` — Weekly Focus, Coach Notes, Not set, No notes, Save, Cancel, Edit
+- `src/components/dashboard/PlayerAlerts.tsx` — Player Alerts, No alerts, Injured, Focus, View all players
+- `src/components/dashboard/RPEAlertsCard.tsx` — High Fatigue Alerts
+- `src/components/dashboard/TeamRPECard.tsx` — Team Fatigue, Fresh/Good/Moderate/Tired/Exhausted, Last Session, 7-Day Avg, Rising/Dropping/Stable
 
-### Flow Summary
-1. Coach taps "Penalty Shot" button
-2. Dialog asks: Our Team or Opponent?
-3. If Our Team: select player, then Scored/Saved
-4. If Opponent: just Scored/Saved
-5. Events recorded with `situation: 'PS'`:
-   - Always: `shot_on_goal` for shooting team (counted in team SOG and goalie SA)
-   - If scored: `goal` for shooting team (counted in team goals and goalie GA)
-   - If our player: manual playerStats updated (SOG, and goal if scored)
-6. No +/- impact (already excluded by existing 5v5 filter)
+**Formulär-dialoger:**
+- `src/components/forms/PlayerFormDialog.tsx` — Edit/Add Player, Name, Jersey Number, Stick Side, Positions (Forward→Forward, Center→Center, Defender→Back, Goalkeeper→Målvakt), Status, Notes, Focus Flag, Delete, Cancel, Save Changes
+- `src/components/forms/DrillFormDialog.tsx` — Edit/Add Drill, Name, Description, Categories, Video URL, Delete, Cancel
+- `src/components/forms/EditDrillDialog.tsx` — same
+- `src/components/forms/PlayFormDialog.tsx` — Edit/Add Play, Name, Category, Key Points, Tags, Diagram URL, Video URL
+- `src/components/forms/TrainingFormDialog.tsx` — Section types, team division text, drill selection text
+- `src/components/forms/GameFormDialog.tsx`, `NewGameDialog.tsx` — Create Game, Cancel
+- `src/components/forms/IDPFormDialog.tsx` — IDP-related text
+- `src/components/forms/TestResultFormDialog.tsx` — test result text
+
+**Spelkomponenter:**
+- Various game components (LiveTracking, SquadSelection, PostGameNotes, PostGameTeamStats, PostGamePlayerStats, etc.) — all English labels
+
+**Statistikkomponenter:**
+- `src/components/stats/SeasonPlayerStats.tsx`, `SeasonTeamStats.tsx`, `TeamTrends.tsx`, `PlayerTrends.tsx`
+
+### Teknisk anmärkning
+- `date-fns` format-strängar med engelska veckodagar (EEE, MMM d) behöver bytas till `sv` locale
+- TeamRPECard day labels behöver ändras till svensk locale
+- Inga databas- eller backend-ändringar krävs
+
+### Uppskattning
+~40+ filer behöver uppdateras med svenska strängar. Alla ändringar är strängbyten — ingen logikändring.
 
