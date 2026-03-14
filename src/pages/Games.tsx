@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NewGameDialog } from '@/components/games/NewGameDialog';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
+import { useTeam } from '@/contexts/TeamContext';
+import { SeasonSelector } from '@/components/SeasonSelector';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trophy, Calendar, MapPin, Play, CheckCircle, Clock } from 'lucide-react';
