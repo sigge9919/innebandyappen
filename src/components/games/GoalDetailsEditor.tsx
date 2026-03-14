@@ -43,7 +43,7 @@ export function GoalDetailsEditor({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Badge variant="default" className="bg-success text-success-foreground">
-                    Goal #{index + 1}
+                    Mål #{index + 1}
                   </Badge>
                   <Badge variant="secondary">P{event.period}</Badge>
                   <Badge variant="outline">{getSituationLabel(event.situation)}</Badge>
