@@ -214,6 +214,66 @@ export default function TeamSettings() {
               </CardContent>
             </Card>
           )}
+
+          {/* Season Management */}
+          {isHeadCoach && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CalendarDays className="h-5 w-5" /> Säsongshantering
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  {seasons.map(s => (
+                    <div key={s.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-sm">{s.name}</p>
+                        {s.isActive && <Badge variant="default" className="text-xs">Aktiv</Badge>}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {s.startDate}{s.endDate ? ` — ${s.endDate}` : ''}
+                      </p>
+                    </div>
+                  ))}
+                  {seasons.length === 0 && (
+                    <p className="text-sm text-muted-foreground">Inga säsonger ännu.</p>
+                  )}
+                </div>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!newSeasonName.trim()) return;
+                    setSeasonLoading(true);
+                    const { error } = await startNewSeason(newSeasonName.trim());
+                    setSeasonLoading(false);
+                    if (error) {
+                      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
+                    } else {
+                      toast({ title: 'Ny säsong startad', description: `${newSeasonName} är nu aktiv.` });
+                      setNewSeasonName('');
+                    }
+                  }}
+                  className="flex items-end gap-3"
+                >
+                  <div className="flex-1 space-y-1">
+                    <Label htmlFor="seasonName">Ny säsong</Label>
+                    <Input
+                      id="seasonName"
+                      value={newSeasonName}
+                      onChange={e => setNewSeasonName(e.target.value)}
+                      placeholder="t.ex. 2026/2027"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={seasonLoading} className="gap-1">
+                    <Plus className="h-4 w-4" />
+                    {seasonLoading ? 'Startar…' : 'Starta'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </AppLayout>
