@@ -46,7 +46,7 @@ export function PenaltyConfirmDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertOctagon className="h-5 w-5 text-amber-500" />
-            Penalty - Our Team
+            Utvisning - Vårt lag
           </DialogTitle>
         </DialogHeader>
 
