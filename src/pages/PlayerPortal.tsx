@@ -316,7 +316,7 @@ export default function PlayerPortal() {
                 />
               </div>
               {pendingSessions.length > 1 && (
-                <p className="text-xs text-muted-foreground">{pendingSessions.length - 1} more to rate</p>
+                <p className="text-xs text-muted-foreground">{pendingSessions.length - 1} till att bedöma</p>
               )}
             </div>
           )}
