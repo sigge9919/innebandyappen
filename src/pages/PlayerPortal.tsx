@@ -321,8 +321,8 @@ export default function PlayerPortal() {
             </div>
           )}
           <DialogFooter className="gap-2">
-            <Button variant="ghost" onClick={handleSkipRPE}>Skip</Button>
-            <Button onClick={handleSubmitRPE}>Submit</Button>
+             <Button variant="ghost" onClick={handleSkipRPE}>Hoppa över</Button>
+             <Button onClick={handleSubmitRPE}>Skicka</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
