@@ -346,7 +346,7 @@ export function LiveTracking({
           />
           <EventButton
             icon={Target}
-            label="Shot on Goal"
+            label="Skott på mål"
             onClick={() => handleShotClick('shot_on_goal', 'home')}
           />
           <EventButton
