@@ -284,7 +284,7 @@ export function PostGamePlayerStats({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="py-2 px-2 text-left font-medium text-muted-foreground">Goalie</th>
+                  <th className="py-2 px-2 text-left font-medium text-muted-foreground">Målvakt</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">GA</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">SA</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">SV</th>
