@@ -184,7 +184,7 @@ export function GoalConfirmDialog({
               {/* Assists */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
-                  Assist (optional, max 1)
+                  Assist (valfritt, max 1)
                   {selectedAssists.length > 0 && (
                     <Badge variant="secondary" className="text-xs">
                       {selectedAssists.length}/1
