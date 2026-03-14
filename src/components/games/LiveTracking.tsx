@@ -337,7 +337,7 @@ export function LiveTracking({
       <div className="grid grid-cols-2 gap-4">
         {/* Our Team */}
         <div className="space-y-3">
-          <h4 className="text-center font-semibold text-foreground">Our Team</h4>
+          <h4 className="text-center font-semibold text-foreground">Vårt lag</h4>
           <EventButton
             icon={CircleDot}
             label="Goal"
