@@ -31,6 +31,7 @@ import { CollapsibleSection } from '@/components/games/CollapsibleSection';
 import { GoalieSelector } from '@/components/games/GoalieSelector';
 import { Period, Team, TeamStats, GameSituation } from '@/types/game';
 import { format } from 'date-fns';
+import { sv } from 'date-fns/locale';
 import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText, ChevronRight, Square, Shield, Settings, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -75,9 +76,9 @@ export default function GameDetail() {
       <AppLayout>
         <div className="page-container">
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Game not found</p>
+            <p className="text-muted-foreground">Matchen hittades inte</p>
             <Button className="mt-4" onClick={() => navigate('/games')}>
-              Back to Games
+              Tillbaka till matcher
             </Button>
           </div>
         </div>
@@ -88,6 +89,12 @@ export default function GameDetail() {
   const squadPlayers = players.filter(p => game.squadPlayerIds.includes(p.id));
   const squadGoalies = squadPlayers.filter(p => p.positions?.includes('Goalkeeper'));
   const canStartGame = game.squadPlayerIds.length > 0;
+
+  const STATUS_LABELS: Record<string, string> = {
+    'Not Started': 'Ej startad',
+    'Live': 'Live',
+    'Finished': 'Avslutad',
+  };
 
   const statusColor = {
     'Not Started': 'bg-muted text-muted-foreground',
@@ -103,7 +110,7 @@ export default function GameDetail() {
     '1': 'Period 1',
     '2': 'Period 2',
     '3': 'Period 3',
-    'OT': 'Overtime',
+    'OT': 'Övertid',
   };
 
   const PERIOD_ORDER = ['1', '2', '3', 'OT'];
@@ -121,7 +128,7 @@ export default function GameDetail() {
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-foreground">vs {game.opponent}</h1>
-              <Badge className={statusColor}>{game.status}</Badge>
+              <Badge className={statusColor}>{STATUS_LABELS[game.status] || game.status}</Badge>
               {game.status === 'Live' && (
                 <Badge variant="outline" className="text-base px-3 py-1">
                   {PERIOD_LABELS[game.currentPeriod]}
@@ -131,7 +138,7 @@ export default function GameDetail() {
             <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                {format(new Date(game.date), 'EEE, MMM d, yyyy')}
+                {format(new Date(game.date), 'EEE d MMM yyyy', { locale: sv })}
               </span>
               <span className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
@@ -149,7 +156,7 @@ export default function GameDetail() {
                 onClick={() => setLiveView(liveView === 'tracking' ? 'stats' : 'tracking')}
               >
                 <BarChart3 className="h-4 w-4" />
-                {liveView === 'stats' ? 'Live' : 'Stats'}
+                {liveView === 'stats' ? 'Live' : 'Statistik'}
               </Button>
               <Button
                 variant={showLiveLineEdit ? 'secondary' : 'outline'}
@@ -158,7 +165,7 @@ export default function GameDetail() {
                 onClick={() => setShowLiveLineEdit(!showLiveLineEdit)}
               >
                 <Settings className="h-4 w-4" />
-                {showLiveLineEdit ? 'Hide' : 'Edit Lines'}
+                {showLiveLineEdit ? 'Dölj' : 'Redigera kedjor'}
               </Button>
               <Button
                 variant="outline"
@@ -167,7 +174,7 @@ export default function GameDetail() {
                 onClick={() => navigate(`/tactics?from=/games/${gameId}`)}
               >
                 <LayoutGrid className="h-4 w-4" />
-                Tactics
+                Taktik
               </Button>
               {!isLastPeriod && (
                 <Button 
@@ -176,7 +183,7 @@ export default function GameDetail() {
                   className="gap-1"
                   onClick={nextPeriod}
                 >
-                  Next Period
+                  Nästa period
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               )}
@@ -188,20 +195,20 @@ export default function GameDetail() {
                     className="gap-1"
                   >
                     <Square className="h-4 w-4" />
-                    End Game
+                    Avsluta match
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>End this game?</AlertDialogTitle>
+                    <AlertDialogTitle>Avsluta matchen?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will finish the game and lock the score at {game.ourScore} - {game.opponentScore}. 
-                      You can still edit player stats and notes after ending the game.
+                      Matchen avslutas med resultatet {game.ourScore} - {game.opponentScore}. 
+                      Du kan fortfarande redigera spelarstatistik och anteckningar efteråt.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={endGame}>End Game</AlertDialogAction>
+                    <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                    <AlertDialogAction onClick={endGame}>Avsluta match</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -226,13 +233,13 @@ export default function GameDetail() {
               <div className="stat-card">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Shield className="h-5 w-5" />
-                  Starting Goalie
+                  Startmålvakt
                 </h3>
                 <GoalieSelector
                   goalies={squadGoalies}
                   selectedGoalieId={game.startingGoalieId}
                   onSelectGoalie={setStartingGoalie}
-                  label="Select Starting Goalie"
+                  label="Välj startmålvakt"
                 />
               </div>
             )}
@@ -240,7 +247,7 @@ export default function GameDetail() {
             {/* Line Setup */}
             {game.squadPlayerIds.length > 0 && (
               <div className="stat-card">
-                <h3 className="text-lg font-semibold mb-4">Line Setup</h3>
+                <h3 className="text-lg font-semibold mb-4">Kedjor</h3>
                 <LineSetup
                   lines={game.lines}
                   squadPlayers={squadPlayers}
@@ -257,11 +264,11 @@ export default function GameDetail() {
               onClick={startGame}
             >
               <Play className="h-6 w-6" />
-              Start Game
+              Starta match
             </Button>
             {!canStartGame && (
               <p className="text-center text-sm text-muted-foreground">
-                Select at least one player to start the game
+                Välj minst en spelare för att starta matchen
               </p>
             )}
           </div>
@@ -273,7 +280,7 @@ export default function GameDetail() {
             {/* Line Edit Panel (Collapsible) */}
             {showLiveLineEdit && (
               <div className="stat-card">
-                <h3 className="text-sm font-semibold mb-3">Edit Lines & Goalie</h3>
+                <h3 className="text-sm font-semibold mb-3">Redigera kedjor & målvakt</h3>
                 <LineSetup
                   lines={game.lines}
                   squadPlayers={squadPlayers}
@@ -314,9 +321,9 @@ export default function GameDetail() {
                   </p>
                 </div>
 
-                <CollapsibleSection title="Team Statistics" icon={<BarChart3 className="h-5 w-5" />}>
+                <CollapsibleSection title="Lagstatistik" icon={<BarChart3 className="h-5 w-5" />}>
                   <PostGameTeamStats
-                    homeTeamName="Our Team"
+                    homeTeamName="Vårt lag"
                     opponentName={game.opponent}
                     getHomeStats={getHomeStats}
                     getOpponentStats={getOpponentStats}
@@ -329,7 +336,7 @@ export default function GameDetail() {
                 {(() => {
                   const specialTeams = getSpecialTeamsStats();
                   return specialTeams.powerPlay && specialTeams.boxPlay ? (
-                    <CollapsibleSection title="Special Teams Summary" icon={<Zap className="h-5 w-5" />}>
+                    <CollapsibleSection title="Specialteam" icon={<Zap className="h-5 w-5" />}>
                       <SpecialTeamsSummary
                         powerPlay={specialTeams.powerPlay}
                         boxPlay={specialTeams.boxPlay}
@@ -338,7 +345,7 @@ export default function GameDetail() {
                   ) : null;
                 })()}
 
-                <CollapsibleSection title="Player Statistics" icon={<User className="h-5 w-5" />}>
+                <CollapsibleSection title="Spelarstatistik" icon={<User className="h-5 w-5" />}>
                   <PostGamePlayerStats
                     squadPlayers={squadPlayers.filter(p => !p.positions?.includes('Goalkeeper'))}
                     goalies={squadGoalies}
@@ -352,7 +359,7 @@ export default function GameDetail() {
                   />
                 </CollapsibleSection>
 
-                <CollapsibleSection title="Line Performance" icon={<TrendingUp className="h-5 w-5" />}>
+                <CollapsibleSection title="Kedjeprestation" icon={<TrendingUp className="h-5 w-5" />}>
                   <EnhancedLinePerformance
                     lines={game.lines}
                     events={game.events}
@@ -384,15 +391,15 @@ export default function GameDetail() {
                 game.ourScore < game.opponentScore ? 'text-destructive' : 
                 'text-muted-foreground'
               )}>
-                {game.ourScore > game.opponentScore ? 'Victory!' : 
-                 game.ourScore < game.opponentScore ? 'Defeat' : 
-                 'Draw'}
+                {game.ourScore > game.opponentScore ? 'Vinst!' : 
+                 game.ourScore < game.opponentScore ? 'Förlust' : 
+                 'Oavgjort'}
               </p>
             </div>
 
-            <CollapsibleSection title="Team Statistics" icon={<BarChart3 className="h-5 w-5" />}>
+            <CollapsibleSection title="Lagstatistik" icon={<BarChart3 className="h-5 w-5" />}>
               <PostGameTeamStats
-                homeTeamName="Our Team"
+                homeTeamName="Vårt lag"
                 opponentName={game.opponent}
                 getHomeStats={getHomeStats}
                 getOpponentStats={getOpponentStats}
@@ -405,7 +412,7 @@ export default function GameDetail() {
             {(() => {
               const specialTeams = getSpecialTeamsStats();
               return specialTeams.powerPlay && specialTeams.boxPlay ? (
-                <CollapsibleSection title="Special Teams Summary" icon={<Zap className="h-5 w-5" />}>
+                <CollapsibleSection title="Specialteam" icon={<Zap className="h-5 w-5" />}>
                   <SpecialTeamsSummary
                     powerPlay={specialTeams.powerPlay}
                     boxPlay={specialTeams.boxPlay}
@@ -414,7 +421,7 @@ export default function GameDetail() {
               ) : null;
             })()}
 
-            <CollapsibleSection title="Player Statistics" icon={<User className="h-5 w-5" />}>
+            <CollapsibleSection title="Spelarstatistik" icon={<User className="h-5 w-5" />}>
               <PostGamePlayerStats
                 squadPlayers={squadPlayers.filter(p => !p.positions?.includes('Goalkeeper'))}
                 goalies={squadGoalies}
@@ -428,7 +435,7 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
-            <CollapsibleSection title="Line Performance" icon={<TrendingUp className="h-5 w-5" />}>
+            <CollapsibleSection title="Kedjeprestation" icon={<TrendingUp className="h-5 w-5" />}>
               <EnhancedLinePerformance
                 lines={game.lines}
                 events={game.events}
@@ -436,14 +443,14 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
-            <CollapsibleSection title="Post-Game Notes" icon={<FileText className="h-5 w-5" />}>
+            <CollapsibleSection title="Matchanteckningar" icon={<FileText className="h-5 w-5" />}>
               <PostGameNotes
                 game={game}
                 onUpdateNotes={updateNotes}
               />
             </CollapsibleSection>
 
-            <CollapsibleSection title="Goal Details" icon={<CircleDot className="h-5 w-5 text-success" />} defaultOpen={false}>
+            <CollapsibleSection title="Måldetaljer" icon={<CircleDot className="h-5 w-5 text-success" />} defaultOpen={false}>
               <GoalDetailsEditor
                 goalEvents={game.events.filter(e => e.type === 'goal')}
                 squadPlayers={squadPlayers}
@@ -451,7 +458,7 @@ export default function GameDetail() {
               />
             </CollapsibleSection>
 
-            <CollapsibleSection title="Penalty Attribution" icon={<AlertOctagon className="h-5 w-5 text-amber-500" />} defaultOpen={false}>
+            <CollapsibleSection title="Utvisningar" icon={<AlertOctagon className="h-5 w-5 text-amber-500" />} defaultOpen={false}>
               <PenaltyEditor
                 penalties={game.penalties || []}
                 squadPlayers={squadPlayers}

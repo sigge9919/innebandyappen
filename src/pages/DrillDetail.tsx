@@ -41,14 +41,12 @@ export default function DrillDetail() {
     }
   }, [isNew]);
 
-  // Sync localDrill with existingDrill
   useEffect(() => {
     if (existingDrill) {
       setLocalDrill(existingDrill);
     }
   }, [existingDrill]);
 
-  // On-demand media scraping for Övningsbanken drills
   useEffect(() => {
     const drill = localDrill;
     if (!drill || isNew || fetchingMedia) return;
@@ -107,9 +105,9 @@ export default function DrillDetail() {
     return (
       <AppLayout>
         <div className="page-container">
-          <p className="text-muted-foreground">Drill not found</p>
+          <p className="text-muted-foreground">Övningen hittades inte</p>
           <Button variant="outline" onClick={() => navigate(backPath)}>
-            Back to Training
+            Tillbaka till träning
           </Button>
         </div>
       </AppLayout>
@@ -129,7 +127,7 @@ export default function DrillDetail() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">{drill?.name || 'New Drill'}</h1>
+            <h1 className="text-2xl font-bold">{drill?.name || 'Ny övning'}</h1>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {drill?.categories?.map(cat => (
                 <Badge key={cat} variant="secondary">{cat}</Badge>
@@ -145,7 +143,7 @@ export default function DrillDetail() {
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setEditDialogOpen(true)}>
               <Edit2 className="h-4 w-4 mr-2" />
-              Edit
+              Redigera
             </Button>
             {!isNew && (
               <Button variant="ghost" size="icon" onClick={handleDelete} className="text-destructive hover:text-destructive">
@@ -162,7 +160,7 @@ export default function DrillDetail() {
           </div>
         )}
 
-        {/* Scraped Media (video/image from Övningsbanken) */}
+        {/* Scraped Media */}
         {fetchingMedia && (
           <div className="mb-6 flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -199,7 +197,7 @@ export default function DrillDetail() {
           </div>
         )}
 
-        {/* Video URL fallback (non-innebandy or no scraped media) */}
+        {/* Video URL fallback */}
         {drill?.videoUrl && !drill?.directVideoUrl && !fetchingMedia && (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
@@ -222,7 +220,7 @@ export default function DrillDetail() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Film className="h-5 w-5 text-primary" />
-              <h2 className="font-semibold">Tactics Board Layouts</h2>
+              <h2 className="font-semibold">Taktiktavlor</h2>
             </div>
             <div className="grid gap-4 grid-cols-1">
               {drill.linkedLayoutIds.map(layoutId => (
@@ -237,7 +235,7 @@ export default function DrillDetail() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
               <ImageIcon className="h-5 w-5 text-primary" />
-              <h2 className="font-semibold">Photos & Videos</h2>
+              <h2 className="font-semibold">Foton & videor</h2>
             </div>
             <PlayMediaGallery media={drill.mediaFiles} readOnly />
           </div>
@@ -249,11 +247,11 @@ export default function DrillDetail() {
             <CardContent className="py-12 text-center">
               <Layout className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-30" />
               <p className="text-muted-foreground mb-4">
-                No content added yet
+                Inget innehåll tillagt ännu
               </p>
               <Button onClick={() => setEditDialogOpen(true)}>
                 <Edit2 className="h-4 w-4 mr-2" />
-                Add Content
+                Lägg till innehåll
               </Button>
             </CardContent>
           </Card>

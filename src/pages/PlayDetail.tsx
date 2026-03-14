@@ -61,9 +61,9 @@ export default function PlayDetail() {
     return (
       <AppLayout>
         <div className="page-container">
-          <p className="text-muted-foreground">Play not found</p>
+          <p className="text-muted-foreground">Spelsystemet hittades inte</p>
           <Button variant="outline" onClick={() => navigate('/playbook')}>
-            Back to Playbook
+            Tillbaka till spelboken
           </Button>
         </div>
       </AppLayout>
@@ -82,7 +82,7 @@ export default function PlayDetail() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">{play?.name || 'New Play'}</h1>
+            <h1 className="text-2xl font-bold">{play?.name || 'Nytt spelsystem'}</h1>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <Badge variant="outline">{play?.category || 'System'}</Badge>
               {play?.tags?.map(tag => (
@@ -96,7 +96,7 @@ export default function PlayDetail() {
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setEditDialogOpen(true)}>
               <Edit2 className="h-4 w-4 mr-2" />
-              Edit
+              Redigera
             </Button>
             {!isNew && (
               <Button variant="ghost" size="icon" onClick={handleDelete} className="text-destructive hover:text-destructive">
@@ -111,7 +111,7 @@ export default function PlayDetail() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Film className="h-5 w-5 text-primary" />
-              <h2 className="font-semibold">Tactics Board Layouts</h2>
+              <h2 className="font-semibold">Taktiktavlor</h2>
             </div>
             <div className="grid gap-4 grid-cols-1">
               {play.linkedLayoutIds.map(layoutId => (
@@ -126,7 +126,7 @@ export default function PlayDetail() {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
               <ImageIcon className="h-5 w-5 text-primary" />
-              <h2 className="font-semibold">Photos & Videos</h2>
+              <h2 className="font-semibold">Foton & videor</h2>
             </div>
             <PlayMediaGallery media={play.mediaFiles} readOnly />
           </div>
@@ -138,11 +138,11 @@ export default function PlayDetail() {
             <CardContent className="py-12 text-center">
               <Layout className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-30" />
               <p className="text-muted-foreground mb-4">
-                No tactics layouts or media added yet
+                Inga taktiktavlor eller media tillagda ännu
               </p>
               <Button onClick={() => setEditDialogOpen(true)}>
                 <Edit2 className="h-4 w-4 mr-2" />
-                Add Content
+                Lägg till innehåll
               </Button>
             </CardContent>
           </Card>
