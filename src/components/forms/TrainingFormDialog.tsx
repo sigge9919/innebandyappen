@@ -212,10 +212,10 @@ export function TrainingFormDialog({
               {/* Session Structure */}
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label>Session Structure</Label>
+                  <Label>Passupplägg</Label>
                   <span className="text-sm text-muted-foreground flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
-                    Total: {totalDuration} min
+                    Totalt: {totalDuration} min
                   </span>
                 </div>
 
