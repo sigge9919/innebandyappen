@@ -972,7 +972,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                   </p>
                 )}
                 <Button onClick={handleSaveLayout} className="w-full">
-                  Save {keyframes.length > 1 ? 'Animation' : 'Layout'}
+                  Spara {keyframes.length > 1 ? 'animation' : 'uppställning'}
                 </Button>
               </div>
             </DialogContent>
