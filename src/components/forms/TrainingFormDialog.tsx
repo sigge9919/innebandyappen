@@ -193,7 +193,7 @@ export function TrainingFormDialog({
                   id="theme"
                   value={formData.theme}
                   onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
-                  placeholder="Training theme (e.g., Transitions, Defense)"
+                  placeholder="Träningstema (t.ex. Omställningar, Försvar)"
                   required
                 />
               </div>
