@@ -397,7 +397,7 @@ export function TrainingFormDialog({
                   onOpenChange(false);
                 }}
               >
-                Delete
+                Ta bort
               </Button>
             )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
