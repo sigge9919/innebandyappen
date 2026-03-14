@@ -956,7 +956,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  Save {keyframes.length > 1 ? 'Animation' : 'Layout'}
+                  Spara {keyframes.length > 1 ? 'animation' : 'uppställning'}
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
