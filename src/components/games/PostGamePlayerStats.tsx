@@ -118,8 +118,8 @@ export function PostGamePlayerStats({
               <tr className="border-b border-border">
                 <th className="py-2 px-2 text-left font-medium text-muted-foreground">Spelare</th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                  <span className="flex items-center justify-center gap-1">
-                    G <Lock className="h-3 w-3" />
+                    <span className="flex items-center justify-center gap-1">
+                      M <Lock className="h-3 w-3" />
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
