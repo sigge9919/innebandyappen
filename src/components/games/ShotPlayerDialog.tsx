@@ -20,10 +20,10 @@ interface ShotPlayerDialogProps {
 }
 
 const SHOT_TYPE_CONFIG = {
-  shot_on_goal: { label: 'Shot on Goal', icon: Target, color: 'text-primary' },
-  shot_off_goal: { label: 'Shot Off Goal', icon: XCircle, color: 'text-muted-foreground' },
-  shot_blocked: { label: 'Shot Blocked', icon: Shield, color: 'text-muted-foreground' },
-  defensive_block: { label: 'Blocked by', icon: Shield, color: 'text-primary' },
+  shot_on_goal: { label: 'Skott på mål', icon: Target, color: 'text-primary' },
+  shot_off_goal: { label: 'Skott utanför', icon: XCircle, color: 'text-muted-foreground' },
+  shot_blocked: { label: 'Blockerat skott', icon: Shield, color: 'text-muted-foreground' },
+  defensive_block: { label: 'Blockerat av', icon: Shield, color: 'text-primary' },
 };
 
 export function ShotPlayerDialog({
