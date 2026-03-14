@@ -130,7 +130,7 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
         <Card>
           <CardContent className="pt-4 pb-4 text-center">
             <p className="text-2xl font-bold">{stats.assists}</p>
-            <p className="text-xs text-muted-foreground">Assists</p>
+            <p className="text-xs text-muted-foreground">Assist</p>
           </CardContent>
         </Card>
         <Card>
