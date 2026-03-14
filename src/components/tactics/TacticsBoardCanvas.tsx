@@ -1228,7 +1228,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                 Nyckelruta {keyframes.length > 0 ? currentKeyframeIndex + 1 : 0} av {keyframes.length}
               </span>
               <span className="text-muted-foreground">
-                {isPlaying ? `Playing: ${Math.round(playbackPosition)}%` : 'Stopped'}
+                {isPlaying ? `Spelar: ${Math.round(playbackPosition)}%` : 'Stoppad'}
               </span>
             </div>
             
