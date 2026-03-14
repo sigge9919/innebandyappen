@@ -423,7 +423,7 @@ export function LiveTracking({
           onClick={onUndo}
         >
           <Undo2 className="h-4 w-4" />
-          Undo Last Event
+          Ångra senaste
         </Button>
       )}
 
