@@ -430,7 +430,7 @@ export function LiveTracking({
       {/* Simple / Advanced Toggle */}
       <div className="flex items-center justify-between px-2 py-3 rounded-lg bg-muted/50 border border-border">
         <span className="text-sm font-medium text-muted-foreground">
-          {advancedMode ? 'Advanced Stats' : 'Simple Stats'}
+          {advancedMode ? 'Avancerad statistik' : 'Enkel statistik'}
         </span>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Simple</span>
