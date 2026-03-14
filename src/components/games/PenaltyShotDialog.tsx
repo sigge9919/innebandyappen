@@ -108,7 +108,7 @@ export function PenaltyShotDialog({
 
         {step === 'team' && (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Who is taking the penalty shot?</p>
+            <p className="text-sm text-muted-foreground">Vem tar straffslaget?</p>
             <div className="grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
