@@ -38,7 +38,11 @@ export default function Dashboard() {
     <AppLayout>
       <div className="page-container">
         <div className="section-header">
-          <h1 className="section-title">Översikt</h1>
+          <div>
+            <h1 className="section-title">Översikt</h1>
+            {selectedSeason && <p className="text-muted-foreground text-sm mt-0.5">{selectedSeason.name}</p>}
+          </div>
+          <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
         </div>
 
         {/* Stats row */}
