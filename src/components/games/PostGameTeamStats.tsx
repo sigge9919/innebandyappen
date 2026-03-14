@@ -87,7 +87,7 @@ export function PostGameTeamStats({
               </thead>
               <tbody>
                 <StatEditRow
-                  label="Goals"
+                  label="Mål"
                   homeValue={homeStats.goals}
                   opponentValue={opponentStats.goals}
                   editable={isEditable}
