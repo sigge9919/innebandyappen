@@ -63,7 +63,7 @@ export function LivePeriodStats({
         {/* Stats Rows */}
         <div className="space-y-1.5">
           <UnifiedStatRow 
-            label="Goals" 
+            label="Mål" 
             homePeriod={periodHomeStats.goals} 
             homeTotal={totalHomeStats.goals}
             opponentPeriod={periodOpponentStats.goals}
