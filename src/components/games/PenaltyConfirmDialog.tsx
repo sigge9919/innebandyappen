@@ -55,7 +55,7 @@ export function PenaltyConfirmDialog({
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
               <User className="h-4 w-4" />
-              Player Committing Penalty
+              Spelare som begick utvisning
             </label>
             
             <div className="flex flex-wrap gap-1.5">
