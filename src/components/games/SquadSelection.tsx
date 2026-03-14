@@ -45,24 +45,24 @@ export function SquadSelection({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-semibold">Squad Selection</h3>
+          <h3 className="text-lg font-semibold">Truppval</h3>
           <span className="text-sm text-muted-foreground">
-            ({selectedPlayerIds.length} selected)
+            ({selectedPlayerIds.length} valda)
           </span>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={selectAll} disabled={disabled}>
-            Select All
+            Välj alla
           </Button>
           <Button variant="outline" size="sm" onClick={clearAll} disabled={disabled}>
-            Clear
+            Rensa
           </Button>
         </div>
       </div>
 
       {/* Active Players */}
       <div className="space-y-2">
-        <p className="text-sm font-medium text-muted-foreground">Active Players</p>
+        <p className="text-sm font-medium text-muted-foreground">Aktiva spelare</p>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {activePlayers.map(player => (
             <PlayerCheckItem
