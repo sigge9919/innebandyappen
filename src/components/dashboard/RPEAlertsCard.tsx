@@ -10,7 +10,6 @@ interface RPEAlertsCardProps {
 }
 
 export function RPEAlertsCard({ ratings, players, onPlayerClick }: RPEAlertsCardProps) {
-  // Get the most recent rating per player
   const latestByPlayer = new Map<string, PlayerRPERating>();
   const sorted = [...ratings].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   for (const r of sorted) {
@@ -19,7 +18,6 @@ export function RPEAlertsCard({ ratings, players, onPlayerClick }: RPEAlertsCard
     }
   }
 
-  // Filter for high RPE (8+)
   const highRPE = Array.from(latestByPlayer.values())
     .filter(r => r.rating >= 8)
     .sort((a, b) => b.rating - a.rating);
@@ -31,7 +29,7 @@ export function RPEAlertsCard({ ratings, players, onPlayerClick }: RPEAlertsCard
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-orange-500" />
-          High Fatigue Alerts
+          Hög trötthet
           <Badge variant="destructive" className="text-xs ml-auto">{highRPE.length}</Badge>
         </CardTitle>
       </CardHeader>
@@ -51,8 +49,8 @@ export function RPEAlertsCard({ ratings, players, onPlayerClick }: RPEAlertsCard
                 </div>
                 <div>
                   <p className="text-sm font-medium">{player.name}</p>
-                  <p className="text-[10px] text-muted-foreground capitalize">
-                    Last {r.sessionType} • {new Date(r.createdAt).toLocaleDateString()}
+                  <p className="text-[10px] text-muted-foreground">
+                    Senaste {r.sessionType === 'game' ? 'match' : 'träning'} • {new Date(r.createdAt).toLocaleDateString('sv')}
                   </p>
                 </div>
               </div>

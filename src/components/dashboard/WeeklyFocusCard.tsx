@@ -17,80 +17,48 @@ export function WeeklyFocusCard({ focus, notes, onFocusChange, onNotesChange }: 
   const [focusValue, setFocusValue] = useState(focus);
   const [notesValue, setNotesValue] = useState(notes);
 
-  const handleSaveFocus = () => {
-    onFocusChange?.(focusValue);
-    setEditingFocus(false);
-  };
-
-  const handleSaveNotes = () => {
-    onNotesChange?.(notesValue);
-    setEditingNotes(false);
-  };
-
-  const handleCancelFocus = () => {
-    setFocusValue(focus);
-    setEditingFocus(false);
-  };
-
-  const handleCancelNotes = () => {
-    setNotesValue(notes);
-    setEditingNotes(false);
-  };
+  const handleSaveFocus = () => { onFocusChange?.(focusValue); setEditingFocus(false); };
+  const handleSaveNotes = () => { onNotesChange?.(notesValue); setEditingNotes(false); };
+  const handleCancelFocus = () => { setFocusValue(focus); setEditingFocus(false); };
+  const handleCancelNotes = () => { setNotesValue(notes); setEditingNotes(false); };
 
   return (
     <div className="stat-card">
       <div className="mb-3">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="metric-label">Weekly Focus</h3>
+          <h3 className="metric-label">Veckans fokus</h3>
           {!editingFocus && onFocusChange && (
-            <button onClick={() => setEditingFocus(true)} className="text-xs text-primary hover:underline">Edit</button>
+            <button onClick={() => setEditingFocus(true)} className="text-xs text-primary hover:underline">Redigera</button>
           )}
         </div>
         {editingFocus ? (
           <div className="flex gap-2">
-            <Input
-              value={focusValue}
-              onChange={(e) => setFocusValue(e.target.value)}
-              className="flex-1 h-8 text-sm"
-              autoFocus
-            />
-            <Button size="icon" className="h-8 w-8" onClick={handleSaveFocus}>
-              <Check className="h-3 w-3" />
-            </Button>
-            <Button size="icon" variant="outline" className="h-8 w-8" onClick={handleCancelFocus}>
-              <X className="h-3 w-3" />
-            </Button>
+            <Input value={focusValue} onChange={(e) => setFocusValue(e.target.value)} className="flex-1 h-8 text-sm" autoFocus />
+            <Button size="icon" className="h-8 w-8" onClick={handleSaveFocus}><Check className="h-3 w-3" /></Button>
+            <Button size="icon" variant="outline" className="h-8 w-8" onClick={handleCancelFocus}><X className="h-3 w-3" /></Button>
           </div>
         ) : (
-          <p className="text-base font-semibold text-foreground">{focus || 'Not set'}</p>
+          <p className="text-base font-semibold text-foreground">{focus || 'Ej satt'}</p>
         )}
       </div>
 
       <div className="border-t border-border pt-3">
         <div className="flex items-center justify-between mb-1">
-          <h4 className="metric-label">Coach Notes</h4>
+          <h4 className="metric-label">Tränarnoteringar</h4>
           {!editingNotes && onNotesChange && (
-            <button onClick={() => setEditingNotes(true)} className="text-xs text-primary hover:underline">Edit</button>
+            <button onClick={() => setEditingNotes(true)} className="text-xs text-primary hover:underline">Redigera</button>
           )}
         </div>
         {editingNotes ? (
           <div className="space-y-2">
-            <Textarea
-              value={notesValue}
-              onChange={(e) => setNotesValue(e.target.value)}
-              rows={3}
-              className="text-sm"
-              autoFocus
-            />
+            <Textarea value={notesValue} onChange={(e) => setNotesValue(e.target.value)} rows={3} className="text-sm" autoFocus />
             <div className="flex gap-2 justify-end">
-              <Button size="sm" className="h-7 text-xs" onClick={handleSaveNotes}>Save</Button>
-              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleCancelNotes}>Cancel</Button>
+              <Button size="sm" className="h-7 text-xs" onClick={handleSaveNotes}>Spara</Button>
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={handleCancelNotes}>Avbryt</Button>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {notes || 'No notes'}
-          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{notes || 'Inga noteringar'}</p>
         )}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { EnhancedGame } from '@/types/game';
 import { format } from 'date-fns';
+import { sv } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -14,12 +15,12 @@ export function LastGameCard({ game }: LastGameCardProps) {
   return (
     <div className="stat-card">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="metric-label">Last Game</h3>
+        <h3 className="metric-label">Senaste matchen</h3>
         <span className={cn(
           'status-badge',
           won ? 'bg-success/10 text-success border-success/20' : tied ? 'bg-muted text-muted-foreground' : 'bg-destructive/10 text-destructive border-destructive/20'
         )}>
-          {won ? 'W' : tied ? 'D' : 'L'}
+          {won ? 'V' : tied ? 'O' : 'F'}
         </span>
       </div>
 
@@ -27,7 +28,7 @@ export function LastGameCard({ game }: LastGameCardProps) {
         <div>
           <p className="text-sm font-medium text-foreground">vs {game.opponent}</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {format(new Date(game.date), 'MMM d')} &middot; {game.location}
+            {format(new Date(game.date), 'd MMM', { locale: sv })} &middot; {game.location === 'Home' ? 'Hemma' : 'Borta'}
           </p>
         </div>
         <p className="text-2xl font-bold text-foreground tabular-nums">
@@ -47,7 +48,7 @@ export function LastGameCard({ game }: LastGameCardProps) {
       )}
 
       <Link to={`/games/${game.id}`} className="block mt-3 text-xs font-medium text-primary hover:underline">
-        View all games
+        Visa alla matcher
       </Link>
     </div>
   );
