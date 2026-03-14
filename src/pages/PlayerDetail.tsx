@@ -437,7 +437,7 @@ export default function PlayerDetail() {
       <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Invite {player.name} to the app</DialogTitle>
+            <DialogTitle>Bjud in {player.name} till appen</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleInvitePlayer} className="space-y-4">
             <div className="grid gap-2">
