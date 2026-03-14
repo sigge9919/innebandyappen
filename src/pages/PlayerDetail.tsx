@@ -71,7 +71,7 @@ export default function PlayerDetail() {
         <div className="page-container">
           <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            Tillbaka
           </Button>
           <div className="text-center py-12">
             <p className="text-muted-foreground">Spelaren hittades inte</p>
