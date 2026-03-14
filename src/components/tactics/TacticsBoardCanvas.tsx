@@ -1106,7 +1106,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('addZone')}
             >
               <Square className="h-4 w-4 mr-2" />
-              Shadow Zone
+              Skuggzon
             </Button>
             
             <div className="w-px h-8 bg-border mx-1" />
