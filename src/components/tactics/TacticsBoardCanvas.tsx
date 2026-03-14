@@ -968,7 +968,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                 />
                 {keyframes.length > 1 && (
                   <p className="text-sm text-muted-foreground">
-                    This will save the animation with {keyframes.length} keyframes.
+                    Detta sparar animationen med {keyframes.length} nyckelrutor.
                   </p>
                 )}
                 <Button onClick={handleSaveLayout} className="w-full">
