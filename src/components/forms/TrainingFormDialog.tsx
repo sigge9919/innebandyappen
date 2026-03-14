@@ -365,7 +365,7 @@ export function TrainingFormDialog({
                                       type="button"
                                       onClick={() => movePlayerToTeam(pid, otherIdx)}
                                       className="text-muted-foreground hover:text-foreground text-[10px] px-1 rounded hover:bg-accent"
-                                      title={`Move to ${teams[otherIdx].name}`}
+                                      title={`Flytta till ${teams[otherIdx].name}`}
                                     >
                                       →{otherIdx + 1}
                                     </button>
