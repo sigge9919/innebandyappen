@@ -12,11 +12,11 @@ import { useToast } from '@/hooks/use-toast';
 import { UserPlus, Trash2 } from 'lucide-react';
 
 const ROLE_LABELS: Record<TeamRole, string> = {
-  head_coach: 'Head Coach',
-  assistant_coach: 'Assistant Coach',
-  stats_coach: 'Stats Coach',
-  viewer: 'Viewer',
-  player: 'Player',
+  head_coach: 'Huvudtränare',
+  assistant_coach: 'Assisterande tränare',
+  stats_coach: 'Statistikansvarig',
+  viewer: 'Åskådare',
+  player: 'Spelare',
 };
 
 export default function TeamSettings() {
