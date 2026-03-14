@@ -108,7 +108,7 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
       {/* Goalie Stats */}
       {allGoalieStats.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-3">Goaltender Statistics</h3>
+          <h3 className="text-lg font-semibold mb-3">Målvaktsstatistik</h3>
           <div className="rounded-lg border overflow-x-auto">
             <Table>
               <TableHeader>
