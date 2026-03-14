@@ -48,7 +48,7 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>Player</TableHead>
+                <TableHead>Spelare</TableHead>
                 <TableHead className="text-center">GP</TableHead>
                 <TableHead className="text-center">G</TableHead>
                 <TableHead className="text-center">A</TableHead>
