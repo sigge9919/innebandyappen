@@ -128,7 +128,7 @@ export default function PlayerPortal() {
         duration: ptForm.duration,
         rpeRating: ptForm.rpeRating,
       });
-      toast({ title: 'Personal training saved!' });
+      toast({ title: 'Personlig träning sparad!' });
       setPtDialogOpen(false);
       setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
     } catch {
