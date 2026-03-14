@@ -46,17 +46,16 @@ export default function Training() {
   return (
     <AppLayout>
       <div className="page-container">
-        {/* Header */}
         <div className="section-header">
           <div>
-            <h1 className="section-title">Training</h1>
+            <h1 className="section-title">Träning</h1>
             <p className="text-muted-foreground mt-1">
-              {sessions.length} sessions planned
+              {sessions.length} pass planerade
             </p>
           </div>
           <Button className="gap-2" onClick={() => navigate('/training/session/new')}>
             <Plus className="h-4 w-4" />
-            Create Session
+            Skapa pass
           </Button>
         </div>
 
@@ -64,20 +63,13 @@ export default function Training() {
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Upcoming Sessions</h2>
+            <h2 className="text-lg font-semibold text-foreground">Kommande pass</h2>
           </div>
           
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sessions.map(session => (
-              <div
-                key={session.id}
-                onClick={() => navigate(`/training/session/${session.id}`)}
-                className="cursor-pointer"
-              >
-                <TrainingCard
-                  session={session}
-                  playerNames={getPlayerNames(session.playerIds)}
-                />
+              <div key={session.id} onClick={() => navigate(`/training/session/${session.id}`)} className="cursor-pointer">
+                <TrainingCard session={session} playerNames={getPlayerNames(session.playerIds)} />
               </div>
             ))}
           </div>
@@ -85,9 +77,9 @@ export default function Training() {
           {sessions.length === 0 && (
             <div className="text-center py-12">
               <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="text-muted-foreground">No sessions planned</p>
+              <p className="text-muted-foreground">Inga pass planerade</p>
               <Button variant="outline" className="mt-4" onClick={() => navigate('/training/session/new')}>
-                Create your first session
+                Skapa ditt första pass
               </Button>
             </div>
           )}
@@ -99,35 +91,24 @@ export default function Training() {
             <div>
               <div className="flex items-center gap-2">
                 <Dumbbell className="h-5 w-5 text-primary" />
-                <h2 className="section-title">Drill Library</h2>
+                <h2 className="section-title">Övningsbibliotek</h2>
               </div>
-              <p className="text-muted-foreground mt-1">
-                {drills.length} drills
-              </p>
+              <p className="text-muted-foreground mt-1">{drills.length} övningar</p>
             </div>
             <Button className="gap-2" onClick={() => navigate('/training/drill/new')}>
               <Plus className="h-4 w-4" />
-              Add Drill
+              Lägg till övning
             </Button>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search drills..."
-                value={drillSearch}
-                onChange={(e) => setDrillSearch(e.target.value)}
-                className="pl-10"
-              />
+              <Input placeholder="Sök övningar..." value={drillSearch} onChange={(e) => setDrillSearch(e.target.value)} className="pl-10" />
             </div>
             <div className="flex gap-2 flex-wrap items-center">
-              <Button
-                variant={drillFilter === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setDrillFilter('all')}
-              >
-                All
+              <Button variant={drillFilter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setDrillFilter('all')}>
+                Alla
               </Button>
               <Button
                 variant={drillFilter === 'favorites' ? 'default' : 'outline'}
@@ -139,12 +120,7 @@ export default function Training() {
                 Favoriter
               </Button>
               {allDrillCategories.map(cat => (
-                <Button
-                  key={cat}
-                  variant={drillFilter === cat ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setDrillFilter(cat)}
-                >
+                <Button key={cat} variant={drillFilter === cat ? 'default' : 'outline'} size="sm" onClick={() => setDrillFilter(cat)}>
                   {cat}
                 </Button>
               ))}
@@ -153,21 +129,16 @@ export default function Training() {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDrills.map(drill => (
-              <DrillCard
-                key={drill.id}
-                drill={drill}
-                onClick={() => handleDrillClick(drill)}
-                onToggleFavorite={handleToggleFavorite}
-              />
+              <DrillCard key={drill.id} drill={drill} onClick={() => handleDrillClick(drill)} onToggleFavorite={handleToggleFavorite} />
             ))}
           </div>
 
           {filteredDrills.length === 0 && (
             <div className="text-center py-12">
               <Dumbbell className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="text-muted-foreground">No drills found</p>
+              <p className="text-muted-foreground">Inga övningar hittades</p>
               <Button variant="outline" className="mt-4" onClick={() => navigate('/training/drill/new')}>
-                Add your first drill
+                Lägg till din första övning
               </Button>
             </div>
           )}

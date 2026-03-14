@@ -37,10 +37,10 @@ export default function Team() {
   });
 
   const filterButtons: { value: FilterType; label: string; icon: React.ElementType; count: number }[] = [
-    { value: 'all', label: 'All', icon: Users, count: players.length },
-    { value: 'active', label: 'Active', icon: Users, count: players.filter(p => p.status === 'Active').length },
-    { value: 'injured', label: 'Injured', icon: AlertTriangle, count: players.filter(p => p.status === 'Injured').length },
-    { value: 'focus', label: 'Focus', icon: Target, count: players.filter(p => p.focusFlag).length },
+    { value: 'all', label: 'Alla', icon: Users, count: players.length },
+    { value: 'active', label: 'Aktiva', icon: Users, count: players.filter(p => p.status === 'Active').length },
+    { value: 'injured', label: 'Skadade', icon: AlertTriangle, count: players.filter(p => p.status === 'Injured').length },
+    { value: 'focus', label: 'Fokus', icon: Target, count: players.filter(p => p.focusFlag).length },
   ];
 
   const handlePlayerClick = (player: Player) => {
@@ -66,12 +66,12 @@ export default function Team() {
         {/* Header */}
         <div className="section-header">
           <div>
-            <h1 className="section-title">Team</h1>
-            <p className="text-muted-foreground mt-1">{players.length} players</p>
+            <h1 className="section-title">Lag</h1>
+            <p className="text-muted-foreground mt-1">{players.length} spelare</p>
           </div>
           <Button className="gap-2" onClick={handleAddPlayer}>
             <Plus className="h-4 w-4" />
-            Add Player
+            Lägg till spelare
           </Button>
         </div>
 
@@ -80,7 +80,7 @@ export default function Team() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search players..."
+              placeholder="Sök spelare..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
@@ -124,7 +124,7 @@ export default function Team() {
         {filteredPlayers.length === 0 && (
           <div className="text-center py-12">
             <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">No players found</p>
+            <p className="text-muted-foreground">Inga spelare hittades</p>
           </div>
         )}
       </div>

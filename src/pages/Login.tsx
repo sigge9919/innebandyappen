@@ -23,9 +23,9 @@ export default function Login() {
     setLoading(false);
 
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
     } else if (isSignUp) {
-      toast({ title: 'Check your email', description: 'We sent you a confirmation link.' });
+      toast({ title: 'Kolla din e-post', description: 'Vi har skickat en bekräftelselänk.' });
     }
   };
 
@@ -38,13 +38,13 @@ export default function Login() {
           </div>
           <CardTitle className="text-xl">Coach OS</CardTitle>
           <CardDescription>
-            {isSignUp ? 'Create your account' : 'Sign in to continue'}
+            {isSignUp ? 'Skapa ditt konto' : 'Logga in för att fortsätta'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-post</Label>
               <Input
                 id="email"
                 type="email"
@@ -55,7 +55,7 @@ export default function Login() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Lösenord</Label>
               <Input
                 id="password"
                 type="password"
@@ -67,7 +67,7 @@ export default function Login() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Please wait…' : isSignUp ? 'Create Account' : 'Sign In'}
+              {loading ? 'Vänta…' : isSignUp ? 'Skapa konto' : 'Logga in'}
             </Button>
           </form>
           <div className="mt-4 text-center">
@@ -76,7 +76,7 @@ export default function Login() {
               onClick={() => setIsSignUp(!isSignUp)}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              {isSignUp ? 'Har du redan ett konto? Logga in' : 'Har du inget konto? Skapa ett'}
             </button>
           </div>
         </CardContent>

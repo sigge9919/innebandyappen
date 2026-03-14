@@ -31,15 +31,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/team', icon: Users, label: 'Team' },
-  { to: '/games', icon: Trophy, label: 'Games' },
-  { to: '/stats', icon: BarChart3, label: 'Stats' },
-  { to: '/training', icon: Calendar, label: 'Training' },
-  { to: '/playbook', icon: BookOpen, label: 'Playbook' },
-  { to: '/development', icon: TrendingUp, label: 'Development' },
-  { to: '/tactics', icon: PenTool, label: 'Tactics Board' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: '/', icon: LayoutDashboard, label: 'Översikt' },
+  { to: '/team', icon: Users, label: 'Lag' },
+  { to: '/games', icon: Trophy, label: 'Matcher' },
+  { to: '/stats', icon: BarChart3, label: 'Statistik' },
+  { to: '/training', icon: Calendar, label: 'Träning' },
+  { to: '/playbook', icon: BookOpen, label: 'Spelbok' },
+  { to: '/development', icon: TrendingUp, label: 'Utveckling' },
+  { to: '/tactics', icon: PenTool, label: 'Taktiktavla' },
+  { to: '/settings', icon: Settings, label: 'Inställningar' },
 ];
 
 function NavItem({ to, icon: Icon, label, onClick }: { to: string; icon: React.ElementType; label: string; onClick?: () => void }) {
@@ -70,7 +70,7 @@ function TeamSwitcher() {
       <DropdownMenuTrigger asChild>
         <button className="w-full flex items-center gap-2 px-2 py-1.5 hover:bg-sidebar-accent transition-colors text-left">
           <span className="text-sm font-semibold text-sidebar-foreground truncate flex-1">
-            {activeTeam?.name ?? 'No team'}
+            {activeTeam?.name ?? 'Inget lag'}
           </span>
           <ChevronDown className="h-3 w-3 text-sidebar-foreground/50 shrink-0" />
         </button>
@@ -98,7 +98,7 @@ function TeamSwitcher() {
           className="flex items-center gap-2 cursor-pointer text-muted-foreground text-sm"
         >
           <Plus className="h-3 w-3" />
-          <span>Create new team</span>
+          <span>Skapa nytt lag</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -132,7 +132,7 @@ export function AppSidebar() {
           className="nav-item w-full text-sidebar-foreground/50 hover:text-sidebar-foreground"
         >
           <LogOut className="h-4 w-4" />
-          <span className="text-sm">Sign Out</span>
+          <span className="text-sm">Logga ut</span>
         </button>
       </div>
     </div>

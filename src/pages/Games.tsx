@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Trophy, Calendar, MapPin, Play, CheckCircle, Clock } from 'lucide-react';
 import { EnhancedGame, GameStatus } from '@/types/game';
 import { format } from 'date-fns';
+import { sv } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 type GameFilterType = 'all' | 'not_started' | 'live' | 'finished';
@@ -45,15 +46,21 @@ export default function Games() {
     addEnhancedGame(game);
   };
 
+  const STATUS_LABELS: Record<GameStatus, string> = {
+    'Not Started': 'Ej startad',
+    'Live': 'Live',
+    'Finished': 'Avslutad',
+  };
+
   return (
     <AppLayout>
       <div className="page-container">
         {/* Header */}
         <div className="section-header">
           <div>
-            <h1 className="section-title">Games</h1>
+            <h1 className="section-title">Matcher</h1>
             <p className="text-muted-foreground mt-1">
-              {games.length} total games
+              {games.length} matcher totalt
               {liveGames > 0 && (
                 <span className="ml-2 text-success font-medium">• {liveGames} Live</span>
               )}
@@ -61,7 +68,7 @@ export default function Games() {
           </div>
           <Button className="gap-2" onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4" />
-            Add Game
+            Lägg till match
           </Button>
         </div>
 
@@ -70,54 +77,35 @@ export default function Games() {
           <div className="grid grid-cols-3 gap-4">
             <div className="stat-card flex flex-col items-center py-4">
               <span className="text-2xl font-bold text-success">{wins}</span>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Wins</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Vinster</span>
             </div>
             <div className="stat-card flex flex-col items-center py-4">
               <span className="text-2xl font-bold text-muted-foreground">{draws}</span>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Draws</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Oavgjorda</span>
             </div>
             <div className="stat-card flex flex-col items-center py-4">
               <span className="text-2xl font-bold text-destructive">{losses}</span>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Losses</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Förluster</span>
             </div>
           </div>
         )}
 
         {/* Game Filters */}
         <div className="flex gap-2 flex-wrap">
-          <Button
-            variant={gameFilter === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setGameFilter('all')}
-          >
-            All Games
+          <Button variant={gameFilter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setGameFilter('all')}>
+            Alla matcher
           </Button>
-          <Button
-            variant={gameFilter === 'not_started' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setGameFilter('not_started')}
-            className="gap-2"
-          >
+          <Button variant={gameFilter === 'not_started' ? 'default' : 'outline'} size="sm" onClick={() => setGameFilter('not_started')} className="gap-2">
             <Clock className="h-4 w-4" />
-            Not Started
+            Ej startade
           </Button>
-          <Button
-            variant={gameFilter === 'live' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setGameFilter('live')}
-            className="gap-2"
-          >
+          <Button variant={gameFilter === 'live' ? 'default' : 'outline'} size="sm" onClick={() => setGameFilter('live')} className="gap-2">
             <Play className="h-4 w-4" />
             Live
           </Button>
-          <Button
-            variant={gameFilter === 'finished' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setGameFilter('finished')}
-            className="gap-2"
-          >
+          <Button variant={gameFilter === 'finished' ? 'default' : 'outline'} size="sm" onClick={() => setGameFilter('finished')} className="gap-2">
             <CheckCircle className="h-4 w-4" />
-            Finished
+            Avslutade
           </Button>
         </div>
 
@@ -128,6 +116,7 @@ export default function Games() {
               key={game.id} 
               game={game}
               onClick={() => handleGameClick(game)}
+              statusLabels={STATUS_LABELS}
             />
           ))}
         </div>
@@ -135,9 +124,9 @@ export default function Games() {
         {filteredGames.length === 0 && (
           <div className="text-center py-12">
             <Trophy className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">No games found</p>
+            <p className="text-muted-foreground">Inga matcher hittades</p>
             <Button className="mt-4" onClick={() => setDialogOpen(true)}>
-              Add Your First Game
+              Lägg till din första match
             </Button>
           </div>
         )}
@@ -152,7 +141,7 @@ export default function Games() {
   );
 }
 
-function GameListCard({ game, onClick }: { game: EnhancedGame; onClick: () => void }) {
+function GameListCard({ game, onClick, statusLabels }: { game: EnhancedGame; onClick: () => void; statusLabels: Record<GameStatus, string> }) {
   const statusConfig: Record<GameStatus, { color: string; icon: React.ComponentType<{ className?: string }> }> = {
     'Not Started': { color: 'bg-muted text-muted-foreground', icon: Clock },
     'Live': { color: 'bg-success/10 text-success border border-success animate-pulse', icon: Play },
@@ -172,11 +161,11 @@ function GameListCard({ game, onClick }: { game: EnhancedGame; onClick: () => vo
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
-          {format(new Date(game.date), 'EEE, MMM d, yyyy')}
+          {format(new Date(game.date), 'EEE d MMM yyyy', { locale: sv })}
         </div>
         <Badge className={cn('gap-1', color)}>
           <StatusIcon className="h-3 w-3" />
-          {game.status}
+          {statusLabels[game.status]}
         </Badge>
       </div>
 
@@ -185,7 +174,7 @@ function GameListCard({ game, onClick }: { game: EnhancedGame; onClick: () => vo
           <h3 className="text-lg font-semibold text-foreground">{game.opponent}</h3>
           <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
             <MapPin className="h-3.5 w-3.5" />
-            {game.location}
+            {game.location === 'Home' ? 'Hemma' : 'Borta'}
           </div>
         </div>
 
@@ -204,14 +193,14 @@ function GameListCard({ game, onClick }: { game: EnhancedGame; onClick: () => vo
       {game.status === 'Not Started' && game.squadPlayerIds.length > 0 && (
         <div className="mt-3 pt-3 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            Squad: {game.squadPlayerIds.length} players selected
+            Trupp: {game.squadPlayerIds.length} spelare valda
           </p>
         </div>
       )}
 
       {isFinished && game.notes?.focusNextWeek && (
         <div className="mt-3 pt-3 border-t border-border">
-          <p className="text-xs font-medium text-muted-foreground uppercase mb-1">Focus Next Week</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase mb-1">Fokus nästa vecka</p>
           <p className="text-sm text-foreground line-clamp-2">{game.notes.focusNextWeek}</p>
         </div>
       )}
