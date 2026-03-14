@@ -66,7 +66,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
             </div>
             <div className="pt-2 border-t border-border">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">PP Efficiency</span>
+                <span className="text-sm font-medium">PP-effektivitet</span>
                 <span className={cn(
                   'text-xl font-bold',
                   parseFloat(ppEfficiency) >= 20 ? 'text-success' : 'text-foreground'
