@@ -104,7 +104,7 @@ export default function TeamSettings() {
               <CardContent>
                 <form onSubmit={handleInvite} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="inviteEmail">Email</Label>
+                    <Label htmlFor="inviteEmail">E-post</Label>
                     <Input
                       id="inviteEmail"
                       type="email"
