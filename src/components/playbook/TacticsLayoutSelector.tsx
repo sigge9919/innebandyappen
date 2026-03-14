@@ -37,8 +37,8 @@ export function TacticsLayoutSelector({ selectedIds, onSelect }: TacticsLayoutSe
     return (
       <div className="text-center py-8 text-muted-foreground">
         <Layout className="h-12 w-12 mx-auto mb-3 opacity-30" />
-        <p>No saved tactics board layouts</p>
-        <p className="text-sm mt-1">Create layouts in the Tactics Board to link them here</p>
+        <p>Inga sparade taktiktavlor</p>
+        <p className="text-sm mt-1">Skapa uppställningar i taktiktavlan för att länka dem här</p>
       </div>
     );
   }
