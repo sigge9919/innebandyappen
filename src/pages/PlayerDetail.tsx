@@ -441,7 +441,7 @@ export default function PlayerDetail() {
           </DialogHeader>
           <form onSubmit={handleInvitePlayer} className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="invite-email">Player's email address</Label>
+              <Label htmlFor="invite-email">Spelarens e-postadress</Label>
               <Input
                 id="invite-email"
                 type="email"
