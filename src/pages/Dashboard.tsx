@@ -59,37 +59,33 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Content grid */}
+        {/* Priority row */}
+        <div className="grid lg:grid-cols-4 gap-4 mb-4">
+          {nextTraining && (
+            <NextTrainingCard
+              session={nextTraining}
+              playerCount={nextTraining.playerIds.length}
+            />
+          )}
+          {upcomingGame && <NextGameCard game={upcomingGame} />}
+          <WeeklyFocusCard 
+            focus={focus} 
+            notes={notes}
+            onFocusChange={saveFocus}
+            onNotesChange={saveNotes}
+          />
+          <TeamRPECard ratings={allRPERatings} players={players} />
+        </div>
+
+        {/* Secondary row */}
         <div className="grid lg:grid-cols-3 gap-4">
-          <div className="space-y-4">
-            {upcomingGame && <NextGameCard game={upcomingGame} />}
-            {lastPlayedGame && <LastGameCard game={lastPlayedGame} />}
-          </div>
-
-          <div className="space-y-4">
-            {nextTraining && (
-              <NextTrainingCard
-                session={nextTraining}
-                playerCount={nextTraining.playerIds.length}
-              />
-            )}
-            <WeeklyFocusCard 
-              focus={focus} 
-              notes={notes}
-              onFocusChange={saveFocus}
-              onNotesChange={saveNotes}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <TeamRPECard ratings={allRPERatings} players={players} />
-            <RPEAlertsCard
-              ratings={allRPERatings}
-              players={players}
-              onPlayerClick={(player) => navigate(`/team/${player.id}`)}
-            />
-            <PlayerAlerts players={players} onPlayerClick={(player) => navigate(`/team/${player.id}`)} />
-          </div>
+          {lastPlayedGame && <LastGameCard game={lastPlayedGame} />}
+          <RPEAlertsCard
+            ratings={allRPERatings}
+            players={players}
+            onPlayerClick={(player) => navigate(`/team/${player.id}`)}
+          />
+          <PlayerAlerts players={players} onPlayerClick={(player) => navigate(`/team/${player.id}`)} />
         </div>
       </div>
     </AppLayout>
