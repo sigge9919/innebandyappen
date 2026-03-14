@@ -237,7 +237,7 @@ export default function PlayerDetail() {
         
         {/* Season Statistics */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">Season Statistics</h2>
+          <h2 className="text-lg font-semibold mb-4">Säsongsstatistik</h2>
           <PlayerStatsSection player={player} games={games} />
         </div>
         
