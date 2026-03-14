@@ -35,7 +35,7 @@ export default function PlayerDetail() {
   const { idps, addIDP, updateIDP, deleteIDP } = useIDPs();
   const { sessions } = useTrainingSessions();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
-  const { activeTeam, inviteCoach } = useTeam();
+  const { activeTeam, inviteCoach, seasons, selectedSeasonId, setSelectedSeasonId } = useTeam();
   const { toast } = useToast();
   
   const player = players.find(p => p.id === playerId);
