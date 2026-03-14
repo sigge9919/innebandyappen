@@ -246,10 +246,10 @@ export default function PlayerDetail() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
-              Development Plans
+              Utvecklingsplaner
             </h2>
             <Button variant="outline" size="sm" onClick={handleAddPlan}>
-              <Plus className="h-4 w-4 mr-1" /> Add Plan
+              <Plus className="h-4 w-4 mr-1" /> Lägg till plan
             </Button>
           </div>
 
