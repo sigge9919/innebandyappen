@@ -63,7 +63,7 @@ export default function TeamSettings() {
           {/* Members */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Team Members</CardTitle>
+              <CardTitle className="text-lg">Lagmedlemmar</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {members.map(m => (
