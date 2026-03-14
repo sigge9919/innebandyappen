@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { usePlayers, useIDPs, useTestResults, useRPERatings, usePersonalTrainings, useTrainingSessions } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { useTeam } from '@/contexts/TeamContext';
+import { SeasonSelector } from '@/components/SeasonSelector';
 import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
 import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
 import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
@@ -34,7 +35,7 @@ export default function PlayerDetail() {
   const { idps, addIDP, updateIDP, deleteIDP } = useIDPs();
   const { sessions } = useTrainingSessions();
   const { tests, addTest, updateTest, deleteTest } = useTestResults();
-  const { activeTeam, inviteCoach } = useTeam();
+  const { activeTeam, inviteCoach, seasons, selectedSeasonId, setSelectedSeasonId } = useTeam();
   const { toast } = useToast();
   
   const player = players.find(p => p.id === playerId);
@@ -237,7 +238,10 @@ export default function PlayerDetail() {
         
         {/* Season Statistics */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">Säsongsstatistik</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Säsongsstatistik</h2>
+            <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
+          </div>
           <PlayerStatsSection player={player} games={games} />
         </div>
         
