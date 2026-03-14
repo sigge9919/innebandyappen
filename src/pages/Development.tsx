@@ -180,7 +180,7 @@ export default function Development() {
                                 <div className="flex items-center gap-2 min-w-0">
                                   <p className="font-medium text-foreground text-sm truncate">{idp.goal}</p>
                                   <Badge variant={getIDPStatusVariant(status)} className="text-xs shrink-0">
-                                    {status === 'Overdue' && <AlertCircle className="h-3 w-3 mr-1" />}
+                                    {status === 'Försenad' && <AlertCircle className="h-3 w-3 mr-1" />}
                                     {STATUS_LABELS[status] || status}
                                   </Badge>
                                 </div>
