@@ -73,7 +73,7 @@ export function GoalieStats({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              <th className="py-2 px-2 text-left font-medium text-muted-foreground">Goalie</th>
+              <th className="py-2 px-2 text-left font-medium text-muted-foreground">Målvakt</th>
               <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                 <span className="flex items-center justify-center gap-1">
                   GA
