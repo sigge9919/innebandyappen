@@ -34,7 +34,7 @@ const ACCESS_LABELS: Record<AccessLevel, string> = {
 };
 
 export default function TeamSettings() {
-  const { activeTeam, activeRole, members, inviteCoach, removeMember } = useTeam();
+  const { activeTeam, activeRole, members, inviteCoach, removeMember, seasons, startNewSeason } = useTeam();
   const { user } = useAuth();
   const { toast } = useToast();
   const { permissions, savePermissions } = usePermissions();
