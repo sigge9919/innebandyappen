@@ -1117,7 +1117,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             </Button>
             <Button variant="outline" size="sm" onClick={() => setZones([])}>
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear Zones
+              Rensa zoner
             </Button>
             <Button variant="outline" size="sm" onClick={clearPlayers}>
               <Trash2 className="h-4 w-4 mr-2" />
