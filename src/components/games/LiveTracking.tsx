@@ -49,7 +49,7 @@ const PERIOD_LABELS: Record<Period, string> = {
   '1': 'Period 1',
   '2': 'Period 2',
   '3': 'Period 3',
-  'OT': 'Overtime',
+  'OT': 'Övertid',
 };
 
 export function LiveTracking({
