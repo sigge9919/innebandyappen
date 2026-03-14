@@ -74,7 +74,7 @@ export default function PlayerDetail() {
             Back
           </Button>
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Player not found</p>
+            <p className="text-muted-foreground">Spelaren hittades inte</p>
           </div>
         </div>
       </AppLayout>
