@@ -32,7 +32,7 @@ export function PenaltyEditor({
   return (
     <div>
       <p className="text-sm text-muted-foreground mb-4">
-        Assign penalties to the players who committed them.
+        Tilldela utvisningar till spelarna som begick dem.
       </p>
       
       <div className="space-y-4">
