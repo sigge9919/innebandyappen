@@ -190,21 +190,21 @@ export default function PlayerPortal() {
             <CardContent className="pt-4 text-center">
               <Activity className="h-5 w-5 text-primary mx-auto mb-1" />
               <p className="text-2xl font-bold">{avgRPE}</p>
-              <p className="text-xs text-muted-foreground">Avg RPE</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 text-center">
-              <TrendingUp className="h-5 w-5 text-primary mx-auto mb-1" />
-              <p className="text-2xl font-bold">{ratings.length}</p>
-              <p className="text-xs text-muted-foreground">Sessions Rated</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 text-center">
-              <Dumbbell className="h-5 w-5 text-primary mx-auto mb-1" />
-              <p className="text-2xl font-bold">{trainings.length}</p>
-              <p className="text-xs text-muted-foreground">Personal Sessions</p>
+               <p className="text-xs text-muted-foreground">Snitt RPE</p>
+             </CardContent>
+           </Card>
+           <Card>
+             <CardContent className="pt-4 text-center">
+               <TrendingUp className="h-5 w-5 text-primary mx-auto mb-1" />
+               <p className="text-2xl font-bold">{ratings.length}</p>
+               <p className="text-xs text-muted-foreground">Bedömda pass</p>
+             </CardContent>
+           </Card>
+           <Card>
+             <CardContent className="pt-4 text-center">
+               <Dumbbell className="h-5 w-5 text-primary mx-auto mb-1" />
+               <p className="text-2xl font-bold">{trainings.length}</p>
+               <p className="text-xs text-muted-foreground">Egna pass</p>
             </CardContent>
           </Card>
         </div>
