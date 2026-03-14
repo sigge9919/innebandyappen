@@ -73,7 +73,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
           <p className="metric-value text-success">{wins}</p>
         </div>
         <div className="stat-card text-center">
-          <p className="metric-label">Losses</p>
+          <p className="metric-label">Förluster</p>
           <p className="metric-value text-destructive">{losses}</p>
         </div>
         <div className="stat-card text-center">
