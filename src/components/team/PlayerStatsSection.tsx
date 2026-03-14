@@ -75,7 +75,7 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
                   <TableHead>GP</TableHead>
                   <TableHead>GA</TableHead>
                   <TableHead>SA</TableHead>
-                  <TableHead>Saves</TableHead>
+                  <TableHead>Räddningar</TableHead>
                   <TableHead>SV%</TableHead>
                 </TableRow>
               </TableHeader>
