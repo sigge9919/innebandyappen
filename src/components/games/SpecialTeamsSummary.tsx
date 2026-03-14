@@ -93,7 +93,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
           
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Goals Against (PP)</span>
+              <span className="text-sm text-muted-foreground">Insläppta mål (PP)</span>
               <span className="font-semibold text-lg text-destructive">{boxPlay.goalsAgainst}</span>
             </div>
             <div className="flex justify-between items-center">
