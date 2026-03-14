@@ -63,7 +63,7 @@ export function TeamTrends({ games }: TeamTrendsProps) {
   if (trendData.length === 0) {
     return (
       <p className="text-center text-muted-foreground py-8">
-        No finished games to show trends
+        Inga avslutade matcher att visa trender för
       </p>
     );
   }
