@@ -113,7 +113,7 @@ export function GoalieStats({
                       </span>
                       {isActive && (
                         <Badge variant="secondary" className="text-xs">
-                          Active
+                          Aktiv
                         </Badge>
                       )}
                     </div>
