@@ -29,6 +29,7 @@ import { useState } from 'react';
 import { useTeam, Team } from '@/contexts/TeamContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { usePermissions, routeToSection } from '@/hooks/usePermissions';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Översikt' },
@@ -109,6 +110,14 @@ export function AppSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { activeTeam } = useTeam();
   const { signOut } = useAuth();
+  const { canView } = usePermissions();
+
+  const visibleNavItems = navItems.filter(item => {
+    const section = routeToSection(item.to);
+    // Dashboard, settings always visible
+    if (!section) return true;
+    return canView(section);
+  });
 
   const SidebarContent = ({ onItemClick }: { onItemClick?: () => void }) => (
     <div className="flex flex-col h-full bg-sidebar">
@@ -120,7 +129,7 @@ export function AppSidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 py-2">
-        {navItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <NavItem key={item.to} {...item} onClick={onItemClick} />
         ))}
       </nav>
