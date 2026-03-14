@@ -297,10 +297,10 @@ export function TrainingFormDialog({
               {/* Players Attending */}
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label>Players Attending</Label>
+                  <Label>Närvarande spelare</Label>
                   <Button type="button" variant="ghost" size="sm" className="text-xs h-7" onClick={selectAllPlayers}>
                     {players.filter(p => p.status === 'Active').every(p => formData.playerIds.includes(p.id))
-                      ? 'Deselect All' : 'Select All'}
+                      ? 'Avmarkera alla' : 'Välj alla'}
                   </Button>
                 </div>
                 <div className="border rounded-md p-3 space-y-2 max-h-40 overflow-y-auto">
