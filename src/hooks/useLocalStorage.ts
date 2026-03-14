@@ -75,17 +75,20 @@ export function useGames() {
   return { games, isLoading, addGame, updateGame, deleteGame, refresh };
 }
 
-export function useTrainingSessions() {
+export function useTrainingSessions(seasonId?: string | null) {
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { activeTeam } = useTeam();
+  const { activeTeam, selectedSeasonId: ctxSeasonId } = useTeam();
+  const effectiveSeasonId = seasonId !== undefined ? seasonId : ctxSeasonId;
 
   const refresh = useCallback(async () => {
     if (!activeTeam) { setSessions([]); setIsLoading(false); return; }
-    const { data } = await supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id);
+    let query = supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id);
+    if (effectiveSeasonId) query = query.eq('season_id', effectiveSeasonId);
+    const { data } = await query;
     setSessions((data ?? []).map(dbToTraining));
     setIsLoading(false);
-  }, [activeTeam]);
+  }, [activeTeam, effectiveSeasonId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
