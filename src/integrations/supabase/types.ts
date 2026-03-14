@@ -88,6 +88,7 @@ export type Database = {
           our_score: number | null
           penalties: Json | null
           player_stats: Json | null
+          season_id: string | null
           squad_player_ids: string[] | null
           starting_goalie_id: string | null
           status: string
@@ -110,6 +111,7 @@ export type Database = {
           our_score?: number | null
           penalties?: Json | null
           player_stats?: Json | null
+          season_id?: string | null
           squad_player_ids?: string[] | null
           starting_goalie_id?: string | null
           status?: string
@@ -132,12 +134,20 @@ export type Database = {
           our_score?: number | null
           penalties?: Json | null
           player_stats?: Json | null
+          season_id?: string | null
           squad_player_ids?: string[] | null
           starting_goalie_id?: string | null
           status?: string
           team_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "games_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "games_team_id_fkey"
             columns: ["team_id"]
@@ -261,6 +271,7 @@ export type Database = {
           id: string
           player_id: string
           rating: number
+          season_id: string | null
           session_id: string
           session_type: string
           team_id: string
@@ -270,6 +281,7 @@ export type Database = {
           id?: string
           player_id: string
           rating?: number
+          season_id?: string | null
           session_id: string
           session_type: string
           team_id: string
@@ -279,6 +291,7 @@ export type Database = {
           id?: string
           player_id?: string
           rating?: number
+          season_id?: string | null
           session_id?: string
           session_type?: string
           team_id?: string
@@ -289,6 +302,13 @@ export type Database = {
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_rpe_ratings_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
             referencedColumns: ["id"]
           },
           {
@@ -396,6 +416,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "plays_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seasons: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          is_active: boolean
+          name: string
+          start_date: string | null
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          start_date?: string | null
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          start_date?: string | null
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seasons_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
@@ -561,6 +619,7 @@ export type Database = {
           duration: number
           id: string
           player_ids: string[] | null
+          season_id: string | null
           sections: Json | null
           team_id: string
           theme: string
@@ -571,6 +630,7 @@ export type Database = {
           duration?: number
           id?: string
           player_ids?: string[] | null
+          season_id?: string | null
           sections?: Json | null
           team_id: string
           theme: string
@@ -581,11 +641,19 @@ export type Database = {
           duration?: number
           id?: string
           player_ids?: string[] | null
+          season_id?: string | null
           sections?: Json | null
           team_id?: string
           theme?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "training_sessions_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "training_sessions_team_id_fkey"
             columns: ["team_id"]
