@@ -1059,7 +1059,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               className={cn(selectedTool !== 'addOpponent' && 'border-destructive text-destructive hover:bg-destructive/10')}
             >
               <UserMinus className="h-4 w-4 mr-2" />
-              Add Opponent
+              Motståndare
             </Button>
             <Button
               variant={selectedTool === 'addBall' ? 'default' : 'outline'}
