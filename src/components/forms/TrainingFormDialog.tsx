@@ -340,7 +340,7 @@ export function TrainingFormDialog({
                       />
                       <Button type="button" variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={randomizeTeams}>
                         <Shuffle className="h-3 w-3" />
-                        Randomize
+                        Slumpa
                       </Button>
                     </div>
                   </div>
