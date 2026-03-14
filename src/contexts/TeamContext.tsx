@@ -57,7 +57,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const {
     seasons, activeSeason, selectedSeason, selectedSeasonId,
     setSelectedSeasonId, startNewSeason, loading: seasonsLoading, refresh: refreshSeasons,
-  } = useSeasons();
+  } = useSeasons(activeTeam?.id);
 
   const refreshTeams = useCallback(async () => {
     if (!user) { setTeams([]); setLoading(false); return; }
