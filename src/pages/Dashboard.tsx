@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { useTeam } from '@/contexts/TeamContext';
+import { SeasonSelector } from '@/components/SeasonSelector';
 import { NextGameCard } from '@/components/dashboard/NextGameCard';
 import { LastGameCard } from '@/components/dashboard/LastGameCard';
 import { NextTrainingCard } from '@/components/dashboard/NextTrainingCard';
@@ -13,6 +15,7 @@ import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { seasons, selectedSeasonId, setSelectedSeasonId, selectedSeason } = useTeam();
   const { players } = usePlayers();
   const { games } = useEnhancedGames();
   const { sessions } = useTrainingSessions();
@@ -35,7 +38,11 @@ export default function Dashboard() {
     <AppLayout>
       <div className="page-container">
         <div className="section-header">
-          <h1 className="section-title">Översikt</h1>
+          <div>
+            <h1 className="section-title">Översikt</h1>
+            {selectedSeason && <p className="text-muted-foreground text-sm mt-0.5">{selectedSeason.name}</p>}
+          </div>
+          <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
         </div>
 
         {/* Stats row */}
