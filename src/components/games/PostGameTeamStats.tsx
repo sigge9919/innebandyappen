@@ -96,7 +96,7 @@ export function PostGameTeamStats({
                   highlight
                 />
                 <StatEditRow
-                  label="Shots on Goal"
+                  label="Skott på mål"
                   homeValue={homeStats.shotsOnGoal}
                   opponentValue={opponentStats.shotsOnGoal}
                   editable={isEditable}
