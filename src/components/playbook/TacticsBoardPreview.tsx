@@ -249,7 +249,7 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
         <div className="px-3 py-2 border-t text-sm font-medium truncate flex items-center gap-2">
           {layout.name}
           <span className="ml-auto text-xs text-muted-foreground group-hover:text-primary transition-colors">
-            Click to expand
+            Klicka för att expandera
           </span>
         </div>
       </div>

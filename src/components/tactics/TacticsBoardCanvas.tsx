@@ -524,7 +524,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
         const player = findPlayerAtPosition(x, y);
         if (player) {
           setPlayers(prev => prev.filter(p => p.id !== player.id));
-          toast.success('Player removed');
+          toast.success('Spelare borttagen');
         }
       } else if (selectedTool === 'addHome') {
         setPlayers((prev) => [
@@ -546,7 +546,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             { id: `ball-${Date.now()}`, x, y, type: 'ball' },
           ]);
         } else {
-          toast.info('Ball already on the field - drag it to move');
+          toast.info('Bollen finns redan på planen - dra för att flytta');
         }
       }
     }
@@ -670,7 +670,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
           const player = findPlayerAtPosition(x, y);
           if (player) {
             setPlayers(prev => prev.filter(p => p.id !== player.id));
-            toast.success('Player removed');
+            toast.success('Spelare borttagen');
           }
         } else if (selectedTool === 'addHome') {
           setPlayers(prev => [...prev, { id: `home-${Date.now()}`, x, y, type: 'home', number: homePlayerCount }]);
@@ -683,7 +683,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
           if (!hasBall) {
             setPlayers(prev => [...prev, { id: `ball-${Date.now()}`, x, y, type: 'ball' }]);
           } else {
-            toast.info('Ball already on the field - drag it to move');
+            toast.info('Bollen finns redan på planen - dra för att flytta');
           }
         }
       }
@@ -755,7 +755,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     
     setKeyframes(redistributedKeyframes);
     setCurrentKeyframeIndex(redistributedKeyframes.length - 1);
-    toast.success(`Keyframe ${redistributedKeyframes.length} added`);
+    toast.success(`Nyckelruta ${redistributedKeyframes.length} tillagd`);
   };
 
   const updateCurrentKeyframe = () => {
@@ -770,7 +770,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
         : kf
     );
     setKeyframes(updatedKeyframes);
-    toast.success('Keyframe updated');
+    toast.success('Nyckelruta uppdaterad');
   };
 
   const deleteCurrentKeyframe = () => {
@@ -783,7 +783,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     if (newKeyframes.length > 0) {
       setPlayers(newKeyframes[Math.max(0, currentKeyframeIndex - 1)].players);
     }
-    toast.success('Keyframe deleted');
+    toast.success('Nyckelruta borttagen');
   };
 
   const goToKeyframe = (index: number) => {
@@ -809,7 +809,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
 
   const playAnimation = () => {
     if (keyframes.length < 2) {
-      toast.error('Add at least 2 keyframes to play animation');
+      toast.error('Lägg till minst 2 nyckelrutor för att spela animation');
       return;
     }
     setPlaybackPosition(0);
@@ -842,7 +842,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   // Save current layout
   const handleSaveLayout = () => {
     if (!layoutName.trim()) {
-      toast.error('Please enter a name for the layout');
+      toast.error('Ange ett namn för uppställningen');
       return;
     }
 
@@ -867,7 +867,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     setSavedLayouts(updatedLayouts);
     setLayoutName('');
     setSaveDialogOpen(false);
-    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Layout'} "${newLayout.name}" saved`);
+    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Uppställning'} "${newLayout.name}" sparad`);
   };
 
   // Load a saved layout
@@ -902,7 +902,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     }
 
     setLoadDialogOpen(false);
-    toast.success(`${layout.isAnimation ? 'Animation' : 'Layout'} "${layout.name}" loaded`);
+    toast.success(`${layout.isAnimation ? 'Animation' : 'Uppställning'} "${layout.name}" laddad`);
   };
 
   // Delete a saved layout
@@ -911,7 +911,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     const updatedLayouts = savedLayouts.filter((l) => l.id !== layoutId);
     saveLayoutToStorage(updatedLayouts);
     setSavedLayouts(updatedLayouts);
-    toast.success('Layout deleted');
+    toast.success('Uppställning borttagen');
   };
 
   return (
@@ -926,7 +926,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setMode('edit')}
             >
               <Pencil className="h-4 w-4 mr-2" />
-              Edit Mode
+              Redigeringsläge
             </Button>
             <Button
               variant={mode === 'animate' ? 'default' : 'outline'}
@@ -934,7 +934,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={toggleMode}
             >
               <Film className="h-4 w-4 mr-2" />
-              Animation Mode
+              Animeringsläge
               {keyframes.length > 0 && (
                 <Badge variant="secondary" className="ml-2 text-xs">
                   {keyframes.length}
@@ -950,29 +950,29 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <Save className="h-4 w-4 mr-2" />
-                Save
+                Spara
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  Save {keyframes.length > 1 ? 'Animation' : 'Layout'}
+                  Spara {keyframes.length > 1 ? 'animation' : 'uppställning'}
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <Input
-                  placeholder="Name (e.g., Power Play Setup 1)"
+                  placeholder="Namn (t.ex. Powerplay uppställning 1)"
                   value={layoutName}
                   onChange={(e) => setLayoutName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSaveLayout()}
                 />
                 {keyframes.length > 1 && (
                   <p className="text-sm text-muted-foreground">
-                    This will save the animation with {keyframes.length} keyframes.
+                    Detta sparar animationen med {keyframes.length} nyckelrutor.
                   </p>
                 )}
                 <Button onClick={handleSaveLayout} className="w-full">
-                  Save {keyframes.length > 1 ? 'Animation' : 'Layout'}
+                  Spara {keyframes.length > 1 ? 'animation' : 'uppställning'}
                 </Button>
               </div>
             </DialogContent>
@@ -982,17 +982,17 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <FolderOpen className="h-4 w-4 mr-2" />
-                Load
+                Ladda
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Load Layout / Animation</DialogTitle>
+                <DialogTitle>Ladda uppställning / animation</DialogTitle>
               </DialogHeader>
               <div className="space-y-2 pt-4 max-h-80 overflow-y-auto">
                 {savedLayouts.length === 0 ? (
                   <p className="text-muted-foreground text-center py-4">
-                    No saved layouts yet
+                    Inga sparade uppställningar ännu
                   </p>
                 ) : (
                   savedLayouts.map((layout) => (
@@ -1008,10 +1008,10 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                         <div>
                           <p className="font-medium">{layout.name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {layout.players.length} players
-                            {layout.isAnimation && ` • ${layout.keyframes?.length} keyframes`}
+                            {layout.players.length} spelare
+                            {layout.isAnimation && ` • ${layout.keyframes?.length} nyckelrutor`}
                             {' • '}
-                            {new Date(layout.createdAt).toLocaleDateString()}
+                            {new Date(layout.createdAt).toLocaleDateString('sv-SE')}
                           </p>
                         </div>
                       </div>
@@ -1041,7 +1041,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('select')}
             >
               <Users className="h-4 w-4 mr-2" />
-              Select/Move
+              Välj/Flytta
             </Button>
             <Button
               variant={selectedTool === 'addHome' ? 'default' : 'outline'}
@@ -1050,7 +1050,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               className={cn(selectedTool !== 'addHome' && 'border-primary text-primary hover:bg-primary/10')}
             >
               <Users className="h-4 w-4 mr-2" />
-              Add Home
+              Hemmalag
             </Button>
             <Button
               variant={selectedTool === 'addOpponent' ? 'destructive' : 'outline'}
@@ -1059,7 +1059,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               className={cn(selectedTool !== 'addOpponent' && 'border-destructive text-destructive hover:bg-destructive/10')}
             >
               <UserMinus className="h-4 w-4 mr-2" />
-              Add Opponent
+              Motståndare
             </Button>
             <Button
               variant={selectedTool === 'addBall' ? 'default' : 'outline'}
@@ -1068,7 +1068,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               className={cn(selectedTool !== 'addBall' && 'border-orange-500 text-orange-500 hover:bg-orange-500/10')}
             >
               <CircleDot className="h-4 w-4 mr-2" />
-              Add Ball
+              Boll
             </Button>
             <Button
               variant={selectedTool === 'delete' ? 'destructive' : 'outline'}
@@ -1076,7 +1076,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('delete')}
             >
               <X className="h-4 w-4 mr-2" />
-              Delete
+              Ta bort
             </Button>
             
             <div className="w-px h-8 bg-border mx-1" />
@@ -1087,7 +1087,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('draw')}
             >
               <Pencil className="h-4 w-4 mr-2" />
-              Draw
+              Rita
             </Button>
             <Button
               variant={selectedTool === 'erase' ? 'default' : 'outline'}
@@ -1095,7 +1095,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('erase')}
             >
               <Eraser className="h-4 w-4 mr-2" />
-              Erase
+              Sudda
             </Button>
             
             <div className="w-px h-8 bg-border mx-1" />
@@ -1106,26 +1106,26 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('addZone')}
             >
               <Square className="h-4 w-4 mr-2" />
-              Shadow Zone
+              Skuggzon
             </Button>
             
             <div className="w-px h-8 bg-border mx-1" />
             
             <Button variant="outline" size="sm" onClick={clearDrawing}>
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear Drawing
+              Rensa ritning
             </Button>
             <Button variant="outline" size="sm" onClick={() => setZones([])}>
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear Zones
+              Rensa zoner
             </Button>
             <Button variant="outline" size="sm" onClick={clearPlayers}>
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear Players
+              Rensa spelare
             </Button>
             <Button variant="outline" size="sm" onClick={resetAll}>
               <RotateCcw className="h-4 w-4 mr-2" />
-              Reset All
+              Återställ allt
             </Button>
           </div>
         </Card>
@@ -1149,7 +1149,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               {isPlaying ? (
                 <Button variant="default" size="sm" onClick={stopAnimation}>
                   <Pause className="h-4 w-4 mr-2" />
-                  Stop
+                   Stopp
                 </Button>
               ) : (
                 <Button 
@@ -1159,7 +1159,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                   disabled={keyframes.length < 2}
                 >
                   <Play className="h-4 w-4 mr-2" />
-                  Play
+                   Spela
                 </Button>
               )}
               
@@ -1183,7 +1183,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               disabled={isPlaying}
             >
               <Circle className="h-4 w-4 mr-2" />
-              Add Keyframe
+              Lägg till nyckelruta
             </Button>
             <Button
               variant="outline"
@@ -1192,7 +1192,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               disabled={keyframes.length === 0 || isPlaying}
             >
               <Save className="h-4 w-4 mr-2" />
-              Update Keyframe
+              Uppdatera nyckelruta
             </Button>
             <Button
               variant="outline"
@@ -1201,14 +1201,14 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               disabled={keyframes.length === 0 || isPlaying}
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete Keyframe
+              Ta bort nyckelruta
             </Button>
             
             <div className="flex-1" />
             
             {/* Speed control */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Speed:</span>
+              <span className="text-sm text-muted-foreground">Hastighet:</span>
               <Slider
                 value={[animationSpeed]}
                 onValueChange={([val]) => setAnimationSpeed(val)}
@@ -1225,10 +1225,10 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
-                Keyframe {keyframes.length > 0 ? currentKeyframeIndex + 1 : 0} of {keyframes.length}
+                Nyckelruta {keyframes.length > 0 ? currentKeyframeIndex + 1 : 0} av {keyframes.length}
               </span>
               <span className="text-muted-foreground">
-                {isPlaying ? `Playing: ${Math.round(playbackPosition)}%` : 'Stopped'}
+                {isPlaying ? `Spelar: ${Math.round(playbackPosition)}%` : 'Stoppad'}
               </span>
             </div>
             
@@ -1313,23 +1313,23 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
 
       {/* Instructions */}
       <Card className="p-4 bg-muted/50">
-        <h3 className="font-semibold mb-2">How to use</h3>
+        <h3 className="font-semibold mb-2">Så använder du tavlan</h3>
         {mode === 'edit' ? (
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• <strong>Add Home/Opponent:</strong> Click on the rink to place players</li>
-            <li>• <strong>Select/Move:</strong> Drag players to reposition them</li>
-            <li>• <strong>Draw:</strong> Draw arrows, lines, or annotations</li>
-            <li>• <strong>Shadow Zone:</strong> Click and drag to mark a highlighted area on the field</li>
-            <li>• <strong>Animation Mode:</strong> Switch to create movement animations</li>
+            <li>• <strong>Hemmalag/Motståndare:</strong> Klicka på planen för att placera spelare</li>
+            <li>• <strong>Välj/Flytta:</strong> Dra spelare för att flytta dem</li>
+            <li>• <strong>Rita:</strong> Rita pilar, linjer eller anteckningar</li>
+            <li>• <strong>Skuggzon:</strong> Klicka och dra för att markera ett område på planen</li>
+            <li>• <strong>Animeringsläge:</strong> Byt läge för att skapa rörliga animationer</li>
           </ul>
         ) : (
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• <strong>Add Keyframe:</strong> Record current player positions as a keyframe</li>
-            <li>• <strong>Move Players:</strong> Drag players to new positions between keyframes</li>
-            <li>• <strong>Curved Paths:</strong> Drag the diamond handles on movement trails to curve paths</li>
-            <li>• <strong>Play:</strong> Watch players animate along curved or straight paths</li>
-            <li>• <strong>Save:</strong> Save your animation for later use</li>
-            <li>• <strong>Tip:</strong> Add at least 2 keyframes to create an animation</li>
+            <li>• <strong>Lägg till nyckelruta:</strong> Spara spelarnas positioner som en nyckelruta</li>
+            <li>• <strong>Flytta spelare:</strong> Dra spelare till nya positioner mellan nyckelrutor</li>
+            <li>• <strong>Kurvade banor:</strong> Dra diamanthandtagen på rörelsebanorna för att kurva banorna</li>
+            <li>• <strong>Spela:</strong> Se spelarna animeras längs kurvade eller raka banor</li>
+            <li>• <strong>Spara:</strong> Spara din animation för senare användning</li>
+            <li>• <strong>Tips:</strong> Lägg till minst 2 nyckelrutor för att skapa en animation</li>
           </ul>
         )}
       </Card>

@@ -234,14 +234,14 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
             <h2 className="font-semibold text-lg">{layout.name}</h2>
             {hasAnimation && (
               <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                {layout.keyframes.length} keyframes
+                {layout.keyframes.length} nyckelrutor
               </span>
             )}
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleOpenInEditor}>
               <ExternalLink className="h-4 w-4 mr-2" />
-              Open in Editor
+              Öppna i redigeraren
             </Button>
             <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
               <X className="h-5 w-5" />
@@ -310,7 +310,7 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
                 </Button>
 
                 <div className="ml-6 flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Speed:</span>
+                  <span className="text-sm text-muted-foreground">Hastighet:</span>
                   {[0.5, 1, 1.5, 2].map(speed => (
                     <Button
                       key={speed}
