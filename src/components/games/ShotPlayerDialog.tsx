@@ -58,7 +58,7 @@ export function ShotPlayerDialog({
         </DialogHeader>
 
         <div className="space-y-3 py-2">
-          <label className="text-sm font-medium">Select Player</label>
+          <label className="text-sm font-medium">Välj spelare</label>
 
            {linePlayers.length > 0 && (
              <div className="space-y-1">
