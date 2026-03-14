@@ -359,8 +359,8 @@ export default function PlayerPortal() {
                 step={1}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>1 = Fresh</span>
-                <span>10 = Exhausted</span>
+                 <span>1 = Pigg</span>
+                 <span>10 = Utmattad</span>
               </div>
             </div>
             <DialogFooter>
