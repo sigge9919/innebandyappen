@@ -1201,7 +1201,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               disabled={keyframes.length === 0 || isPlaying}
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete Keyframe
+              Ta bort nyckelruta
             </Button>
             
             <div className="flex-1" />
