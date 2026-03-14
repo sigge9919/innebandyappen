@@ -911,7 +911,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     const updatedLayouts = savedLayouts.filter((l) => l.id !== layoutId);
     saveLayoutToStorage(updatedLayouts);
     setSavedLayouts(updatedLayouts);
-    toast.success('Layout deleted');
+    toast.success('Uppställning borttagen');
   };
 
   return (
