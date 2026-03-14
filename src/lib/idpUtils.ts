@@ -1,6 +1,6 @@
 import { IndividualDevelopmentPlan } from '@/types';
 
-export type IDPStatus = 'Active' | 'Completed' | 'Overdue';
+export type IDPStatus = 'Aktiv' | 'Slutförd' | 'Försenad';
 
 export function getIDPStatus(idp: IndividualDevelopmentPlan): IDPStatus {
   if (idp.completed) return 'Completed';
