@@ -1087,7 +1087,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('draw')}
             >
               <Pencil className="h-4 w-4 mr-2" />
-              Draw
+              Rita
             </Button>
             <Button
               variant={selectedTool === 'erase' ? 'default' : 'outline'}
