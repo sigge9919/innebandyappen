@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
+import { useSeasons, Season } from '@/hooks/useSeasons';
 
 export type TeamRole = 'head_coach' | 'assistant_coach' | 'stats_coach' | 'viewer' | 'player';
 
@@ -32,6 +33,15 @@ interface TeamContextValue {
   removeMember: (memberId: string) => Promise<{ error: Error | null }>;
   refreshTeams: () => Promise<void>;
   refreshMembers: () => Promise<void>;
+  // Season-related
+  seasons: Season[];
+  activeSeason: Season | null;
+  selectedSeason: Season | null;
+  selectedSeasonId: string | null;
+  setSelectedSeasonId: (id: string) => void;
+  startNewSeason: (name: string, startDate?: string) => Promise<{ error: Error | null }>;
+  seasonsLoading: boolean;
+  refreshSeasons: () => Promise<void>;
 }
 
 const TeamContext = createContext<TeamContextValue | undefined>(undefined);
@@ -44,13 +54,17 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const {
+    seasons, activeSeason, selectedSeason, selectedSeasonId,
+    setSelectedSeasonId, startNewSeason, loading: seasonsLoading, refresh: refreshSeasons,
+  } = useSeasons();
+
   const refreshTeams = useCallback(async () => {
     if (!user) { setTeams([]); setLoading(false); return; }
     const { data } = await supabase.from('teams').select('*');
     const teamList = (data ?? []) as Team[];
     setTeams(teamList);
 
-    // Auto-select logic
     const storedId = localStorage.getItem('coachOS_activeTeamId');
     const stored = teamList.find(t => t.id === storedId);
     if (stored) {
@@ -68,7 +82,6 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     refreshTeams();
   }, [refreshTeams]);
 
-  // Load role & members when active team changes
   const refreshMembers = useCallback(async () => {
     if (!activeTeam) { setMembers([]); setActiveRole(null); return; }
     const { data } = await supabase.from('team_members').select('*').eq('team_id', activeTeam.id);
@@ -93,7 +106,6 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     if (error) return { error: error as unknown as Error };
 
     await refreshTeams();
-    // Auto-select the newly created team
     const { data: newTeam } = await supabase.from('teams').select('*').eq('id', teamId).single();
     if (newTeam) setActiveTeam(newTeam as Team);
     return { error: null };
@@ -122,6 +134,8 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     <TeamContext.Provider value={{
       teams, activeTeam, activeRole, members, loading,
       setActiveTeam, createTeam, inviteCoach, removeMember, refreshTeams, refreshMembers,
+      seasons, activeSeason, selectedSeason, selectedSeasonId,
+      setSelectedSeasonId, startNewSeason, seasonsLoading, refreshSeasons,
     }}>
       {children}
     </TeamContext.Provider>
