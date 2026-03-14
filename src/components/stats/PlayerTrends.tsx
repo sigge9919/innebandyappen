@@ -85,7 +85,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
     <div className="space-y-6">
       <Select value={selectedPlayerId} onValueChange={setSelectedPlayerId}>
         <SelectTrigger className="w-full max-w-xs">
-          <SelectValue placeholder="Select player" />
+          <SelectValue placeholder="Välj spelare" />
         </SelectTrigger>
         <SelectContent>
           {players.map(p => (
