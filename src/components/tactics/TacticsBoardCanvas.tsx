@@ -992,7 +992,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               <div className="space-y-2 pt-4 max-h-80 overflow-y-auto">
                 {savedLayouts.length === 0 ? (
                   <p className="text-muted-foreground text-center py-4">
-                    No saved layouts yet
+                    Inga sparade uppställningar ännu
                   </p>
                 ) : (
                   savedLayouts.map((layout) => (
