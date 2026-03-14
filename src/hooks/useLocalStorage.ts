@@ -604,10 +604,11 @@ function testResultUpdatesToDb(u: Partial<TestResult>) {
 
 // ── RPE Ratings ──────────────────────────────────────────────
 
-export function useRPERatings(playerId?: string) {
+export function useRPERatings(playerId?: string, seasonId?: string | null) {
   const [ratings, setRatings] = useState<PlayerRPERating[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { activeTeam } = useTeam();
+  const { activeTeam, selectedSeasonId: ctxSeasonId } = useTeam();
+  const effectiveSeasonId = seasonId !== undefined ? seasonId : ctxSeasonId;
 
   const refresh = useCallback(async () => {
     if (!activeTeam) { setRatings([]); setIsLoading(false); return; }
@@ -616,10 +617,11 @@ export function useRPERatings(playerId?: string) {
       .select('*')
       .eq('team_id', activeTeam.id);
     if (playerId) query = query.eq('player_id', playerId);
+    if (effectiveSeasonId) query = query.eq('season_id', effectiveSeasonId);
     const { data } = await query;
     setRatings((data ?? []).map(dbToRPE));
     setIsLoading(false);
-  }, [activeTeam, playerId]);
+  }, [activeTeam, playerId, effectiveSeasonId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
