@@ -442,6 +442,7 @@ export type Database = {
         Row: {
           coach_notes: string | null
           id: string
+          permissions: Json | null
           play_categories: string[] | null
           team_id: string
           test_types: string[] | null
@@ -451,6 +452,7 @@ export type Database = {
         Insert: {
           coach_notes?: string | null
           id?: string
+          permissions?: Json | null
           play_categories?: string[] | null
           team_id: string
           test_types?: string[] | null
@@ -460,6 +462,7 @@ export type Database = {
         Update: {
           coach_notes?: string | null
           id?: string
+          permissions?: Json | null
           play_categories?: string[] | null
           team_id?: string
           test_types?: string[] | null
