@@ -335,7 +335,7 @@ export default function PlayerPortal() {
           </DialogHeader>
           <form onSubmit={handleAddPersonalTraining} className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="pt-date">Date</Label>
+              <Label htmlFor="pt-date">Datum</Label>
               <Input id="pt-date" type="date" value={ptForm.date} onChange={e => setPtForm(p => ({ ...p, date: e.target.value }))} required />
             </div>
             <div className="grid gap-2">
