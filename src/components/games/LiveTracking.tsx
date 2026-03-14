@@ -412,7 +412,7 @@ export function LiveTracking({
         className="w-full p-4 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-95 border-2 border-primary bg-primary/10 text-primary hover:bg-primary/20"
       >
         <Crosshair className="h-6 w-6" />
-        <span className="font-semibold">Penalty Shot</span>
+        <span className="font-semibold">Straffslag</span>
       </button>
 
       {/* Undo */}
