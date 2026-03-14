@@ -104,7 +104,7 @@ export function PostGameTeamStats({
                   onOpponentChange={(v) => handleStatChange('opponent', 'shotsOnGoal', v)}
                 />
                 <StatEditRow
-                  label="Shots off Goal"
+                  label="Skott utanför"
                   homeValue={homeStats.shotsOffGoal}
                   opponentValue={opponentStats.shotsOffGoal}
                   editable={isEditable}
