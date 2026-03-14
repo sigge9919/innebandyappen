@@ -305,7 +305,7 @@ export function LiveTracking({
 
         {/* Situation Selection */}
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-sm">Situation</span>
+          <span className="font-semibold text-sm">Spelläge</span>
           <Badge 
             variant={game.currentSituation === '5v4' ? 'default' : game.currentSituation === '4v5' ? 'destructive' : 'secondary'}
             className="text-xs"
