@@ -115,7 +115,7 @@ export default function TeamSettings() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Role</Label>
+                    <Label>Roll</Label>
                     <Select value={role} onValueChange={v => setRole(v as TeamRole)}>
                       <SelectTrigger>
                         <SelectValue />
