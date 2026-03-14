@@ -102,7 +102,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
           <p className="metric-value text-2xl">
             {bpOpportunities > 0 ? `${bpKillRate.toFixed(1)}%` : '-'}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">Penalty kills</p>
+          <p className="text-xs text-muted-foreground mt-1">Utvisningsavvärjningar</p>
         </div>
       </div>
 
