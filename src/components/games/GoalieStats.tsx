@@ -66,7 +66,7 @@ export function GoalieStats({
     <div className="space-y-4">
       <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
         <Shield className="h-4 w-4" />
-        Goaltender Statistics
+        Målvaktsstatistik
       </h4>
 
       <div className="overflow-x-auto">
