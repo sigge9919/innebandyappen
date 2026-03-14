@@ -23,7 +23,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
     return (
       <div className="text-center py-8 text-muted-foreground">
         <Zap className="h-8 w-8 mx-auto mb-2 opacity-50" />
-        <p>No special teams situations recorded</p>
+        <p>Inga specialteam-situationer registrerade</p>
       </div>
     );
   }
@@ -39,7 +39,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
         )}>
           <div className="flex items-center gap-2 mb-3">
             <Zap className="h-5 w-5 text-success" />
-            <h4 className="font-semibold">Power Play (5v4)</h4>
+            <h4 className="font-semibold">Powerplay (5v4)</h4>
             <Badge variant="secondary" className="ml-auto">
               {powerPlay.opportunities} PP
             </Badge>
@@ -47,26 +47,26 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
           
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">PP Goals</span>
+              <span className="text-sm text-muted-foreground">PP-mål</span>
               <span className="font-semibold text-lg text-success">{powerPlay.goalsFor}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Shorthanded Goals Against</span>
+              <span className="text-sm text-muted-foreground">Mål emot i numerärt underläge</span>
               <span className="font-semibold text-destructive">{powerPlay.goalsAgainst}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Shots on Goal</span>
+              <span className="text-sm text-muted-foreground">Skott på mål</span>
               <span className="font-medium">{powerPlay.shotsOnGoal}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Total Shots</span>
+              <span className="text-sm text-muted-foreground">Totala skott</span>
               <span className="font-medium">
                 {powerPlay.shotsOnGoal + powerPlay.shotsOffGoal + powerPlay.shotsBlocked}
               </span>
             </div>
             <div className="pt-2 border-t border-border">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">PP Efficiency</span>
+                <span className="text-sm font-medium">PP-effektivitet</span>
                 <span className={cn(
                   'text-xl font-bold',
                   parseFloat(ppEfficiency) >= 20 ? 'text-success' : 'text-foreground'
@@ -85,7 +85,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
         )}>
           <div className="flex items-center gap-2 mb-3">
             <Shield className="h-5 w-5 text-primary" />
-            <h4 className="font-semibold">Box Play (4v5)</h4>
+            <h4 className="font-semibold">Boxplay (4v5)</h4>
             <Badge variant="secondary" className="ml-auto">
               {boxPlay.opportunities} PK
             </Badge>
@@ -93,26 +93,26 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
           
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Goals Against (PP)</span>
+              <span className="text-sm text-muted-foreground">Insläppta mål (PP)</span>
               <span className="font-semibold text-lg text-destructive">{boxPlay.goalsAgainst}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Shorthanded Goals For</span>
+              <span className="text-sm text-muted-foreground">Mål i numerärt underläge</span>
               <span className="font-semibold text-success">{boxPlay.goalsFor}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Shots on Goal</span>
+              <span className="text-sm text-muted-foreground">Skott på mål</span>
               <span className="font-medium">{boxPlay.shotsOnGoal}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Total Shots</span>
+              <span className="text-sm text-muted-foreground">Totala skott</span>
               <span className="font-medium">
                 {boxPlay.shotsOnGoal + boxPlay.shotsOffGoal + boxPlay.shotsBlocked}
               </span>
             </div>
             <div className="pt-2 border-t border-border">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">PK Efficiency</span>
+                <span className="text-sm font-medium">BP-effektivitet</span>
                 <span className={cn(
                   'text-xl font-bold',
                   parseFloat(bpEfficiency) >= 80 ? 'text-success' : 'text-foreground'
