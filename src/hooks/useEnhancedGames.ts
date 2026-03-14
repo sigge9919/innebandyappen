@@ -45,9 +45,11 @@ export function useEnhancedGames(seasonId?: string | null) {
 
   const addEnhancedGame = useCallback(async (game: EnhancedGame) => {
     if (!activeTeam) return;
-    await supabase.from('games').insert(enhancedGameToDb(game, activeTeam.id));
+    const dbGame = enhancedGameToDb(game, activeTeam.id);
+    if (effectiveSeasonId) (dbGame as any).season_id = effectiveSeasonId;
+    await supabase.from('games').insert(dbGame);
     refresh();
-  }, [activeTeam, refresh]);
+  }, [activeTeam, effectiveSeasonId, refresh]);
 
   const updateEnhancedGame = useCallback(async (id: string, updates: Partial<EnhancedGame>) => {
     await supabase.from('games').update(enhancedGameUpdatesToDb(updates)).eq('id', id);
