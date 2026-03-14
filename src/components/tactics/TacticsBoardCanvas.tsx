@@ -1076,7 +1076,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('delete')}
             >
               <X className="h-4 w-4 mr-2" />
-              Delete
+              Ta bort
             </Button>
             
             <div className="w-px h-8 bg-border mx-1" />
