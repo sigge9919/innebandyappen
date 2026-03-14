@@ -76,7 +76,7 @@ export function PenaltyConfirmDialog({
             </div>
 
             <p className="text-xs text-muted-foreground mt-2">
-              You can skip player selection and assign later in post-game review.
+              Du kan hoppa över spelarval och tilldela senare i eftermatchgenomgången.
             </p>
           </div>
         </div>
