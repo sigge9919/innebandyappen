@@ -1,0 +1,1 @@
+ALTER TABLE public.team_settings ADD COLUMN permissions jsonb DEFAULT '{}'::jsonb;
