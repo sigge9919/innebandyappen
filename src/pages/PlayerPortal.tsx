@@ -158,7 +158,7 @@ export default function PlayerPortal() {
     return (
       <AppLayout>
         <div className="page-container text-center py-12">
-          <p className="text-muted-foreground">Your player profile hasn't been linked yet. Please contact your coach.</p>
+          <p className="text-muted-foreground">Din spelarprofil har inte kopplats ännu. Kontakta din tränare.</p>
         </div>
       </AppLayout>
     );
