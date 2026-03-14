@@ -71,7 +71,7 @@ export function PostGameTeamStats({
         <TabsContent value={selectedPeriod} className="mt-0">
           {!isEditable && (
             <p className="text-sm text-muted-foreground mb-3 text-center">
-              Select a period to edit individual stats
+              Välj en period för att redigera statistik
             </p>
           )}
 
@@ -80,14 +80,14 @@ export function PostGameTeamStats({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="py-2 px-3 text-left font-medium text-muted-foreground">Stat</th>
+                  <th className="py-2 px-3 text-left font-medium text-muted-foreground">Statistik</th>
                   <th className="py-2 px-3 text-center font-medium">{homeTeamName}</th>
                   <th className="py-2 px-3 text-center font-medium">{opponentName}</th>
                 </tr>
               </thead>
               <tbody>
                 <StatEditRow
-                  label="Goals"
+                  label="Mål"
                   homeValue={homeStats.goals}
                   opponentValue={opponentStats.goals}
                   editable={isEditable}
@@ -96,7 +96,7 @@ export function PostGameTeamStats({
                   highlight
                 />
                 <StatEditRow
-                  label="Shots on Goal"
+                  label="Skott på mål"
                   homeValue={homeStats.shotsOnGoal}
                   opponentValue={opponentStats.shotsOnGoal}
                   editable={isEditable}
@@ -104,7 +104,7 @@ export function PostGameTeamStats({
                   onOpponentChange={(v) => handleStatChange('opponent', 'shotsOnGoal', v)}
                 />
                 <StatEditRow
-                  label="Shots off Goal"
+                  label="Skott utanför"
                   homeValue={homeStats.shotsOffGoal}
                   opponentValue={opponentStats.shotsOffGoal}
                   editable={isEditable}
@@ -112,7 +112,7 @@ export function PostGameTeamStats({
                   onOpponentChange={(v) => handleStatChange('opponent', 'shotsOffGoal', v)}
                 />
                 <StatEditRow
-                  label="Shots Blocked"
+                  label="Blockerade skott"
                   homeValue={homeStats.shotsBlocked}
                   opponentValue={opponentStats.shotsBlocked}
                   editable={isEditable}
@@ -120,7 +120,7 @@ export function PostGameTeamStats({
                   onOpponentChange={(v) => handleStatChange('opponent', 'shotsBlocked', v)}
                 />
                 <tr className="border-t border-border bg-muted/30">
-                  <td className="py-2 px-3 font-semibold">Total Shots</td>
+                  <td className="py-2 px-3 font-semibold">Totala skott</td>
                   <td className="py-2 px-3 text-center font-semibold">{getTotalShots(homeStats)}</td>
                   <td className="py-2 px-3 text-center font-semibold">{getTotalShots(opponentStats)}</td>
                 </tr>

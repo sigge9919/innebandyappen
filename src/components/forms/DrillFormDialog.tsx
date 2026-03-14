@@ -31,12 +31,7 @@ export function DrillFormDialog({ open, onOpenChange, drill, onSave, onDelete }:
         videoUrl: drill.videoUrl || '',
       });
     } else {
-      setFormData({
-        name: '',
-        description: '',
-        categories: '',
-        videoUrl: '',
-      });
+      setFormData({ name: '', description: '', categories: '', videoUrl: '' });
     }
   }, [drill, open]);
 
@@ -57,45 +52,45 @@ export function DrillFormDialog({ open, onOpenChange, drill, onSave, onDelete }:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{drill ? 'Edit Drill' : 'Add Drill'}</DialogTitle>
+          <DialogTitle>{drill ? 'Redigera övning' : 'Lägg till övning'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Namn</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Drill name"
+                placeholder="Övningens namn"
                 required
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Beskrivning</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe the drill..."
+                placeholder="Beskriv övningen..."
                 rows={3}
                 required
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="categories">Categories (comma-separated)</Label>
+              <Label htmlFor="categories">Kategorier (kommaseparerade)</Label>
               <Input
                 id="categories"
                 value={formData.categories}
                 onChange={(e) => setFormData({ ...formData, categories: e.target.value })}
-                placeholder="Tactics, Skills, Conditioning"
+                placeholder="Taktik, Teknik, Kondition"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="videoUrl">Video URL (optional)</Label>
+              <Label htmlFor="videoUrl">Video-URL (valfritt)</Label>
               <Input
                 id="videoUrl"
                 value={formData.videoUrl}
@@ -110,19 +105,16 @@ export function DrillFormDialog({ open, onOpenChange, drill, onSave, onDelete }:
               <Button
                 type="button"
                 variant="destructive"
-                onClick={() => {
-                  onDelete(drill.id);
-                  onOpenChange(false);
-                }}
+                onClick={() => { onDelete(drill.id); onOpenChange(false); }}
               >
-                Delete
+                Ta bort
               </Button>
             )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              {drill ? 'Save Changes' : 'Add Drill'}
+              {drill ? 'Spara ändringar' : 'Lägg till övning'}
             </Button>
           </DialogFooter>
         </form>

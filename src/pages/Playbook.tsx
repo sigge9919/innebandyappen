@@ -38,24 +38,24 @@ export default function Playbook() {
     const trimmed = newCategory.trim();
     if (!trimmed) return;
     if (categories.includes(trimmed)) {
-      toast.error('Category already exists');
+      toast.error('Kategorin finns redan');
       return;
     }
     addCategory(trimmed);
     setNewCategory('');
     setShowAddCategory(false);
-    toast.success(`Category "${trimmed}" added`);
+    toast.success(`Kategorin "${trimmed}" tillagd`);
   };
 
   const handleDeleteCategory = (cat: string) => {
     const usedByPlays = plays.some(p => p.category === cat);
     if (usedByPlays) {
-      toast.error('Cannot delete category that is used by plays');
+      toast.error('Kan inte ta bort kategori som används av spelsystem');
       return;
     }
     deleteCategory(cat);
     if (filter === cat) setFilter('all');
-    toast.success(`Category "${cat}" deleted`);
+    toast.success(`Kategorin "${cat}" borttagen`);
   };
 
   return (
@@ -64,14 +64,14 @@ export default function Playbook() {
         {/* Header */}
         <div className="section-header">
           <div>
-            <h1 className="section-title">Playbook</h1>
+            <h1 className="section-title">Spelbok</h1>
             <p className="text-muted-foreground mt-1">
-              {plays.length} plays
+              {plays.length} spelsystem
             </p>
           </div>
           <Button className="gap-2" onClick={handleAddPlay}>
             <Plus className="h-4 w-4" />
-            Add Play
+            Lägg till spel
           </Button>
         </div>
 
@@ -80,7 +80,7 @@ export default function Playbook() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search plays or tags..."
+              placeholder="Sök spelsystem eller taggar..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
@@ -92,7 +92,7 @@ export default function Playbook() {
               size="sm"
               onClick={() => setFilter('all')}
             >
-              All Plays
+              Alla
             </Button>
             {categories.map(cat => (
               <div key={cat} className="relative group">
@@ -116,7 +116,7 @@ export default function Playbook() {
                 <Input
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="Category name"
+                  placeholder="Kategorinamn"
                   className="h-8 w-32 text-sm"
                   onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
                   autoFocus
@@ -131,7 +131,7 @@ export default function Playbook() {
             ) : (
               <Button size="sm" variant="outline" className="border-dashed" onClick={() => setShowAddCategory(true)}>
                 <Plus className="h-3 w-3 mr-1" />
-                Category
+                Kategori
               </Button>
             )}
           </div>
@@ -151,7 +151,7 @@ export default function Playbook() {
         {filteredPlays.length === 0 && (
           <div className="text-center py-12">
             <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">No plays found</p>
+            <p className="text-muted-foreground">Inga spelsystem hittades</p>
           </div>
         )}
       </div>

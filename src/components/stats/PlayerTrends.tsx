@@ -62,7 +62,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
   }, [games, selectedPlayerId, isGoalie]);
 
   if (players.length === 0) {
-    return <p className="text-center text-muted-foreground py-8">No players available</p>;
+    return <p className="text-center text-muted-foreground py-8">Inga spelare tillgängliga</p>;
   }
 
   const skaterCharts: ChartDef[] = [
@@ -85,7 +85,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
     <div className="space-y-6">
       <Select value={selectedPlayerId} onValueChange={setSelectedPlayerId}>
         <SelectTrigger className="w-full max-w-xs">
-          <SelectValue placeholder="Select player" />
+          <SelectValue placeholder="Välj spelare" />
         </SelectTrigger>
         <SelectContent>
           {players.map(p => (
@@ -98,7 +98,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
 
       {trendData.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">
-          No game data for this player
+          Ingen matchdata för denna spelare
         </p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">

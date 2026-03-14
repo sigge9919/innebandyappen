@@ -42,13 +42,13 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
     <div className="space-y-6">
       {/* Skater Stats */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Skater Statistics</h3>
+        <h3 className="text-lg font-semibold mb-3">Utespelarstatistik</h3>
         <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>Player</TableHead>
+                <TableHead>Spelare</TableHead>
                 <TableHead className="text-center">GP</TableHead>
                 <TableHead className="text-center">G</TableHead>
                 <TableHead className="text-center">A</TableHead>
@@ -67,7 +67,7 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
               {skaterStats.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={14} className="text-center text-muted-foreground py-8">
-                    No player statistics available
+                    Ingen spelarstatistik tillgänglig
                   </TableCell>
                 </TableRow>
               ) : (
@@ -108,13 +108,13 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
       {/* Goalie Stats */}
       {allGoalieStats.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-3">Goaltender Statistics</h3>
+          <h3 className="text-lg font-semibold mb-3">Målvaktsstatistik</h3>
           <div className="rounded-lg border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[50px]">#</TableHead>
-                  <TableHead>Goaltender</TableHead>
+                  <TableHead>Målvakt</TableHead>
                   <TableHead className="text-center">GP</TableHead>
                   <TableHead className="text-center">GA</TableHead>
                   <TableHead className="text-center">SA</TableHead>
@@ -125,7 +125,7 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
                 {allGoalieStats.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                      No goaltender statistics available
+                      Ingen målvaktsstatistik tillgänglig
                     </TableCell>
                   </TableRow>
                 ) : (

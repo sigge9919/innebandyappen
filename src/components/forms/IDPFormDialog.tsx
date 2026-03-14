@@ -42,12 +42,8 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
       });
     } else {
       setFormData({
-        goal: '',
-        startDate: undefined,
-        endDate: undefined,
-        focusAreas: [''],
-        shortTermGoals: [''],
-        coachNotes: '',
+        goal: '', startDate: undefined, endDate: undefined,
+        focusAreas: [''], shortTermGoals: [''], coachNotes: '',
       });
     }
   }, [idp, open]);
@@ -103,24 +99,24 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Development Plan - {player.name}</DialogTitle>
+          <DialogTitle>Utvecklingsplan - {player.name}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="goal">Goal *</Label>
+              <Label htmlFor="goal">Mål *</Label>
               <Input
                 id="goal"
                 value={formData.goal}
                 onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
-                placeholder="e.g. Become a stronger two-way player"
+                placeholder="t.ex. Bli en starkare tvåvägsspelare"
                 required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>Start Date</Label>
+                <Label>Startdatum</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -131,7 +127,7 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.startDate ? format(formData.startDate, "PPP") : "Pick date"}
+                      {formData.startDate ? format(formData.startDate, "PPP") : "Välj datum"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -147,7 +143,7 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
               </div>
 
               <div className="grid gap-2">
-                <Label>End Date</Label>
+                <Label>Slutdatum</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -158,7 +154,7 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.endDate ? format(formData.endDate, "PPP") : "Pick date"}
+                      {formData.endDate ? format(formData.endDate, "PPP") : "Välj datum"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -176,7 +172,7 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
 
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label>Focus Areas</Label>
+                <Label>Fokusområden</Label>
                 <Button type="button" variant="ghost" size="sm" onClick={() => addField('focusAreas')}>
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -187,7 +183,7 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
                     <Input
                       value={area}
                       onChange={(e) => updateField('focusAreas', index, e.target.value)}
-                      placeholder={`Focus area ${index + 1}`}
+                      placeholder={`Fokusområde ${index + 1}`}
                     />
                     {formData.focusAreas.length > 1 && (
                       <Button type="button" variant="ghost" size="icon" onClick={() => removeField('focusAreas', index)}>
@@ -201,7 +197,7 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
 
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label>Short-Term Goals</Label>
+                <Label>Kortsiktiga mål</Label>
                 <Button type="button" variant="ghost" size="sm" onClick={() => addField('shortTermGoals')}>
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -212,7 +208,7 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
                     <Input
                       value={goal}
                       onChange={(e) => updateField('shortTermGoals', index, e.target.value)}
-                      placeholder={`Goal ${index + 1}`}
+                      placeholder={`Mål ${index + 1}`}
                     />
                     {formData.shortTermGoals.length > 1 && (
                       <Button type="button" variant="ghost" size="icon" onClick={() => removeField('shortTermGoals', index)}>
@@ -225,12 +221,12 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="coachNotes">Coach Notes</Label>
+              <Label htmlFor="coachNotes">Tränaranteckningar</Label>
               <Textarea
                 id="coachNotes"
                 value={formData.coachNotes}
                 onChange={(e) => setFormData({ ...formData, coachNotes: e.target.value })}
-                placeholder="Notes on player development..."
+                placeholder="Anteckningar om spelarens utveckling..."
                 rows={3}
               />
             </div>
@@ -240,14 +236,14 @@ export function IDPFormDialog({ open, onOpenChange, idp, player, onSave, onDelet
             {idp && onDelete && (
               <Button type="button" variant="destructive" onClick={handleDelete} className="sm:mr-auto">
                 <Trash2 className="h-4 w-4 mr-1" />
-                Delete
+                Ta bort
               </Button>
             )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              Save Development Plan
+              Spara utvecklingsplan
             </Button>
           </DialogFooter>
         </form>

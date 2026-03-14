@@ -12,8 +12,8 @@ import { Player, PlayerPosition } from '@/types';
 const POSITIONS: { value: PlayerPosition; label: string }[] = [
   { value: 'Forward', label: 'Forward' },
   { value: 'Center', label: 'Center' },
-  { value: 'Defender', label: 'Defender' },
-  { value: 'Goalkeeper', label: 'Goalkeeper' },
+  { value: 'Defender', label: 'Back' },
+  { value: 'Goalkeeper', label: 'Målvakt' },
 ];
 
 interface PlayerFormDialogProps {
@@ -37,7 +37,6 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
 
   useEffect(() => {
     if (player) {
-      // Handle migration from old single position to new positions array
       const positions = player.positions || 
         ((player as any).position ? [(player as any).position as PlayerPosition] : ['Forward']);
       setFormData({ ...player, positions });
@@ -57,7 +56,6 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
   const togglePosition = (position: PlayerPosition) => {
     const currentPositions = formData.positions || [];
     if (currentPositions.includes(position)) {
-      // Don't allow removing the last position
       if (currentPositions.length > 1) {
         setFormData({ ...formData, positions: currentPositions.filter(p => p !== position) });
       }
@@ -86,24 +84,24 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{player ? 'Edit Player' : 'Add Player'}</DialogTitle>
+          <DialogTitle>{player ? 'Redigera spelare' : 'Lägg till spelare'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Namn</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Player name"
+                placeholder="Spelarens namn"
                 required
               />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="jerseyNumber">Jersey Number</Label>
+                <Label htmlFor="jerseyNumber">Tröjnummer</Label>
                 <Input
                   id="jerseyNumber"
                   type="number"
@@ -115,7 +113,7 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="stickSide">Stick Side</Label>
+                <Label htmlFor="stickSide">Klubbsida</Label>
                 <Select
                   value={formData.stickSide}
                   onValueChange={(value) => setFormData({ ...formData, stickSide: value as Player['stickSide'] })}
@@ -124,15 +122,15 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Left">Left</SelectItem>
-                    <SelectItem value="Right">Right</SelectItem>
+                    <SelectItem value="Left">Vänster</SelectItem>
+                    <SelectItem value="Right">Höger</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="grid gap-2">
-              <Label>Positions</Label>
+              <Label>Positioner</Label>
               <div className="flex flex-wrap gap-3">
                 {POSITIONS.map(({ value, label }) => (
                   <div key={value} className="flex items-center gap-2">
@@ -159,25 +157,25 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Injured">Injured</SelectItem>
+                  <SelectItem value="Active">Aktiv</SelectItem>
+                  <SelectItem value="Injured">Skadad</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="notes">Notes</Label>
+              <Label htmlFor="notes">Anteckningar</Label>
               <Textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Player notes..."
+                placeholder="Anteckningar om spelaren..."
                 rows={3}
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="focusFlag">Focus Flag</Label>
+              <Label htmlFor="focusFlag">Fokusmarkering</Label>
               <Switch
                 id="focusFlag"
                 checked={formData.focusFlag}
@@ -196,14 +194,14 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
                   onOpenChange(false);
                 }}
               >
-                Delete
+                Ta bort
               </Button>
             )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              {player ? 'Save Changes' : 'Add Player'}
+              {player ? 'Spara ändringar' : 'Lägg till spelare'}
             </Button>
           </DialogFooter>
         </form>

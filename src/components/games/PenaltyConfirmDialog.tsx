@@ -46,7 +46,7 @@ export function PenaltyConfirmDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertOctagon className="h-5 w-5 text-amber-500" />
-            Penalty - Our Team
+            Utvisning - Vårt lag
           </DialogTitle>
         </DialogHeader>
 
@@ -55,7 +55,7 @@ export function PenaltyConfirmDialog({
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
               <User className="h-4 w-4" />
-              Player Committing Penalty
+              Spelare som begick utvisning
             </label>
             
             <div className="flex flex-wrap gap-1.5">
@@ -76,20 +76,20 @@ export function PenaltyConfirmDialog({
             </div>
 
             <p className="text-xs text-muted-foreground mt-2">
-              You can skip player selection and assign later in post-game review.
+              Du kan hoppa över spelarval och tilldela senare i eftermatchgenomgången.
             </p>
           </div>
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" onClick={handleCancel}>
-            Cancel
+            Avbryt
           </Button>
           <Button 
             onClick={handleConfirm}
             className="bg-amber-500 hover:bg-amber-600 text-white"
           >
-            Confirm Penalty
+            Bekräfta utvisning
           </Button>
         </DialogFooter>
       </DialogContent>

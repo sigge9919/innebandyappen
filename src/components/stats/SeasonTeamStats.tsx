@@ -65,19 +65,19 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
       {/* Record Summary */}
       <div className="grid grid-cols-4 gap-4">
         <div className="stat-card text-center">
-          <p className="metric-label">Games</p>
+          <p className="metric-label">Matcher</p>
           <p className="metric-value">{gamesPlayed}</p>
         </div>
         <div className="stat-card text-center">
-          <p className="metric-label">Wins</p>
+          <p className="metric-label">Vinster</p>
           <p className="metric-value text-success">{wins}</p>
         </div>
         <div className="stat-card text-center">
-          <p className="metric-label">Losses</p>
+          <p className="metric-label">Förluster</p>
           <p className="metric-value text-destructive">{losses}</p>
         </div>
         <div className="stat-card text-center">
-          <p className="metric-label">Win Rate</p>
+          <p className="metric-label">Vinstprocent</p>
           <p className="metric-value">{winRate.toFixed(0)}%</p>
         </div>
       </div>
@@ -92,7 +92,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
           <p className="metric-value text-2xl">
             {ppOpportunities > 0 ? `${ppEfficiency.toFixed(1)}%` : '-'}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">Goals per opportunity</p>
+          <p className="text-xs text-muted-foreground mt-1">Mål per tillfälle</p>
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-2">
@@ -102,18 +102,18 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
           <p className="metric-value text-2xl">
             {bpOpportunities > 0 ? `${bpKillRate.toFixed(1)}%` : '-'}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">Penalty kills</p>
+          <p className="text-xs text-muted-foreground mt-1">Utvisningsavvärjningar</p>
         </div>
       </div>
 
       {/* Overall Stats */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Overall Statistics</h3>
+        <h3 className="text-lg font-semibold mb-3">Övergripande statistik</h3>
         <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Team</TableHead>
+                <TableHead>Lag</TableHead>
                 <TableHead className="text-center">GP</TableHead>
                 <TableHead className="text-center">G</TableHead>
                 <TableHead className="text-center">SOG</TableHead>
@@ -125,8 +125,8 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <StatsRow label="Our Team" stats={homeStats} isHighlight />
-              <StatsRow label="Opponents (combined)" stats={opponentStats} />
+              <StatsRow label="Vårt lag" stats={homeStats} isHighlight />
+              <StatsRow label="Motståndare (kombinerat)" stats={opponentStats} />
             </TableBody>
           </Table>
         </div>
@@ -134,7 +134,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
 
       {/* Situation Breakdown */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Situation Breakdown</h3>
+        <h3 className="text-lg font-semibold mb-3">Spellägesfördelning</h3>
         <div className="space-y-4">
           {situationStats.map(({ situation, home, opponent, opportunities }) => {
             // Skip if no activity in this situation
@@ -148,14 +148,14 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
                   <span className="font-medium">{getSituationLabel(situation)}</span>
                   {opportunities !== undefined && opportunities > 0 && (
                     <span className="text-sm text-muted-foreground">
-                      {opportunities} opportunities
+                      {opportunities} tillfällen
                     </span>
                   )}
                 </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Team</TableHead>
+                      <TableHead>Lag</TableHead>
                       <TableHead className="text-center">G</TableHead>
                       <TableHead className="text-center">SOG</TableHead>
                       <TableHead className="text-center">Miss</TableHead>
@@ -166,7 +166,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="font-medium">Our Team</TableCell>
+                      <TableCell className="font-medium">Vårt lag</TableCell>
                       <TableCell className="text-center font-semibold">{home.goals}</TableCell>
                       <TableCell className="text-center">{home.shotsOnGoal}</TableCell>
                       <TableCell className="text-center">{home.shotsOffGoal}</TableCell>
@@ -177,7 +177,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">Opponents</TableCell>
+                      <TableCell className="font-medium">Motståndare</TableCell>
                       <TableCell className="text-center font-semibold">{opponent.goals}</TableCell>
                       <TableCell className="text-center">{opponent.shotsOnGoal}</TableCell>
                       <TableCell className="text-center">{opponent.shotsOffGoal}</TableCell>

@@ -101,7 +101,7 @@ export function GoalConfirmDialog({
               "h-5 w-5",
               isHomeGoal ? "text-success" : "text-destructive"
             )} />
-            {isHomeGoal ? 'Goal Scored!' : `${opponentName} Goal`}
+            {isHomeGoal ? 'Mål!' : `${opponentName} mål`}
           </DialogTitle>
         </DialogHeader>
 
@@ -110,7 +110,7 @@ export function GoalConfirmDialog({
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {isHomeGoal ? 'Line on Ice' : 'Line that Conceded'}
+              {isHomeGoal ? 'Kedja på plan' : 'Kedja som släppte in'}
             </label>
             <div className="flex flex-wrap gap-2">
               {availableLines.map(line => (
@@ -133,12 +133,12 @@ export function GoalConfirmDialog({
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  Goal Scorer
+                  Målskytt
                 </label>
                 
                 {linePlayers.length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Line players:</p>
+                    <p className="text-xs text-muted-foreground">Kedjespelare:</p>
                     <div className="flex flex-wrap gap-1.5">
                       {linePlayers.map(player => (
                         <button
@@ -160,7 +160,7 @@ export function GoalConfirmDialog({
 
                 {otherPlayers.length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Other players:</p>
+                    <p className="text-xs text-muted-foreground">Övriga spelare:</p>
                     <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                       {otherPlayers.map(player => (
                         <button
@@ -184,7 +184,7 @@ export function GoalConfirmDialog({
               {/* Assists */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
-                  Assist (optional, max 1)
+                  Assist (valfritt, max 1)
                   {selectedAssists.length > 0 && (
                     <Badge variant="secondary" className="text-xs">
                       {selectedAssists.length}/1
@@ -194,7 +194,7 @@ export function GoalConfirmDialog({
                 
                 {linePlayers.length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Line players:</p>
+                    <p className="text-xs text-muted-foreground">Kedjespelare:</p>
                     <div className="flex flex-wrap gap-1.5">
                       {linePlayers.filter(p => p.id !== selectedScorer).map(player => (
                         <button
@@ -216,7 +216,7 @@ export function GoalConfirmDialog({
 
                 {otherPlayers.filter(p => p.id !== selectedScorer).length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Other players:</p>
+                    <p className="text-xs text-muted-foreground">Övriga spelare:</p>
                     <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                       {otherPlayers.filter(p => p.id !== selectedScorer).map(player => (
                         <button
@@ -242,7 +242,7 @@ export function GoalConfirmDialog({
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" onClick={handleCancel}>
-            Cancel
+            Avbryt
           </Button>
           <Button 
             onClick={handleConfirm}
@@ -250,7 +250,7 @@ export function GoalConfirmDialog({
               isHomeGoal ? 'bg-success hover:bg-success/90' : 'bg-destructive hover:bg-destructive/90'
             )}
           >
-            Confirm Goal
+            Bekräfta mål
           </Button>
         </DialogFooter>
       </DialogContent>

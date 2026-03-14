@@ -49,7 +49,7 @@ const PERIOD_LABELS: Record<Period, string> = {
   '1': 'Period 1',
   '2': 'Period 2',
   '3': 'Period 3',
-  'OT': 'Overtime',
+  'OT': 'Övertid',
 };
 
 export function LiveTracking({
@@ -240,7 +240,7 @@ export function LiveTracking({
       {/* Live Period Stats */}
       <LivePeriodStats
         currentPeriod={game.currentPeriod}
-        homeTeamName="Our Team"
+        homeTeamName="Vårt lag"
         opponentName={game.opponent}
         periodHomeStats={periodHomeStats}
         periodOpponentStats={periodOpponentStats}
@@ -253,7 +253,7 @@ export function LiveTracking({
       {/* Active Line & Situation */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-sm">Active Line</span>
+          <span className="font-semibold text-sm">Aktiv kedja</span>
           <div className="flex items-center gap-2">
             {activeLine && (
               <Badge variant="default" className="text-xs">{activeLine.name}</Badge>
@@ -305,7 +305,7 @@ export function LiveTracking({
 
         {/* Situation Selection */}
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-sm">Situation</span>
+          <span className="font-semibold text-sm">Spelläge</span>
           <Badge 
             variant={game.currentSituation === '5v4' ? 'default' : game.currentSituation === '4v5' ? 'destructive' : 'secondary'}
             className="text-xs"
@@ -337,27 +337,27 @@ export function LiveTracking({
       <div className="grid grid-cols-2 gap-4">
         {/* Our Team */}
         <div className="space-y-3">
-          <h4 className="text-center font-semibold text-foreground">Our Team</h4>
+          <h4 className="text-center font-semibold text-foreground">Vårt lag</h4>
           <EventButton
             icon={CircleDot}
-            label="Goal"
+            label="Mål"
             variant="success"
             onClick={() => handleGoalClick('home')}
           />
           <EventButton
             icon={Target}
-            label="Shot on Goal"
+            label="Skott på mål"
             onClick={() => handleShotClick('shot_on_goal', 'home')}
           />
           <EventButton
             icon={XCircle}
-            label="Shot Off"
+            label="Utanför"
             variant="muted"
             onClick={() => handleShotClick('shot_off_goal', 'home')}
           />
           <EventButton
             icon={Shield}
-            label="Blocked"
+            label="Blockerat"
             variant="muted"
             onClick={() => handleShotClick('shot_blocked', 'home')}
           />
@@ -366,7 +366,7 @@ export function LiveTracking({
             className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"
           >
             <AlertOctagon className="h-8 w-8" />
-            <span className="font-semibold text-sm">2 min Penalty</span>
+            <span className="font-semibold text-sm">2 min utvisning</span>
           </button>
         </div>
 
@@ -375,24 +375,24 @@ export function LiveTracking({
           <h4 className="text-center font-semibold text-foreground">{game.opponent}</h4>
           <EventButton
             icon={CircleDot}
-            label="Goal"
+            label="Mål"
             variant="destructive"
             onClick={() => handleGoalClick('opponent')}
           />
           <EventButton
             icon={Target}
-            label="Shot on Goal"
+            label="Skott på mål"
             onClick={() => onRecordEvent('shot_on_goal', 'opponent')}
           />
           <EventButton
             icon={XCircle}
-            label="Shot Off"
+            label="Utanför"
             variant="muted"
             onClick={() => onRecordEvent('shot_off_goal', 'opponent')}
           />
           <EventButton
             icon={Shield}
-            label="Blocked"
+            label="Blockerat"
             variant="muted"
             onClick={() => handleShotClick('shot_blocked', 'opponent')}
           />
@@ -401,7 +401,7 @@ export function LiveTracking({
             className="w-full p-4 rounded-xl flex flex-col items-center gap-2 transition-all active:scale-95 border-2 border-amber-500 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:border-amber-400"
           >
             <AlertOctagon className="h-8 w-8" />
-            <span className="font-semibold text-sm">2 min Penalty</span>
+            <span className="font-semibold text-sm">2 min utvisning</span>
           </button>
         </div>
       </div>
@@ -412,7 +412,7 @@ export function LiveTracking({
         className="w-full p-4 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-95 border-2 border-primary bg-primary/10 text-primary hover:bg-primary/20"
       >
         <Crosshair className="h-6 w-6" />
-        <span className="font-semibold">Penalty Shot</span>
+        <span className="font-semibold">Straffslag</span>
       </button>
 
       {/* Undo */}
@@ -423,27 +423,27 @@ export function LiveTracking({
           onClick={onUndo}
         >
           <Undo2 className="h-4 w-4" />
-          Undo Last Event
+          Ångra senaste
         </Button>
       )}
 
       {/* Simple / Advanced Toggle */}
       <div className="flex items-center justify-between px-2 py-3 rounded-lg bg-muted/50 border border-border">
         <span className="text-sm font-medium text-muted-foreground">
-          {advancedMode ? 'Advanced Stats' : 'Simple Stats'}
+          {advancedMode ? 'Avancerad statistik' : 'Enkel statistik'}
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Simple</span>
+          <span className="text-xs text-muted-foreground">Enkel</span>
           <Switch
             checked={advancedMode}
             onCheckedChange={setAdvancedMode}
           />
-          <span className="text-xs text-muted-foreground">Advanced</span>
+          <span className="text-xs text-muted-foreground">Avancerad</span>
         </div>
       </div>
       {advancedMode && (
         <p className="text-xs text-muted-foreground text-center -mt-2">
-          Shots will be attributed to individual players
+          Skott kommer att kopplas till enskilda spelare
         </p>
       )}
     </div>

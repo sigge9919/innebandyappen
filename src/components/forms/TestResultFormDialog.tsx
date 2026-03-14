@@ -17,7 +17,7 @@ interface TestResultFormDialogProps {
   onOpenChange: (open: boolean) => void;
   test?: TestResult | null;
   players: Player[];
-  allTests?: TestResult[]; // all team test results for prev-result lookup
+  allTests?: TestResult[];
   onSave: (tests: TestResult[]) => void;
   onDelete?: (id: string) => void;
   defaultPlayerId?: string;
@@ -34,14 +34,7 @@ interface PlayerRow {
 }
 
 export function TestResultFormDialog({
-  open,
-  onOpenChange,
-  test,
-  players,
-  allTests = [],
-  onSave,
-  onDelete,
-  defaultPlayerId,
+  open, onOpenChange, test, players, allTests = [], onSave, onDelete, defaultPlayerId,
 }: TestResultFormDialogProps) {
   const isEditing = !!test;
   const { testTypes, addTestType } = useTestTypes();
@@ -50,30 +43,20 @@ export function TestResultFormDialog({
   const [newTypeInput, setNewTypeInput] = useState('');
   const [showNewTypeInput, setShowNewTypeInput] = useState(false);
 
-  // Shared fields
   const [sharedFields, setSharedFields] = useState({
-    testType: '',
-    testName: '',
-    date: format(new Date(), 'yyyy-MM-dd'),
+    testType: '', testName: '', date: format(new Date(), 'yyyy-MM-dd'),
   });
 
-  // Single-player fields
   const [singleFields, setSingleFields] = useState({
-    playerId: '',
-    result: '',
-    previousResult: '',
-    trend: 'same' as TestResult['trend'],
+    playerId: '', result: '', previousResult: '', trend: 'same' as TestResult['trend'],
   });
 
-  // Group-player rows
   const [playerRows, setPlayerRows] = useState<PlayerRow[]>([]);
 
-  // Compute previous result for a given player + testName from allTests
   const getPrevResult = (playerId: string, testName: string): string => {
     if (!testName.trim()) return '';
     const matches = allTests
       .filter(t => t.playerId === playerId && t.testName.toLowerCase() === testName.toLowerCase())
-      // exclude the test being edited
       .filter(t => !isEditing || t.id !== test?.id)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return matches[0]?.result ?? '';
@@ -84,31 +67,18 @@ export function TestResultFormDialog({
     if (test) {
       setMode('single');
       setSharedFields({ testType: test.testType, testName: test.testName, date: test.date });
-      setSingleFields({
-        playerId: test.playerId,
-        result: test.result,
-        previousResult: test.previousResult || '',
-        trend: test.trend,
-      });
+      setSingleFields({ playerId: test.playerId, result: test.result, previousResult: test.previousResult || '', trend: test.trend });
     } else {
       setMode('single');
       const defaultType = testTypes[0] ?? 'Fitness';
       setSharedFields({ testType: defaultType, testName: '', date: format(new Date(), 'yyyy-MM-dd') });
-      setSingleFields({
-        playerId: defaultPlayerId || players[0]?.id || '',
-        result: '',
-        previousResult: '',
-        trend: 'same',
-      });
-      setPlayerRows(
-        players.map((p) => ({ playerId: p.id, checked: false, result: '', previousResult: '', trend: 'same' }))
-      );
+      setSingleFields({ playerId: defaultPlayerId || players[0]?.id || '', result: '', previousResult: '', trend: 'same' });
+      setPlayerRows(players.map((p) => ({ playerId: p.id, checked: false, result: '', previousResult: '', trend: 'same' })));
     }
     setShowNewTypeInput(false);
     setNewTypeInput('');
   }, [test, players, open, defaultPlayerId, testTypes]);
 
-  // Auto-fill previousResult in single mode when player or testName changes
   const autoPrevSingle = useMemo(() => {
     if (isEditing) return '';
     return getPrevResult(singleFields.playerId, sharedFields.testName);
@@ -120,15 +90,9 @@ export function TestResultFormDialog({
     }
   }, [autoPrevSingle, isEditing, mode]);
 
-  // When testName changes in group mode, update each checked row's previousResult
   useEffect(() => {
     if (isEditing || mode !== 'group') return;
-    setPlayerRows(rows =>
-      rows.map(row => ({
-        ...row,
-        previousResult: getPrevResult(row.playerId, sharedFields.testName),
-      }))
-    );
+    setPlayerRows(rows => rows.map(row => ({ ...row, previousResult: getPrevResult(row.playerId, sharedFields.testName) })));
   }, [sharedFields.testName, mode, allTests, isEditing]);
 
   const updatePlayerRow = (playerId: string, updates: Partial<PlayerRow>) => {
@@ -148,7 +112,6 @@ export function TestResultFormDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (isEditing || mode === 'single') {
       const result: TestResult = {
         id: test?.id || crypto.randomUUID(),
@@ -163,18 +126,13 @@ export function TestResultFormDialog({
       onSave([result]);
     } else {
       const results: TestResult[] = checkedRows.map(row => ({
-        id: crypto.randomUUID(),
-        playerId: row.playerId,
+        id: crypto.randomUUID(), playerId: row.playerId,
         testType: sharedFields.testType as TestResult['testType'],
-        testName: sharedFields.testName,
-        date: sharedFields.date,
-        result: row.result,
-        previousResult: row.previousResult || undefined,
-        trend: row.trend,
+        testName: sharedFields.testName, date: sharedFields.date,
+        result: row.result, previousResult: row.previousResult || undefined, trend: row.trend,
       }));
       onSave(results);
     }
-
     onOpenChange(false);
   };
 
@@ -184,123 +142,60 @@ export function TestResultFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[560px]">
         <DialogHeader>
-          <DialogTitle>{test ? 'Edit Test Result' : 'Add Test Result'}</DialogTitle>
+          <DialogTitle>{test ? 'Redigera testresultat' : 'Lägg till testresultat'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Mode toggle — only when creating */}
           {!isEditing && (
             <div className="flex rounded-lg border border-border overflow-hidden">
-              <button
-                type="button"
-                className={cn(
-                  'flex-1 py-2 text-sm font-medium transition-colors',
-                  mode === 'single' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'
-                )}
-                onClick={() => setMode('single')}
-              >
-                Single Player
+              <button type="button" className={cn('flex-1 py-2 text-sm font-medium transition-colors', mode === 'single' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground')} onClick={() => setMode('single')}>
+                Enskild spelare
               </button>
-              <button
-                type="button"
-                className={cn(
-                  'flex-1 py-2 text-sm font-medium transition-colors',
-                  mode === 'group' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'
-                )}
-                onClick={() => setMode('group')}
-              >
-                Group Test
+              <button type="button" className={cn('flex-1 py-2 text-sm font-medium transition-colors', mode === 'group' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground')} onClick={() => setMode('group')}>
+                Grupptest
               </button>
             </div>
           )}
 
-          {/* Shared fields */}
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label>Test Type</Label>
+              <Label>Testtyp</Label>
               {showNewTypeInput ? (
                 <div className="flex gap-1">
-                  <Input
-                    autoFocus
-                    value={newTypeInput}
-                    onChange={e => setNewTypeInput(e.target.value)}
-                    placeholder="New type name"
-                    className="h-9"
-                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddNewType(); } }}
-                  />
-                  <Button type="button" size="sm" onClick={handleAddNewType} className="h-9 px-2">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                  <Button type="button" size="sm" variant="ghost" onClick={() => setShowNewTypeInput(false)} className="h-9 px-2">
-                    <X className="h-4 w-4" />
-                  </Button>
+                  <Input autoFocus value={newTypeInput} onChange={e => setNewTypeInput(e.target.value)} placeholder="Nytt typnamn" className="h-9" onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddNewType(); } }} />
+                  <Button type="button" size="sm" onClick={handleAddNewType} className="h-9 px-2"><Plus className="h-4 w-4" /></Button>
+                  <Button type="button" size="sm" variant="ghost" onClick={() => setShowNewTypeInput(false)} className="h-9 px-2"><X className="h-4 w-4" /></Button>
                 </div>
               ) : (
-                <Select
-                  value={sharedFields.testType}
-                  onValueChange={v => {
-                    if (v === '__new__') { setShowNewTypeInput(true); return; }
-                    setSharedFields(f => ({ ...f, testType: v }));
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
+                <Select value={sharedFields.testType} onValueChange={v => { if (v === '__new__') { setShowNewTypeInput(true); return; } setSharedFields(f => ({ ...f, testType: v })); }}>
+                  <SelectTrigger><SelectValue placeholder="Välj typ" /></SelectTrigger>
                   <SelectContent>
-                    {testTypes.map(t => (
-                      <SelectItem key={t} value={t}>{t}</SelectItem>
-                    ))}
-                    <SelectItem value="__new__">
-                      <span className="flex items-center gap-1 text-primary">
-                        <Plus className="h-3 w-3" /> Add new type…
-                      </span>
-                    </SelectItem>
+                    {testTypes.map(t => (<SelectItem key={t} value={t}>{t}</SelectItem>))}
+                    <SelectItem value="__new__"><span className="flex items-center gap-1 text-primary"><Plus className="h-3 w-3" /> Lägg till ny typ…</span></SelectItem>
                   </SelectContent>
                 </Select>
               )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={sharedFields.date}
-                onChange={e => setSharedFields(f => ({ ...f, date: e.target.value }))}
-                required
-              />
+              <Label htmlFor="date">Datum</Label>
+              <Input id="date" type="date" value={sharedFields.date} onChange={e => setSharedFields(f => ({ ...f, date: e.target.value }))} required />
             </div>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="testName">Test Name</Label>
-            <Input
-              id="testName"
-              value={sharedFields.testName}
-              onChange={e => setSharedFields(f => ({ ...f, testName: e.target.value }))}
-              placeholder="e.g., Sprint Test, Shooting Accuracy"
-              required
-            />
+            <Label htmlFor="testName">Testnamn</Label>
+            <Input id="testName" value={sharedFields.testName} onChange={e => setSharedFields(f => ({ ...f, testName: e.target.value }))} placeholder="t.ex. Sprinttest, Skottträffsäkerhet" required />
           </div>
 
-          {/* Single player mode */}
           {(isEditing || mode === 'single') && (
             <>
               {!isEditing && (
                 <div className="grid gap-2">
-                  <Label>Player</Label>
-                  <Select
-                    value={singleFields.playerId}
-                    onValueChange={v => setSingleFields(f => ({ ...f, playerId: v }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select player" />
-                    </SelectTrigger>
+                  <Label>Spelare</Label>
+                  <Select value={singleFields.playerId} onValueChange={v => setSingleFields(f => ({ ...f, playerId: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Välj spelare" /></SelectTrigger>
                     <SelectContent>
-                      {players.map(player => (
-                        <SelectItem key={player.id} value={player.id}>
-                          #{player.jerseyNumber} {player.name}
-                        </SelectItem>
-                      ))}
+                      {players.map(player => (<SelectItem key={player.id} value={player.id}>#{player.jerseyNumber} {player.name}</SelectItem>))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -308,56 +203,37 @@ export function TestResultFormDialog({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="result">Result</Label>
-                  <Input
-                    id="result"
-                    value={singleFields.result}
-                    onChange={e => setSingleFields(f => ({ ...f, result: e.target.value }))}
-                    placeholder="e.g., 4.2s, 85%"
-                    required
-                  />
+                  <Label htmlFor="result">Resultat</Label>
+                  <Input id="result" value={singleFields.result} onChange={e => setSingleFields(f => ({ ...f, result: e.target.value }))} placeholder="t.ex. 4.2s, 85%" required />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="previousResult">
-                    Previous Result
-                    {!isEditing && singleFields.previousResult && (
-                      <span className="text-xs text-muted-foreground ml-1">(auto-filled)</span>
-                    )}
+                    Föregående resultat
+                    {!isEditing && singleFields.previousResult && (<span className="text-xs text-muted-foreground ml-1">(auto)</span>)}
                   </Label>
-                  <Input
-                    id="previousResult"
-                    value={singleFields.previousResult}
-                    onChange={e => setSingleFields(f => ({ ...f, previousResult: e.target.value }))}
-                    placeholder="e.g., 4.5s, 82%"
-                  />
+                  <Input id="previousResult" value={singleFields.previousResult} onChange={e => setSingleFields(f => ({ ...f, previousResult: e.target.value }))} placeholder="t.ex. 4.5s, 82%" />
                 </div>
               </div>
 
               <div className="grid gap-2">
                 <Label>Trend</Label>
-                <Select
-                  value={singleFields.trend}
-                  onValueChange={v => setSingleFields(f => ({ ...f, trend: v as TestResult['trend'] }))}
-                >
+                <Select value={singleFields.trend} onValueChange={v => setSingleFields(f => ({ ...f, trend: v as TestResult['trend'] }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="up">Improving</SelectItem>
-                    <SelectItem value="same">No Change</SelectItem>
-                    <SelectItem value="down">Declining</SelectItem>
+                    <SelectItem value="up">Förbättring</SelectItem>
+                    <SelectItem value="same">Oförändrad</SelectItem>
+                    <SelectItem value="down">Försämring</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </>
           )}
 
-          {/* Group mode */}
           {!isEditing && mode === 'group' && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Players & Results</Label>
-                {checkedRows.length > 0 && (
-                  <span className="text-xs text-muted-foreground">{checkedRows.length} selected</span>
-                )}
+                <Label>Spelare & resultat</Label>
+                {checkedRows.length > 0 && (<span className="text-xs text-muted-foreground">{checkedRows.length} valda</span>)}
               </div>
 
               <ScrollArea className="h-64 rounded-md border border-border">
@@ -368,43 +244,23 @@ export function TestResultFormDialog({
                     return (
                       <div key={player.id} className="p-3">
                         <div className="flex items-center gap-3 mb-2">
-                          <Checkbox
-                            id={`check-${player.id}`}
-                            checked={row.checked}
-                            onCheckedChange={checked => updatePlayerRow(player.id, { checked: !!checked })}
-                          />
+                          <Checkbox id={`check-${player.id}`} checked={row.checked} onCheckedChange={checked => updatePlayerRow(player.id, { checked: !!checked })} />
                           <label htmlFor={`check-${player.id}`} className="text-sm font-medium cursor-pointer select-none">
                             <span className="text-muted-foreground mr-1">#{player.jerseyNumber}</span>
                             {player.name}
                           </label>
-                          {row.previousResult && (
-                            <span className="text-xs text-muted-foreground ml-auto">prev: {row.previousResult}</span>
-                          )}
+                          {row.previousResult && (<span className="text-xs text-muted-foreground ml-auto">föreg: {row.previousResult}</span>)}
                         </div>
-
                         {row.checked && (
                           <div className="ml-7 grid grid-cols-3 gap-2">
-                            <Input
-                              placeholder="Result *"
-                              value={row.result}
-                              onChange={e => updatePlayerRow(player.id, { result: e.target.value })}
-                              className="h-8 text-sm"
-                            />
-                            <Input
-                              placeholder="Prev result"
-                              value={row.previousResult}
-                              onChange={e => updatePlayerRow(player.id, { previousResult: e.target.value })}
-                              className="h-8 text-sm"
-                            />
-                            <Select
-                              value={row.trend}
-                              onValueChange={v => updatePlayerRow(player.id, { trend: v as TestResult['trend'] })}
-                            >
+                            <Input placeholder="Resultat *" value={row.result} onChange={e => updatePlayerRow(player.id, { result: e.target.value })} className="h-8 text-sm" />
+                            <Input placeholder="Föreg. resultat" value={row.previousResult} onChange={e => updatePlayerRow(player.id, { previousResult: e.target.value })} className="h-8 text-sm" />
+                            <Select value={row.trend} onValueChange={v => updatePlayerRow(player.id, { trend: v as TestResult['trend'] })}>
                               <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="up">↑ Better</SelectItem>
-                                <SelectItem value="same">→ Same</SelectItem>
-                                <SelectItem value="down">↓ Worse</SelectItem>
+                                <SelectItem value="up">↑ Bättre</SelectItem>
+                                <SelectItem value="same">→ Samma</SelectItem>
+                                <SelectItem value="down">↓ Sämre</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -419,17 +275,15 @@ export function TestResultFormDialog({
 
           <DialogFooter className="gap-2">
             {test && onDelete && (
-              <Button type="button" variant="destructive" onClick={() => { onDelete(test.id); onOpenChange(false); }}>
-                Delete
-              </Button>
+              <Button type="button" variant="destructive" onClick={() => { onDelete(test.id); onOpenChange(false); }}>Ta bort</Button>
             )}
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Avbryt</Button>
             <Button type="submit" disabled={mode === 'group' && !isEditing && !isGroupValid}>
               {isEditing
-                ? 'Save Changes'
+                ? 'Spara ändringar'
                 : mode === 'group'
-                ? `Save ${checkedRows.length > 0 ? checkedRows.length : ''} Result${checkedRows.length !== 1 ? 's' : ''}`
-                : 'Add Test'}
+                ? `Spara ${checkedRows.length > 0 ? checkedRows.length : ''} resultat`
+                : 'Lägg till test'}
             </Button>
           </DialogFooter>
         </form>

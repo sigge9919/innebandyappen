@@ -19,6 +19,13 @@ const TrendIcon = ({ trend }: { trend: 'up' | 'down' | 'same' }) => {
   return <Minus className="h-4 w-4 text-muted-foreground" />;
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  'Active': 'Aktiv',
+  'Overdue': 'Försenad',
+  'Completed': 'Klar',
+  'Upcoming': 'Kommande',
+};
+
 export default function Development() {
   const navigate = useNavigate();
   const { players } = usePlayers();
@@ -33,7 +40,6 @@ export default function Development() {
   const [selectedTest, setSelectedTest] = useState<TestResult | null>(null);
   const [testDialogOpen, setTestDialogOpen] = useState(false);
 
-  // Only active (non-completed) IDPs for the development tab
   const activeIdps = idps.filter(isIDPActive);
 
   const playersWithActivePlan = players.filter(p => activeIdps.some(idp => idp.playerId === p.id));
@@ -99,8 +105,8 @@ export default function Development() {
       <div className="page-container">
         <div className="section-header">
           <div>
-            <h1 className="section-title">Development</h1>
-            <p className="text-muted-foreground mt-1">Track player growth</p>
+            <h1 className="section-title">Utveckling</h1>
+            <p className="text-muted-foreground mt-1">Följ spelarnas utveckling</p>
           </div>
         </div>
 
@@ -110,7 +116,7 @@ export default function Development() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold text-foreground">Active Plans</h2>
+                <h2 className="text-lg font-semibold text-foreground">Aktiva planer</h2>
               </div>
             </div>
 
@@ -120,14 +126,14 @@ export default function Development() {
                 size="sm"
                 onClick={() => setPlayerFilter('with-plan')}
               >
-                With Plan ({playersWithActivePlan.length})
+                Med plan ({playersWithActivePlan.length})
               </Button>
               <Button
                 variant={playerFilter === 'without-plan' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setPlayerFilter('without-plan')}
               >
-                Without Plan ({playersWithoutActivePlan.length})
+                Utan plan ({playersWithoutActivePlan.length})
               </Button>
             </div>
 
@@ -136,8 +142,8 @@ export default function Development() {
                 <div className="stat-card text-center py-8">
                   <p className="text-sm text-muted-foreground">
                     {playerFilter === 'with-plan'
-                      ? 'No players have an active development plan'
-                      : 'All players have an active development plan'}
+                      ? 'Inga spelare har en aktiv utvecklingsplan'
+                      : 'Alla spelare har en aktiv utvecklingsplan'}
                   </p>
                 </div>
               )}
@@ -175,7 +181,7 @@ export default function Development() {
                                   <p className="font-medium text-foreground text-sm truncate">{idp.goal}</p>
                                   <Badge variant={getIDPStatusVariant(status)} className="text-xs shrink-0">
                                     {status === 'Overdue' && <AlertCircle className="h-3 w-3 mr-1" />}
-                                    {status}
+                                    {STATUS_LABELS[status] || status}
                                   </Badge>
                                 </div>
                                 <div className="flex items-center gap-1 shrink-0">
@@ -185,7 +191,7 @@ export default function Development() {
                                     onClick={(e) => handleMarkComplete(idp, e)}
                                     className="text-xs h-7"
                                   >
-                                    Complete
+                                    Klar
                                   </Button>
                                   <Button
                                     variant="ghost"
@@ -193,13 +199,13 @@ export default function Development() {
                                     onClick={(e) => handleEditPlan(player, idp, e)}
                                     className="text-xs h-7"
                                   >
-                                    Edit
+                                    Redigera
                                   </Button>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <CalendarDays className="h-3.5 w-3.5" />
-                                {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
+                                {new Date(idp.startDate).toLocaleDateString('sv-SE')} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString('sv-SE') : 'Pågående'}
                               </div>
                               {idp.focusAreas.length > 0 && (
                                 <div className="flex flex-wrap gap-1.5">
@@ -217,7 +223,7 @@ export default function Development() {
                           className="w-full"
                           onClick={(e) => handleCreatePlan(player, e)}
                         >
-                          <Plus className="h-4 w-4 mr-1" /> Add Another Plan
+                          <Plus className="h-4 w-4 mr-1" /> Lägg till plan
                         </Button>
                       </div>
                     ) : (
@@ -227,7 +233,7 @@ export default function Development() {
                         className="w-full"
                         onClick={(e) => handleCreatePlan(player, e)}
                       >
-                        <Plus className="h-4 w-4 mr-1" /> Create Development Plan
+                        <Plus className="h-4 w-4 mr-1" /> Skapa utvecklingsplan
                       </Button>
                     )}
                   </div>
@@ -241,11 +247,11 @@ export default function Development() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ClipboardList className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold text-foreground">Recent Tests</h2>
+                <h2 className="text-lg font-semibold text-foreground">Senaste tester</h2>
               </div>
               <Button variant="outline" size="sm" onClick={handleAddTest}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Test
+                Lägg till test
               </Button>
             </div>
 
@@ -269,14 +275,14 @@ export default function Development() {
                           <Badge variant="outline" className="text-xs">{test.testType}</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {player?.name} • {new Date(test.date).toLocaleDateString()}
+                          {player?.name} • {new Date(test.date).toLocaleDateString('sv-SE')}
                         </p>
                       </div>
                       <div className="text-right flex items-center gap-3">
                         <div>
                           <p className="font-bold text-foreground">{test.result}</p>
                           {test.previousResult && (
-                            <p className="text-xs text-muted-foreground">prev: {test.previousResult}</p>
+                            <p className="text-xs text-muted-foreground">föreg: {test.previousResult}</p>
                           )}
                         </div>
                         <TrendIcon trend={test.trend} />
@@ -286,9 +292,9 @@ export default function Development() {
                 }) : (
                   <div className="text-center py-8">
                     <ClipboardList className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">No test results yet</p>
+                    <p className="text-sm text-muted-foreground">Inga testresultat ännu</p>
                     <Button variant="outline" size="sm" className="mt-3" onClick={handleAddTest}>
-                      Add first test
+                      Lägg till första testet
                     </Button>
                   </div>
                 )}

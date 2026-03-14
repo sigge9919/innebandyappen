@@ -109,17 +109,17 @@ export function PostGamePlayerStats({
     <div className="space-y-6">
       <div>
         <p className="text-xs text-muted-foreground mb-4">
-          G, A, PIM, +/- are auto-calculated from events. Shots can be entered manually.
+          M, A, UM, +/- beräknas automatiskt från händelser. Skott kan anges manuellt.
         </p>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                <th className="py-2 px-2 text-left font-medium text-muted-foreground">Player</th>
+                <th className="py-2 px-2 text-left font-medium text-muted-foreground">Spelare</th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
-                  <span className="flex items-center justify-center gap-1">
-                    G <Lock className="h-3 w-3" />
+                    <span className="flex items-center justify-center gap-1">
+                      M <Lock className="h-3 w-3" />
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
@@ -268,7 +268,7 @@ export function PostGamePlayerStats({
         </table>
       </div>
       <p className="text-xs text-muted-foreground mt-3">
-        G = Goals, A = Assists, SOG = Shots on Goal, Miss = Missed Shots, Blk = Shots Blocked (by opponent), Tot = Total Shots, Def = Defensive Blocks, PIM = Penalty Minutes, +/− = Plus/Minus (5v5 only)
+        M = Mål, A = Assist, SOG = Skott på mål, Miss = Missade skott, Blk = Blockerade skott (av motståndare), Tot = Totala skott, Def = Defensiva blockeringar, UM = Utvisningsminuter, +/− = Plus/Minus (5v5)
       </p>
       </div>
 
@@ -277,14 +277,14 @@ export function PostGamePlayerStats({
         <div className="pt-4 border-t border-border">
           <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2 mb-4">
             <Shield className="h-4 w-4" />
-            Goaltender Statistics
+            Målvaktsstatistik
           </h4>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="py-2 px-2 text-left font-medium text-muted-foreground">Goalie</th>
+                  <th className="py-2 px-2 text-left font-medium text-muted-foreground">Målvakt</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">GA</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">SA</th>
                   <th className="py-2 px-2 text-center font-medium text-muted-foreground">SV</th>
@@ -315,7 +315,7 @@ export function PostGamePlayerStats({
                           </span>
                           {isActive && (
                             <Badge variant="secondary" className="text-xs">
-                              Active
+                              Aktiv
                             </Badge>
                           )}
                         </div>
@@ -358,7 +358,7 @@ export function PostGamePlayerStats({
           </div>
 
           <p className="text-xs text-muted-foreground mt-3">
-            GA = Goals Against, SA = Shots Against, SV = Saves, SV% = Save Percentage
+            GA = Insläppta mål, SA = Skott mot, SV = Räddningar, SV% = Räddningsprocent
           </p>
         </div>
       )}
