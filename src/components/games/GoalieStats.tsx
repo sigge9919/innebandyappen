@@ -24,7 +24,7 @@ export function GoalieStats({
   if (goalies.length === 0) {
     return (
       <div className="text-sm text-muted-foreground italic py-4 text-center">
-        No goalkeepers in squad
+        Inga målvakter i truppen
       </div>
     );
   }
@@ -66,14 +66,14 @@ export function GoalieStats({
     <div className="space-y-4">
       <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
         <Shield className="h-4 w-4" />
-        Goaltender Statistics
+        Målvaktsstatistik
       </h4>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              <th className="py-2 px-2 text-left font-medium text-muted-foreground">Goalie</th>
+              <th className="py-2 px-2 text-left font-medium text-muted-foreground">Målvakt</th>
               <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                 <span className="flex items-center justify-center gap-1">
                   GA
@@ -113,7 +113,7 @@ export function GoalieStats({
                       </span>
                       {isActive && (
                         <Badge variant="secondary" className="text-xs">
-                          Active
+                          Aktiv
                         </Badge>
                       )}
                     </div>
@@ -156,7 +156,7 @@ export function GoalieStats({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        GA = Goals Against, SA = Shots Against, SV = Saves, SV% = Save Percentage
+        GA = Insläppta mål, SA = Skott emot, SV = Räddningar, SV% = Räddningsprocent
       </p>
     </div>
   );

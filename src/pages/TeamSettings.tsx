@@ -35,9 +35,9 @@ export default function TeamSettings() {
     const { error } = await inviteCoach(email.trim(), role);
     setLoading(false);
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Invited', description: `${email} invited as ${ROLE_LABELS[role]}` });
+      toast({ title: 'Inbjudan skickad', description: `${email} inbjuden som ${ROLE_LABELS[role]}` });
       setEmail('');
     }
   };
@@ -45,7 +45,7 @@ export default function TeamSettings() {
   const handleRemove = async (memberId: string) => {
     const { error } = await removeMember(memberId);
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -70,7 +70,7 @@ export default function TeamSettings() {
                 <div key={m.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <div>
                     <p className="font-medium text-sm">
-                      {m.user_id === user?.id ? 'You' : m.invite_email || 'Linked user'}
+                      {m.user_id === user?.id ? 'Du' : m.invite_email || 'Länkad användare'}
                     </p>
                     <Badge variant="secondary" className="mt-1 text-xs">
                       {ROLE_LABELS[m.role]}

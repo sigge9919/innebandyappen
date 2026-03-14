@@ -23,7 +23,7 @@ export function GoalDetailsEditor({
     return (
       <div className="text-center py-8 text-muted-foreground">
         <CircleDot className="h-8 w-8 mx-auto mb-2 opacity-50" />
-        <p>No goals scored this game</p>
+        <p>Inga mål gjorda i denna match</p>
       </div>
     );
   }
@@ -31,7 +31,7 @@ export function GoalDetailsEditor({
   return (
     <div>
       <p className="text-sm text-muted-foreground mb-4">
-        Assign goal scorers and assists (0-1 assistant per goal).
+        Tilldela målskyttar och assister (0–1 assist per mål).
       </p>
       
       <div className="space-y-4">
@@ -43,7 +43,7 @@ export function GoalDetailsEditor({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Badge variant="default" className="bg-success text-success-foreground">
-                    Goal #{index + 1}
+                    Mål #{index + 1}
                   </Badge>
                   <Badge variant="secondary">P{event.period}</Badge>
                   <Badge variant="outline">{getSituationLabel(event.situation)}</Badge>
@@ -53,7 +53,7 @@ export function GoalDetailsEditor({
               {/* Goal Scorer */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Goal Scorer</label>
+                  <label className="text-sm font-medium">Målskytt</label>
                   <Select
                     value={event.playerId || NONE_VALUE}
                     onValueChange={(value) => {
@@ -62,10 +62,10 @@ export function GoalDetailsEditor({
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select scorer" />
+                      <SelectValue placeholder="Välj skytt" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>No scorer assigned</SelectItem>
+                      <SelectItem value={NONE_VALUE}>Ingen skytt tilldelad</SelectItem>
                       {squadPlayers.map(player => (
                         <SelectItem key={player.id} value={player.id}>
                           #{player.jerseyNumber} {player.name}
@@ -86,10 +86,10 @@ export function GoalDetailsEditor({
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="None" />
+                      <SelectValue placeholder="Ingen" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>None</SelectItem>
+                      <SelectItem value={NONE_VALUE}>Ingen</SelectItem>
                       {squadPlayers
                         .filter(p => p.id !== event.playerId)
                         .map(player => (

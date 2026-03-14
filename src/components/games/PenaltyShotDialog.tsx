@@ -102,13 +102,13 @@ export function PenaltyShotDialog({
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            Penalty Shot
+            Straffslag
           </DialogTitle>
         </DialogHeader>
 
         {step === 'team' && (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Who is taking the penalty shot?</p>
+            <p className="text-sm text-muted-foreground">Vem tar straffslaget?</p>
             <div className="grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
@@ -116,7 +116,7 @@ export function PenaltyShotDialog({
                 onClick={() => handleTeamSelect('home')}
               >
                 <CircleDot className="h-5 w-5 text-success" />
-                <span className="text-sm font-semibold">Our Team</span>
+                <span className="text-sm font-semibold">Vårt lag</span>
               </Button>
               <Button
                 variant="outline"
@@ -132,7 +132,7 @@ export function PenaltyShotDialog({
 
         {step === 'player' && (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Select the penalty taker</p>
+            <p className="text-sm text-muted-foreground">Välj straffskjutare</p>
             <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
               {fieldPlayers.map(player => (
                 <Button
@@ -152,7 +152,7 @@ export function PenaltyShotDialog({
         {step === 'outcome' && (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              {shootingTeam === 'home' ? 'Our' : opponentName + "'s"} penalty shot — what happened?
+              {shootingTeam === 'home' ? 'Vårt' : opponentName + 's'} straffslag — vad hände?
             </p>
             <div className="grid grid-cols-2 gap-3">
               <Button
@@ -160,7 +160,7 @@ export function PenaltyShotDialog({
                 onClick={() => handleOutcome(true)}
               >
                 <CircleDot className="h-6 w-6" />
-                <span className="font-semibold">Goal!</span>
+                <span className="font-semibold">Mål!</span>
               </Button>
               <Button
                 variant="outline"
@@ -168,7 +168,7 @@ export function PenaltyShotDialog({
                 onClick={() => handleOutcome(false)}
               >
                 <Shield className="h-6 w-6" />
-                <span className="font-semibold">Saved</span>
+                <span className="font-semibold">Räddning</span>
               </Button>
             </div>
           </div>

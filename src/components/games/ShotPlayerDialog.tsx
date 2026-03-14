@@ -20,10 +20,10 @@ interface ShotPlayerDialogProps {
 }
 
 const SHOT_TYPE_CONFIG = {
-  shot_on_goal: { label: 'Shot on Goal', icon: Target, color: 'text-primary' },
-  shot_off_goal: { label: 'Shot Off Goal', icon: XCircle, color: 'text-muted-foreground' },
-  shot_blocked: { label: 'Shot Blocked', icon: Shield, color: 'text-muted-foreground' },
-  defensive_block: { label: 'Blocked by', icon: Shield, color: 'text-primary' },
+  shot_on_goal: { label: 'Skott på mål', icon: Target, color: 'text-primary' },
+  shot_off_goal: { label: 'Skott utanför', icon: XCircle, color: 'text-muted-foreground' },
+  shot_blocked: { label: 'Blockerat skott', icon: Shield, color: 'text-muted-foreground' },
+  defensive_block: { label: 'Blockerat av', icon: Shield, color: 'text-primary' },
 };
 
 export function ShotPlayerDialog({
@@ -58,11 +58,11 @@ export function ShotPlayerDialog({
         </DialogHeader>
 
         <div className="space-y-3 py-2">
-          <label className="text-sm font-medium">Select Player</label>
+          <label className="text-sm font-medium">Välj spelare</label>
 
            {linePlayers.length > 0 && (
              <div className="space-y-1">
-               <p className="text-xs text-muted-foreground">Line players:</p>
+               <p className="text-xs text-muted-foreground">Kedjespelare:</p>
                <div className="flex flex-wrap gap-2">
                  {linePlayers.map(player => (
                    <button
@@ -79,7 +79,7 @@ export function ShotPlayerDialog({
 
            {otherPlayers.length > 0 && (
              <div className="space-y-1">
-               <p className="text-xs text-muted-foreground">Other players:</p>
+               <p className="text-xs text-muted-foreground">Övriga spelare:</p>
                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                  {otherPlayers.map(player => (
                    <button

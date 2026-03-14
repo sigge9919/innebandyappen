@@ -87,23 +87,23 @@ export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: P
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{play ? 'Edit Play' : 'Add Play'}</DialogTitle>
+          <DialogTitle>{play ? 'Redigera spel' : 'Lägg till spel'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Namn</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Play name"
+                placeholder="Spelnamn"
                 required
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">Kategori</Label>
               <Select
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -121,7 +121,7 @@ export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: P
 
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label>Key Points</Label>
+                <Label>Nyckelpunkter</Label>
                 <Button type="button" variant="ghost" size="sm" onClick={addKeyPoint}>
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -132,7 +132,7 @@ export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: P
                     <Input
                       value={point}
                       onChange={(e) => updateKeyPoint(index, e.target.value)}
-                      placeholder={`Key point ${index + 1}`}
+                      placeholder={`Nyckelpunkt ${index + 1}`}
                     />
                     {formData.keyPoints.length > 1 && (
                       <Button
@@ -150,17 +150,17 @@ export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: P
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="tags">Tags (comma-separated)</Label>
+              <Label htmlFor="tags">Taggar (kommaseparerade)</Label>
               <Input
                 id="tags"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                placeholder="PP, 5v4, Defense"
+                placeholder="PP, 5v4, Försvar"
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="diagramUrl">Diagram URL (optional)</Label>
+              <Label htmlFor="diagramUrl">Diagram-URL (valfritt)</Label>
               <Input
                 id="diagramUrl"
                 value={formData.diagramUrl}
@@ -170,7 +170,7 @@ export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: P
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="videoUrl">Video URL (optional)</Label>
+              <Label htmlFor="videoUrl">Video-URL (valfritt)</Label>
               <Input
                 id="videoUrl"
                 value={formData.videoUrl}
@@ -190,14 +190,14 @@ export function PlayFormDialog({ open, onOpenChange, play, onSave, onDelete }: P
                   onOpenChange(false);
                 }}
               >
-                Delete
+                Ta bort
               </Button>
             )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              {play ? 'Save Changes' : 'Add Play'}
+              {play ? 'Spara ändringar' : 'Lägg till spel'}
             </Button>
           </DialogFooter>
         </form>

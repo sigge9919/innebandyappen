@@ -24,7 +24,7 @@ export function PenaltyEditor({
     return (
       <div className="text-center py-8 text-muted-foreground">
         <AlertOctagon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-        <p>No penalties recorded this game</p>
+        <p>Inga utvisningar registrerade i denna match</p>
       </div>
     );
   }
@@ -32,14 +32,14 @@ export function PenaltyEditor({
   return (
     <div>
       <p className="text-sm text-muted-foreground mb-4">
-        Assign penalties to the players who committed them.
+        Tilldela utvisningar till spelarna som begick dem.
       </p>
       
       <div className="space-y-4">
         {/* Our Team Penalties */}
         {homePenalties.length > 0 && (
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-3">Our Team Penalties ({homePenalties.length})</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-3">Våra utvisningar ({homePenalties.length})</h4>
             <div className="space-y-2">
               {homePenalties.map((penalty, index) => (
                 <div key={penalty.id} className="flex items-center gap-3 p-3 border border-border rounded-lg">
@@ -50,7 +50,7 @@ export function PenaltyEditor({
                       </Badge>
                       <Badge variant="secondary">P{penalty.period}</Badge>
                       <span className="text-sm text-muted-foreground">
-                        Penalty #{index + 1}
+                        Utvisning #{index + 1}
                       </span>
                     </div>
                   </div>
@@ -63,10 +63,10 @@ export function PenaltyEditor({
                     }}
                   >
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select player" />
+                      <SelectValue placeholder="Välj spelare" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>Not assigned</SelectItem>
+                      <SelectItem value={NONE_VALUE}>Ej tilldelad</SelectItem>
                       {squadPlayers.map(player => (
                         <SelectItem key={player.id} value={player.id}>
                           #{player.jerseyNumber} {player.name.split(' ')[0]}
@@ -84,7 +84,7 @@ export function PenaltyEditor({
         {opponentPenalties.length > 0 && (
           <div>
             <h4 className="text-sm font-semibold text-muted-foreground mb-3">
-              Opponent Penalties ({opponentPenalties.length})
+              Motståndarens utvisningar ({opponentPenalties.length})
             </h4>
             <div className="space-y-2">
               {opponentPenalties.map((penalty, index) => (
@@ -94,7 +94,7 @@ export function PenaltyEditor({
                       <Badge variant="secondary">2 min</Badge>
                       <Badge variant="outline">P{penalty.period}</Badge>
                       <span className="text-sm text-muted-foreground">
-                        Opponent Penalty #{index + 1}
+                        Motståndarutvisning #{index + 1}
                       </span>
                     </div>
                   </div>

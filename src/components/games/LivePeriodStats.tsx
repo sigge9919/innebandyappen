@@ -18,7 +18,7 @@ const PERIOD_LABELS: Record<Period, string> = {
   '1': 'Period 1',
   '2': 'Period 2',
   '3': 'Period 3',
-  'OT': 'Overtime',
+  'OT': 'Övertid',
 };
 
 export function LivePeriodStats({
@@ -53,17 +53,17 @@ export function LivePeriodStats({
       <div className="border border-border rounded-lg p-3 bg-primary/5">
         {/* Column Headers */}
         <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground mb-2">
-          <div className="text-center">Game</div>
+          <div className="text-center">Match</div>
           <div className="text-center text-primary font-medium">Period</div>
           <div></div>
           <div className="text-center text-primary font-medium">Period</div>
-          <div className="text-center">Game</div>
+          <div className="text-center">Match</div>
         </div>
         
         {/* Stats Rows */}
         <div className="space-y-1.5">
           <UnifiedStatRow 
-            label="Goals" 
+            label="Mål" 
             homePeriod={periodHomeStats.goals} 
             homeTotal={totalHomeStats.goals}
             opponentPeriod={periodOpponentStats.goals}
@@ -71,21 +71,21 @@ export function LivePeriodStats({
             highlight
           />
           <UnifiedStatRow 
-            label="On Goal" 
+            label="På mål" 
             homePeriod={periodHomeStats.shotsOnGoal} 
             homeTotal={totalHomeStats.shotsOnGoal}
             opponentPeriod={periodOpponentStats.shotsOnGoal}
             opponentTotal={totalOpponentStats.shotsOnGoal}
           />
           <UnifiedStatRow 
-            label="Off Goal" 
+            label="Utanför" 
             homePeriod={periodHomeStats.shotsOffGoal} 
             homeTotal={totalHomeStats.shotsOffGoal}
             opponentPeriod={periodOpponentStats.shotsOffGoal}
             opponentTotal={totalOpponentStats.shotsOffGoal}
           />
           <UnifiedStatRow 
-            label="Blocked" 
+            label="Blockerat" 
             homePeriod={periodHomeStats.shotsBlocked} 
             homeTotal={totalHomeStats.shotsBlocked}
             opponentPeriod={periodOpponentStats.shotsBlocked}
@@ -93,7 +93,7 @@ export function LivePeriodStats({
           />
           <div className="border-t border-border pt-1.5">
             <UnifiedStatRow 
-              label="Total Shots" 
+              label="Totala skott" 
               homePeriod={getTotalShots(periodHomeStats)} 
               homeTotal={getTotalShots(totalHomeStats)}
               opponentPeriod={getTotalShots(periodOpponentStats)}

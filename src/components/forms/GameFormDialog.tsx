@@ -63,24 +63,24 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{game ? 'Edit Game' : 'Add Game'}</DialogTitle>
+          <DialogTitle>{game ? 'Redigera match' : 'Lägg till match'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="opponent">Opponent</Label>
+              <Label htmlFor="opponent">Motståndare</Label>
               <Input
                 id="opponent"
                 value={formData.opponent}
                 onChange={(e) => setFormData({ ...formData, opponent: e.target.value })}
-                placeholder="Opponent team name"
+                placeholder="Motståndarlagets namn"
                 required
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="date">Datum</Label>
                 <Input
                   id="date"
                   type="date"
@@ -90,7 +90,7 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="location">Plats</Label>
                 <Select
                   value={formData.location}
                   onValueChange={(value) => setFormData({ ...formData, location: value as Game['location'] })}
@@ -99,8 +99,8 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Home">Home</SelectItem>
-                    <SelectItem value="Away">Away</SelectItem>
+                    <SelectItem value="Home">Hemma</SelectItem>
+                    <SelectItem value="Away">Borta</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -116,8 +116,8 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Upcoming">Upcoming</SelectItem>
-                  <SelectItem value="Played">Played</SelectItem>
+                  <SelectItem value="Upcoming">Kommande</SelectItem>
+                  <SelectItem value="Played">Spelad</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -126,7 +126,7 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="ourScore">Our Score</Label>
+                    <Label htmlFor="ourScore">Vårt resultat</Label>
                     <Input
                       id="ourScore"
                       type="number"
@@ -136,7 +136,7 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="opponentScore">Opponent Score</Label>
+                    <Label htmlFor="opponentScore">Motståndarens resultat</Label>
                     <Input
                       id="opponentScore"
                       type="number"
@@ -148,7 +148,7 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="whatWorked">What Worked</Label>
+                  <Label htmlFor="whatWorked">Vad fungerade</Label>
                   <Textarea
                     id="whatWorked"
                     value={formData.notes?.whatWorked || ''}
@@ -161,7 +161,7 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="whatDidnt">What Didn't Work</Label>
+                  <Label htmlFor="whatDidnt">Vad fungerade inte</Label>
                   <Textarea
                     id="whatDidnt"
                     value={formData.notes?.whatDidnt || ''}
@@ -174,7 +174,7 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="focusNextWeek">Focus Next Week</Label>
+                  <Label htmlFor="focusNextWeek">Fokus nästa vecka</Label>
                   <Textarea
                     id="focusNextWeek"
                     value={formData.notes?.focusNextWeek || ''}
@@ -199,14 +199,14 @@ export function GameFormDialog({ open, onOpenChange, game, onSave, onDelete }: G
                   onOpenChange(false);
                 }}
               >
-                Delete
+                Ta bort
               </Button>
             )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              {game ? 'Save Changes' : 'Add Game'}
+              {game ? 'Spara ändringar' : 'Lägg till match'}
             </Button>
           </DialogFooter>
         </form>

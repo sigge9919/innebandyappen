@@ -142,7 +142,7 @@ export function TrainingFormDialog({
   };
 
   const getDrillName = (drillId: string) => {
-    return drills.find(d => d.id === drillId)?.name || 'Unknown';
+    return drills.find(d => d.id === drillId)?.name || 'Okänd';
   };
 
   const allAssignedDrillIds = sections.flatMap(s => s.drillIds);
@@ -155,7 +155,7 @@ export function TrainingFormDialog({
   const randomizeTeams = () => {
     const shuffled = [...attendingFieldPlayers].sort(() => Math.random() - 0.5);
     const newTeams: TrainingTeam[] = Array.from({ length: teamCount }, (_, i) => ({
-      name: `Team ${i + 1}`,
+      name: `Lag ${i + 1}`,
       playerIds: [],
     }));
     shuffled.forEach((player, idx) => {
@@ -182,24 +182,24 @@ export function TrainingFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[650px] max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>{session ? 'Edit Training Session' : 'Create Training Session'}</DialogTitle>
+          <DialogTitle>{session ? 'Redigera träningspass' : 'Skapa träningspass'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 space-y-4">
           <ScrollArea className="flex-1 min-h-0 pr-4" style={{ maxHeight: 'calc(90vh - 180px)' }}>
             <div className="grid gap-4 pb-2">
               <div className="grid gap-2">
-                <Label htmlFor="theme">Theme</Label>
+                <Label htmlFor="theme">Tema</Label>
                 <Input
                   id="theme"
                   value={formData.theme}
                   onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
-                  placeholder="Training theme (e.g., Transitions, Defense)"
+                  placeholder="Träningstema (t.ex. Omställningar, Försvar)"
                   required
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="date">Datum</Label>
                 <Input
                   id="date"
                   type="date"
@@ -212,10 +212,10 @@ export function TrainingFormDialog({
               {/* Session Structure */}
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label>Session Structure</Label>
+                  <Label>Passupplägg</Label>
                   <span className="text-sm text-muted-foreground flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
-                    Total: {totalDuration} min
+                    Totalt: {totalDuration} min
                   </span>
                 </div>
 
@@ -264,7 +264,7 @@ export function TrainingFormDialog({
                           <details className="group">
                             <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-1">
                               <Plus className="h-3 w-3" />
-                              Add drills
+                              Lägg till övningar
                             </summary>
                             <div className="mt-1.5 space-y-1 max-h-28 overflow-y-auto border border-border rounded p-2">
                               {drills.map(drill => (
@@ -280,7 +280,7 @@ export function TrainingFormDialog({
                                   >
                                     {drill.name}
                                     {allAssignedDrillIds.includes(drill.id) && !section.drillIds.includes(drill.id) && (
-                                      <span className="text-muted-foreground ml-1">(used)</span>
+                                      <span className="text-muted-foreground ml-1">(använd)</span>
                                     )}
                                   </label>
                                 </div>
@@ -297,10 +297,10 @@ export function TrainingFormDialog({
               {/* Players Attending */}
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label>Players Attending</Label>
+                  <Label>Närvarande spelare</Label>
                   <Button type="button" variant="ghost" size="sm" className="text-xs h-7" onClick={selectAllPlayers}>
                     {players.filter(p => p.status === 'Active').every(p => formData.playerIds.includes(p.id))
-                      ? 'Deselect All' : 'Select All'}
+                      ? 'Avmarkera alla' : 'Välj alla'}
                   </Button>
                 </div>
                 <div className="border rounded-md p-3 space-y-2 max-h-40 overflow-y-auto">
@@ -325,10 +325,10 @@ export function TrainingFormDialog({
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-1.5">
                       <Users className="h-4 w-4" />
-                      Teams for Gameplay
+                      Lag för spelövningar
                     </Label>
                     <div className="flex items-center gap-2">
-                      <Label htmlFor="teamCount" className="text-xs text-muted-foreground">Teams:</Label>
+                      <Label htmlFor="teamCount" className="text-xs text-muted-foreground">Lag:</Label>
                       <Input
                         id="teamCount"
                         type="number"
@@ -340,7 +340,7 @@ export function TrainingFormDialog({
                       />
                       <Button type="button" variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={randomizeTeams}>
                         <Shuffle className="h-3 w-3" />
-                        Randomize
+                        Slumpa
                       </Button>
                     </div>
                   </div>
@@ -365,7 +365,7 @@ export function TrainingFormDialog({
                                       type="button"
                                       onClick={() => movePlayerToTeam(pid, otherIdx)}
                                       className="text-muted-foreground hover:text-foreground text-[10px] px-1 rounded hover:bg-accent"
-                                      title={`Move to ${teams[otherIdx].name}`}
+                                      title={`Flytta till ${teams[otherIdx].name}`}
                                     >
                                       →{otherIdx + 1}
                                     </button>
@@ -379,7 +379,7 @@ export function TrainingFormDialog({
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      Click "Randomize" to split {attendingFieldPlayers.length} field players into teams
+                      Klicka "Slumpa" för att dela upp {attendingFieldPlayers.length} utespelare i lag
                     </p>
                   )}
                 </div>
@@ -397,14 +397,14 @@ export function TrainingFormDialog({
                   onOpenChange(false);
                 }}
               >
-                Delete
+                Ta bort
               </Button>
             )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              {session ? 'Save Changes' : 'Create Session'}
+              {session ? 'Spara ändringar' : 'Skapa pass'}
             </Button>
           </DialogFooter>
         </form>

@@ -51,7 +51,7 @@ export function LineSetup({
             onValueChange={(value) => onSelectGoalie(value === NONE_VALUE ? undefined : value)}
           >
             <SelectTrigger className="w-[180px] h-9">
-              <SelectValue placeholder="Select goalie" />
+              <SelectValue placeholder="Välj målvakt" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={NONE_VALUE}>Not selected</SelectItem>
@@ -137,7 +137,7 @@ function LineCard({
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             className="flex-1"
-            placeholder="Line name"
+            placeholder="Kedjenamn"
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSaveName();
               if (e.key === 'Escape') handleCancelName();
@@ -195,7 +195,7 @@ function LineCard({
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground italic">No players assigned</p>
+        <p className="text-sm text-muted-foreground italic">Inga spelare tilldelade</p>
       )}
     </div>
   );
