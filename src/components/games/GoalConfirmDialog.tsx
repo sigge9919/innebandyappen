@@ -250,7 +250,7 @@ export function GoalConfirmDialog({
               isHomeGoal ? 'bg-success hover:bg-success/90' : 'bg-destructive hover:bg-destructive/90'
             )}
           >
-            Confirm Goal
+            Bekräfta mål
           </Button>
         </DialogFooter>
       </DialogContent>

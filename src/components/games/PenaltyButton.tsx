@@ -21,7 +21,7 @@ export function PenaltyButton({ team, teamName, onRecordPenalty }: PenaltyButton
       onClick={() => onRecordPenalty(team)}
     >
       <AlertOctagon className="h-6 w-6" />
-      <span className="font-semibold text-sm">2 min Penalty</span>
+      <span className="font-semibold text-sm">2 min utvisning</span>
       <span className="text-xs opacity-75">{teamName}</span>
     </Button>
   );

@@ -89,7 +89,7 @@ export function PenaltyConfirmDialog({
             onClick={handleConfirm}
             className="bg-amber-500 hover:bg-amber-600 text-white"
           >
-            Confirm Penalty
+            Bekräfta utvisning
           </Button>
         </DialogFooter>
       </DialogContent>
