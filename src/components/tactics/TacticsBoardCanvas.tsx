@@ -1192,7 +1192,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               disabled={keyframes.length === 0 || isPlaying}
             >
               <Save className="h-4 w-4 mr-2" />
-              Update Keyframe
+              Uppdatera nyckelruta
             </Button>
             <Button
               variant="outline"
