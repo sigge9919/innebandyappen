@@ -108,7 +108,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
 
       {/* Overall Stats */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Overall Statistics</h3>
+        <h3 className="text-lg font-semibold mb-3">Övergripande statistik</h3>
         <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
