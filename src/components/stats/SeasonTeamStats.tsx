@@ -65,7 +65,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
       {/* Record Summary */}
       <div className="grid grid-cols-4 gap-4">
         <div className="stat-card text-center">
-          <p className="metric-label">Games</p>
+          <p className="metric-label">Matcher</p>
           <p className="metric-value">{gamesPlayed}</p>
         </div>
         <div className="stat-card text-center">
