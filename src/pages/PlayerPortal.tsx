@@ -132,7 +132,7 @@ export default function PlayerPortal() {
       setPtDialogOpen(false);
       setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
     } catch {
-      toast({ title: 'Failed to save training', variant: 'destructive' });
+      toast({ title: 'Kunde inte spara träning', variant: 'destructive' });
     }
   };
 
