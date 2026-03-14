@@ -364,7 +364,7 @@ export default function PlayerDetail() {
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary" />
-              RPE Ratings
+              RPE-betyg
             </h2>
             <div className="space-y-2">
               {[...ratings].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 10).map(r => (
