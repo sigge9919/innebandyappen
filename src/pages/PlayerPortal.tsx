@@ -348,7 +348,7 @@ export default function PlayerPortal() {
             </div>
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label>How tired do you feel? (RPE)</Label>
+                <Label>Hur trött känner du dig? (RPE)</Label>
                 <span className={`text-xl font-bold ${getRPEColor(ptForm.rpeRating)}`}>{ptForm.rpeRating}</span>
               </div>
               <Slider
