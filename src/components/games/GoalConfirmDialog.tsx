@@ -194,7 +194,7 @@ export function GoalConfirmDialog({
                 
                 {linePlayers.length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Line players:</p>
+                    <p className="text-xs text-muted-foreground">Kedjespelare:</p>
                     <div className="flex flex-wrap gap-1.5">
                       {linePlayers.filter(p => p.id !== selectedScorer).map(player => (
                         <button
