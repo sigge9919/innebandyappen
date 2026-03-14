@@ -134,7 +134,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
 
       {/* Situation Breakdown */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Situation Breakdown</h3>
+        <h3 className="text-lg font-semibold mb-3">Spellägesfördelning</h3>
         <div className="space-y-4">
           {situationStats.map(({ situation, home, opponent, opportunities }) => {
             // Skip if no activity in this situation
