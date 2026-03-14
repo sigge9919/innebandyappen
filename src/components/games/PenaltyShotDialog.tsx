@@ -116,7 +116,7 @@ export function PenaltyShotDialog({
                 onClick={() => handleTeamSelect('home')}
               >
                 <CircleDot className="h-5 w-5 text-success" />
-                <span className="text-sm font-semibold">Our Team</span>
+                <span className="text-sm font-semibold">Vårt lag</span>
               </Button>
               <Button
                 variant="outline"
