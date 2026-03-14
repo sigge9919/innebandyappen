@@ -9,7 +9,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Trash2 } from 'lucide-react';
+import { UserPlus, Trash2, Shield } from 'lucide-react';
+import {
+  usePermissions,
+  APP_SECTIONS,
+  CONFIGURABLE_ROLES,
+  AccessLevel,
+  PermissionsMap,
+  AppSection,
+} from '@/hooks/usePermissions';
 
 const ROLE_LABELS: Record<TeamRole, string> = {
   head_coach: 'Huvudtränare',
@@ -19,10 +27,17 @@ const ROLE_LABELS: Record<TeamRole, string> = {
   player: 'Spelare',
 };
 
+const ACCESS_LABELS: Record<AccessLevel, string> = {
+  none: 'Ingen åtkomst',
+  view: 'Visa',
+  edit: 'Redigera',
+};
+
 export default function TeamSettings() {
   const { activeTeam, activeRole, members, inviteCoach, removeMember } = useTeam();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { permissions, savePermissions } = usePermissions();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<TeamRole>('assistant_coach');
   const [loading, setLoading] = useState(false);
@@ -49,6 +64,18 @@ export default function TeamSettings() {
     }
   };
 
+  const handlePermissionChange = async (roleKey: string, section: AppSection, level: AccessLevel) => {
+    const updated: PermissionsMap = {
+      ...permissions,
+      [roleKey]: {
+        ...permissions[roleKey],
+        [section]: level,
+      },
+    };
+    await savePermissions(updated);
+    toast({ title: 'Behörigheter uppdaterade' });
+  };
+
   return (
     <AppLayout>
       <div className="page-container">
@@ -59,7 +86,7 @@ export default function TeamSettings() {
           </div>
         </div>
 
-        <div className="grid gap-6 max-w-2xl">
+        <div className="grid gap-6 max-w-4xl">
           {/* Members */}
           <Card>
             <CardHeader>
@@ -131,6 +158,57 @@ export default function TeamSettings() {
                     {loading ? 'Bjuder in…' : 'Skicka inbjudan'}
                   </Button>
                 </form>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Permissions matrix */}
+          {isHeadCoach && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Shield className="h-5 w-5" /> Behörigheter per roll
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Sektion</th>
+                        {CONFIGURABLE_ROLES.map(r => (
+                          <th key={r.key} className="text-left py-2 px-2 font-medium text-muted-foreground min-w-[140px]">
+                            {r.label}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {APP_SECTIONS.map(section => (
+                        <tr key={section.key} className="border-b border-border last:border-0">
+                          <td className="py-3 pr-4 font-medium">{section.label}</td>
+                          {CONFIGURABLE_ROLES.map(r => (
+                            <td key={r.key} className="py-3 px-2">
+                              <Select
+                                value={permissions[r.key]?.[section.key] ?? 'none'}
+                                onValueChange={(v) => handlePermissionChange(r.key, section.key, v as AccessLevel)}
+                              >
+                                <SelectTrigger className="h-8 text-xs w-[130px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">{ACCESS_LABELS.none}</SelectItem>
+                                  <SelectItem value="view">{ACCESS_LABELS.view}</SelectItem>
+                                  <SelectItem value="edit">{ACCESS_LABELS.edit}</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </CardContent>
             </Card>
           )}
