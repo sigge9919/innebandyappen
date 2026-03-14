@@ -364,8 +364,8 @@ export default function PlayerPortal() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setPtDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Save</Button>
+               <Button type="button" variant="outline" onClick={() => setPtDialogOpen(false)}>Avbryt</Button>
+               <Button type="submit">Spara</Button>
             </DialogFooter>
           </form>
         </DialogContent>
