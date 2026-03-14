@@ -262,17 +262,17 @@ export default function PlayerDetail() {
                     key={idp.id}
                     className={cn(
                       "cursor-pointer hover:shadow-md transition-shadow",
-                      status === 'Completed' && "opacity-60"
+                      status === 'Slutförd' && "opacity-60"
                     )}
                     onClick={() => handleEditPlan(idp)}
                   >
                     <CardContent className="pt-6 space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
-                          <p className={cn("font-semibold text-foreground", status === 'Completed' && "line-through")}>{idp.goal}</p>
+                          <p className={cn("font-semibold text-foreground", status === 'Slutförd' && "line-through")}>{idp.goal}</p>
                           <Badge variant={getIDPStatusVariant(status)} className="text-xs shrink-0">
-                            {status === 'Overdue' && <AlertCircle className="h-3 w-3 mr-1" />}
-                            {status === 'Completed' && <CheckCircle2 className="h-3 w-3 mr-1" />}
+                            {status === 'Försenad' && <AlertCircle className="h-3 w-3 mr-1" />}
+                            {status === 'Slutförd' && <CheckCircle2 className="h-3 w-3 mr-1" />}
                             {status}
                           </Badge>
                         </div>
