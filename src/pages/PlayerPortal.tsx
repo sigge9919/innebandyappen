@@ -224,9 +224,9 @@ export default function PlayerPortal() {
           {recentRatings.length > 0 ? (
             <div className="space-y-2">
               {recentRatings.map(r => {
-                const sessionLabel = r.sessionType === 'game'
-                  ? (() => { const g = games.find(g => g.id === r.sessionId); return g ? `Game vs ${g.opponent}` : 'Game'; })()
-                  : (() => { const s = sessions.find(s => s.id === r.sessionId); return s ? `Training: ${s.theme}` : 'Training'; })();
+                 const sessionLabel = r.sessionType === 'game'
+                   ? (() => { const g = games.find(g => g.id === r.sessionId); return g ? `Match vs ${g.opponent}` : 'Match'; })()
+                   : (() => { const s = sessions.find(s => s.id === r.sessionId); return s ? `Träning: ${s.theme}` : 'Träning'; })();
                 return (
                   <div key={r.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                     <div>
