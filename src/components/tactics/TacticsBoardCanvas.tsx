@@ -961,7 +961,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <Input
-                  placeholder="Name (e.g., Power Play Setup 1)"
+                  placeholder="Namn (t.ex. Powerplay uppställning 1)"
                   value={layoutName}
                   onChange={(e) => setLayoutName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSaveLayout()}
