@@ -62,7 +62,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
   }, [games, selectedPlayerId, isGoalie]);
 
   if (players.length === 0) {
-    return <p className="text-center text-muted-foreground py-8">No players available</p>;
+    return <p className="text-center text-muted-foreground py-8">Inga spelare tillgängliga</p>;
   }
 
   const skaterCharts: ChartDef[] = [
