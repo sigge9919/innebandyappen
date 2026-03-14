@@ -312,7 +312,7 @@ export default function PlayerDetail() {
                       {idp.coachNotes && (
                         <p className="text-sm text-muted-foreground border-t border-border pt-2">{idp.coachNotes}</p>
                       )}
-                      <p className="text-xs text-muted-foreground">Updated: {new Date(idp.lastUpdated).toLocaleDateString()}</p>
+                      <p className="text-xs text-muted-foreground">Uppdaterad: {new Date(idp.lastUpdated).toLocaleDateString('sv-SE')}</p>
                     </CardContent>
                   </Card>
                 );
