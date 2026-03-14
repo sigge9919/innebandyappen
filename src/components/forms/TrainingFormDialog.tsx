@@ -182,7 +182,7 @@ export function TrainingFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[650px] max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>{session ? 'Edit Training Session' : 'Create Training Session'}</DialogTitle>
+          <DialogTitle>{session ? 'Redigera träningspass' : 'Skapa träningspass'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 space-y-4">
           <ScrollArea className="flex-1 min-h-0 pr-4" style={{ maxHeight: 'calc(90vh - 180px)' }}>
