@@ -148,7 +148,7 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
                   <span className="font-medium">{getSituationLabel(situation)}</span>
                   {opportunities !== undefined && opportunities > 0 && (
                     <span className="text-sm text-muted-foreground">
-                      {opportunities} opportunities
+                      {opportunities} tillfällen
                     </span>
                   )}
                 </div>
