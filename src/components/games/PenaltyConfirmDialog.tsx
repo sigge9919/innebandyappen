@@ -83,7 +83,7 @@ export function PenaltyConfirmDialog({
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" onClick={handleCancel}>
-            Cancel
+            Avbryt
           </Button>
           <Button 
             onClick={handleConfirm}
