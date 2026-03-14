@@ -379,7 +379,7 @@ export function TrainingFormDialog({
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      Click "Randomize" to split {attendingFieldPlayers.length} field players into teams
+                      Klicka "Slumpa" för att dela upp {attendingFieldPlayers.length} utespelare i lag
                     </p>
                   )}
                 </div>
