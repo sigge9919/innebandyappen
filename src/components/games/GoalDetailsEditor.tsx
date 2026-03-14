@@ -62,10 +62,10 @@ export function GoalDetailsEditor({
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select scorer" />
+                      <SelectValue placeholder="Välj skytt" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>No scorer assigned</SelectItem>
+                      <SelectItem value={NONE_VALUE}>Ingen skytt tilldelad</SelectItem>
                       {squadPlayers.map(player => (
                         <SelectItem key={player.id} value={player.id}>
                           #{player.jerseyNumber} {player.name}
