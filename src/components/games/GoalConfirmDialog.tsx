@@ -101,7 +101,7 @@ export function GoalConfirmDialog({
               "h-5 w-5",
               isHomeGoal ? "text-success" : "text-destructive"
             )} />
-            {isHomeGoal ? 'Goal Scored!' : `${opponentName} Goal`}
+            {isHomeGoal ? 'Mål!' : `${opponentName} mål`}
           </DialogTitle>
         </DialogHeader>
 
