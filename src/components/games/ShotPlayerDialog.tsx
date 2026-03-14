@@ -62,7 +62,7 @@ export function ShotPlayerDialog({
 
            {linePlayers.length > 0 && (
              <div className="space-y-1">
-               <p className="text-xs text-muted-foreground">Line players:</p>
+               <p className="text-xs text-muted-foreground">Kedjespelare:</p>
                <div className="flex flex-wrap gap-2">
                  {linePlayers.map(player => (
                    <button
