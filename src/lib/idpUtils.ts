@@ -16,11 +16,11 @@ export function getIDPStatus(idp: IndividualDevelopmentPlan): IDPStatus {
 }
 
 export function getIDPStatusVariant(status: IDPStatus): 'default' | 'destructive' | 'secondary' {
-  switch (status) {
-    case 'Active': return 'default';
-    case 'Completed': return 'secondary';
-    case 'Overdue': return 'destructive';
-  }
+   switch (status) {
+     case 'Aktiv': return 'default';
+     case 'Slutförd': return 'secondary';
+     case 'Försenad': return 'destructive';
+   }
 }
 
 export function isIDPActive(idp: IndividualDevelopmentPlan): boolean {
