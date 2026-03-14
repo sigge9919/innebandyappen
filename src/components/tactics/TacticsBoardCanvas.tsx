@@ -934,7 +934,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={toggleMode}
             >
               <Film className="h-4 w-4 mr-2" />
-              Animation Mode
+              Animeringsläge
               {keyframes.length > 0 && (
                 <Badge variant="secondary" className="ml-2 text-xs">
                   {keyframes.length}
