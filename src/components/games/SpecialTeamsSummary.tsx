@@ -97,7 +97,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
               <span className="font-semibold text-lg text-destructive">{boxPlay.goalsAgainst}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Shorthanded Goals For</span>
+              <span className="text-sm text-muted-foreground">Mål i numerärt underläge</span>
               <span className="font-semibold text-success">{boxPlay.goalsFor}</span>
             </div>
             <div className="flex justify-between items-center">
