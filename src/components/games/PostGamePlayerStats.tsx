@@ -315,7 +315,7 @@ export function PostGamePlayerStats({
                           </span>
                           {isActive && (
                             <Badge variant="secondary" className="text-xs">
-                              Active
+                              Aktiv
                             </Badge>
                           )}
                         </div>
