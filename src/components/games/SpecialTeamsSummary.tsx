@@ -59,7 +59,7 @@ export function SpecialTeamsSummary({ powerPlay, boxPlay }: SpecialTeamsSummaryP
               <span className="font-medium">{powerPlay.shotsOnGoal}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Total Shots</span>
+              <span className="text-sm text-muted-foreground">Totala skott</span>
               <span className="font-medium">
                 {powerPlay.shotsOnGoal + powerPlay.shotsOffGoal + powerPlay.shotsBlocked}
               </span>
