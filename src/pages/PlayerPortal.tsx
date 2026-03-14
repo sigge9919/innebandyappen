@@ -331,7 +331,7 @@ export default function PlayerPortal() {
       <Dialog open={ptDialogOpen} onOpenChange={setPtDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Log Personal Training</DialogTitle>
+            <DialogTitle>Logga personlig träning</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddPersonalTraining} className="space-y-4">
             <div className="grid gap-2">
