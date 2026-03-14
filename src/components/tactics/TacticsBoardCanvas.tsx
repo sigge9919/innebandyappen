@@ -755,7 +755,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     
     setKeyframes(redistributedKeyframes);
     setCurrentKeyframeIndex(redistributedKeyframes.length - 1);
-    toast.success(`Keyframe ${redistributedKeyframes.length} added`);
+    toast.success(`Nyckelruta ${redistributedKeyframes.length} tillagd`);
   };
 
   const updateCurrentKeyframe = () => {
