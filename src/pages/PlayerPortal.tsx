@@ -219,7 +219,7 @@ export default function PlayerPortal() {
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" />
-            RPE History
+            RPE-historik
           </h2>
           {recentRatings.length > 0 ? (
             <div className="space-y-2">
