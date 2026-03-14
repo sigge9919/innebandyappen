@@ -51,7 +51,7 @@ export function LineSetup({
             onValueChange={(value) => onSelectGoalie(value === NONE_VALUE ? undefined : value)}
           >
             <SelectTrigger className="w-[180px] h-9">
-              <SelectValue placeholder="Select goalie" />
+              <SelectValue placeholder="Välj målvakt" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={NONE_VALUE}>Not selected</SelectItem>
