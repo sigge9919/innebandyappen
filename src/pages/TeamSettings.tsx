@@ -35,9 +35,9 @@ export default function TeamSettings() {
     const { error } = await inviteCoach(email.trim(), role);
     setLoading(false);
     if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Invited', description: `${email} invited as ${ROLE_LABELS[role]}` });
+      toast({ title: 'Inbjudan skickad', description: `${email} inbjuden som ${ROLE_LABELS[role]}` });
       setEmail('');
     }
   };
