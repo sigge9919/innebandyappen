@@ -39,7 +39,7 @@ export function PenaltyEditor({
         {/* Our Team Penalties */}
         {homePenalties.length > 0 && (
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-3">Our Team Penalties ({homePenalties.length})</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-3">Våra utvisningar ({homePenalties.length})</h4>
             <div className="space-y-2">
               {homePenalties.map((penalty, index) => (
                 <div key={penalty.id} className="flex items-center gap-3 p-3 border border-border rounded-lg">
