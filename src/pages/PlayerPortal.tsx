@@ -285,7 +285,7 @@ export default function PlayerPortal() {
           ) : (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                No personal trainings logged yet
+                Inga personliga träningar loggade ännu
               </CardContent>
             </Card>
           )}
