@@ -1008,10 +1008,10 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                         <div>
                           <p className="font-medium">{layout.name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {layout.players.length} players
-                            {layout.isAnimation && ` • ${layout.keyframes?.length} keyframes`}
+                            {layout.players.length} spelare
+                            {layout.isAnimation && ` • ${layout.keyframes?.length} nyckelrutor`}
                             {' • '}
-                            {new Date(layout.createdAt).toLocaleDateString()}
+                            {new Date(layout.createdAt).toLocaleDateString('sv-SE')}
                           </p>
                         </div>
                       </div>
