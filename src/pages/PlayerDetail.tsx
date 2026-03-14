@@ -385,7 +385,7 @@ export default function PlayerDetail() {
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Dumbbell className="h-5 w-5 text-primary" />
-              Personal Trainings
+              Personliga träningar
             </h2>
             <div className="space-y-2">
               {personalTrainings.map(t => (
