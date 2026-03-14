@@ -277,7 +277,7 @@ export function PostGamePlayerStats({
         <div className="pt-4 border-t border-border">
           <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2 mb-4">
             <Shield className="h-4 w-4" />
-            Goaltender Statistics
+            Målvaktsstatistik
           </h4>
 
           <div className="overflow-x-auto">
