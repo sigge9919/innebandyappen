@@ -94,9 +94,11 @@ export function useTrainingSessions(seasonId?: string | null) {
 
   const addSession = useCallback(async (session: TrainingSession) => {
     if (!activeTeam) return;
-    await supabase.from('training_sessions').insert(trainingToDb(session, activeTeam.id));
+    const dbSession = trainingToDb(session, activeTeam.id);
+    if (effectiveSeasonId) (dbSession as any).season_id = effectiveSeasonId;
+    await supabase.from('training_sessions').insert(dbSession);
     refresh();
-  }, [activeTeam, refresh]);
+  }, [activeTeam, effectiveSeasonId, refresh]);
 
   const updateSession = useCallback(async (id: string, updates: Partial<TrainingSession>) => {
     await supabase.from('training_sessions').update(trainingUpdatesToDb(updates)).eq('id', id);
