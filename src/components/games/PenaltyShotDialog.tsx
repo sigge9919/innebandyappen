@@ -152,7 +152,7 @@ export function PenaltyShotDialog({
         {step === 'outcome' && (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              {shootingTeam === 'home' ? 'Our' : opponentName + "'s"} penalty shot — what happened?
+              {shootingTeam === 'home' ? 'Vårt' : opponentName + 's'} straffslag — vad hände?
             </p>
             <div className="grid grid-cols-2 gap-3">
               <Button
