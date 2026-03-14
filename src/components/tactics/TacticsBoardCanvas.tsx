@@ -902,7 +902,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     }
 
     setLoadDialogOpen(false);
-    toast.success(`${layout.isAnimation ? 'Animation' : 'Layout'} "${layout.name}" loaded`);
+    toast.success(`${layout.isAnimation ? 'Animation' : 'Uppställning'} "${layout.name}" laddad`);
   };
 
   // Delete a saved layout
