@@ -867,7 +867,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     setSavedLayouts(updatedLayouts);
     setLayoutName('');
     setSaveDialogOpen(false);
-    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Layout'} "${newLayout.name}" saved`);
+    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Uppställning'} "${newLayout.name}" sparad`);
   };
 
   // Load a saved layout
