@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { usePlayers, useIDPs, useTestResults, useRPERatings, usePersonalTrainings, useTrainingSessions } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { useTeam } from '@/contexts/TeamContext';
+import { SeasonSelector } from '@/components/SeasonSelector';
 import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
 import { IDPFormDialog } from '@/components/forms/IDPFormDialog';
 import { TestResultFormDialog } from '@/components/forms/TestResultFormDialog';
