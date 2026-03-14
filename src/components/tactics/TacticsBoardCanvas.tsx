@@ -783,7 +783,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     if (newKeyframes.length > 0) {
       setPlayers(newKeyframes[Math.max(0, currentKeyframeIndex - 1)].players);
     }
-    toast.success('Keyframe deleted');
+    toast.success('Nyckelruta borttagen');
   };
 
   const goToKeyframe = (index: number) => {
