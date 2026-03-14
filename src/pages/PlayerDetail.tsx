@@ -451,7 +451,7 @@ export default function PlayerDetail() {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                The player can sign up with this email to access their personal portal with stats, RPE tracking, and personal training log.
+                Spelaren kan registrera sig med denna e-post för att komma åt sin personliga portal med statistik, RPE-uppföljning och träningslogg.
               </p>
             </div>
             <DialogFooter>
