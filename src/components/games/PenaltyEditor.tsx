@@ -24,7 +24,7 @@ export function PenaltyEditor({
     return (
       <div className="text-center py-8 text-muted-foreground">
         <AlertOctagon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-        <p>No penalties recorded this game</p>
+        <p>Inga utvisningar registrerade i denna match</p>
       </div>
     );
   }
