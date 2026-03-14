@@ -141,6 +141,28 @@ export default function PlayerPortal() {
   return (
     <AppLayout>
       <div className="page-container max-w-3xl mx-auto">
+        {/* Pending RPE Banner */}
+        {pendingSessions.length > 0 && (
+          <Alert className="mb-6 border-primary/30 bg-primary/5">
+            <Bell className="h-4 w-4 text-primary" />
+            <AlertDescription className="flex items-center justify-between">
+              <span className="text-sm font-medium">
+                Du har {pendingSessions.length} pass att bedöma
+              </span>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setCurrentPending(pendingSessions[0]);
+                  setCurrentRPE(5);
+                  setRpeDialogOpen(true);
+                }}
+              >
+                Bedöm nu
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Player Header */}
         <div className="flex items-center gap-4 mb-6">
           <div className="w-16 h-16 rounded-xl bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold">
