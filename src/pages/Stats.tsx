@@ -36,9 +36,11 @@ export default function Stats() {
           <div>
             <h1 className="section-title">Statistik</h1>
             <p className="text-muted-foreground mt-1">
-              Säsongsstatistik från {finishedGamesCount} avslutad{finishedGamesCount !== 1 ? 'e' : ''} match{finishedGamesCount !== 1 ? 'er' : ''}
+              {selectedSeason ? `${selectedSeason.name} — ` : ''}
+              {finishedGamesCount} avslutad{finishedGamesCount !== 1 ? 'e' : ''} match{finishedGamesCount !== 1 ? 'er' : ''}
             </p>
           </div>
+          <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
         </div>
 
         {finishedGamesCount === 0 ? (
