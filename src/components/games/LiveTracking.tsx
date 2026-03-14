@@ -240,7 +240,7 @@ export function LiveTracking({
       {/* Live Period Stats */}
       <LivePeriodStats
         currentPeriod={game.currentPeriod}
-        homeTeamName="Our Team"
+        homeTeamName="Vårt lag"
         opponentName={game.opponent}
         periodHomeStats={periodHomeStats}
         periodOpponentStats={periodOpponentStats}
