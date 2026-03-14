@@ -987,7 +987,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Load Layout / Animation</DialogTitle>
+                <DialogTitle>Ladda uppställning / animation</DialogTitle>
               </DialogHeader>
               <div className="space-y-2 pt-4 max-h-80 overflow-y-auto">
                 {savedLayouts.length === 0 ? (
