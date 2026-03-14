@@ -168,7 +168,7 @@ export function PenaltyShotDialog({
                 onClick={() => handleOutcome(false)}
               >
                 <Shield className="h-6 w-6" />
-                <span className="font-semibold">Saved</span>
+                <span className="font-semibold">Räddning</span>
               </Button>
             </div>
           </div>

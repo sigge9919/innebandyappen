@@ -113,7 +113,7 @@ export function EditDrillDialog({ open, onOpenChange, drill, onSave }: EditDrill
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
-          <DialogTitle>{drill ? 'Edit Drill' : 'Add Drill'}</DialogTitle>
+          <DialogTitle>{drill ? 'Redigera övning' : 'Lägg till övning'}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
@@ -122,23 +122,23 @@ export function EditDrillDialog({ open, onOpenChange, drill, onSave }: EditDrill
               {/* Basic Info */}
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="drill-name">Name</Label>
+                  <Label htmlFor="drill-name">Namn</Label>
                   <Input
                     id="drill-name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Drill name"
+                    placeholder="Övningsnamn"
                     required
                   />
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="drill-description">Description</Label>
+                  <Label htmlFor="drill-description">Beskrivning</Label>
                   <Textarea
                     id="drill-description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Describe the drill..."
+                    placeholder="Beskriv övningen..."
                     rows={3}
                     required
                   />
@@ -146,16 +146,16 @@ export function EditDrillDialog({ open, onOpenChange, drill, onSave }: EditDrill
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="drill-categories">Categories (comma-separated)</Label>
+                    <Label htmlFor="drill-categories">Kategorier (kommaseparerade)</Label>
                     <Input
                       id="drill-categories"
                       value={formData.categories}
                       onChange={(e) => setFormData({ ...formData, categories: e.target.value })}
-                      placeholder="Tactics, Skills, Conditioning"
+                      placeholder="Taktik, Teknik, Kondition"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="drill-videoUrl">Video URL (optional)</Label>
+                    <Label htmlFor="drill-videoUrl">Video-URL (valfritt)</Label>
                     <Input
                       id="drill-videoUrl"
                       value={formData.videoUrl}
@@ -171,7 +171,7 @@ export function EditDrillDialog({ open, onOpenChange, drill, onSave }: EditDrill
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="tactics" className="gap-2">
                     <Film className="h-4 w-4" />
-                    Tactics ({formData.linkedLayoutIds.length})
+                    Taktik ({formData.linkedLayoutIds.length})
                   </TabsTrigger>
                   <TabsTrigger value="media" className="gap-2">
                     <ImageIcon className="h-4 w-4" />
@@ -201,7 +201,7 @@ export function EditDrillDialog({ open, onOpenChange, drill, onSave }: EditDrill
                         <Button variant="outline" size="sm" asChild>
                           <span>
                             <Upload className="h-4 w-4 mr-2" />
-                            Upload Photos/Videos
+                            Ladda upp foton/videor
                           </span>
                         </Button>
                       </label>
@@ -210,7 +210,7 @@ export function EditDrillDialog({ open, onOpenChange, drill, onSave }: EditDrill
                     {formData.mediaFiles.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
                         <ImageIcon className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                        <p className="text-sm">No media uploaded</p>
+                        <p className="text-sm">Ingen media uppladdad</p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-3 gap-2">
@@ -242,10 +242,10 @@ export function EditDrillDialog({ open, onOpenChange, drill, onSave }: EditDrill
 
           <DialogFooter className="px-6 py-4 border-t shrink-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              {drill ? 'Save Changes' : 'Add Drill'}
+              {drill ? 'Spara ändringar' : 'Lägg till övning'}
             </Button>
           </DialogFooter>
         </form>

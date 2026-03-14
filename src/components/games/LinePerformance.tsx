@@ -12,7 +12,7 @@ export function LinePerformance({ lineStats, periodStats, className }: LinePerfo
   if (lineStats.length === 0) {
     return (
       <div className={cn('stat-card text-center py-8', className)}>
-        <p className="text-muted-foreground">No line statistics recorded yet</p>
+        <p className="text-muted-foreground">Ingen kedjestatistik registrerad ännu</p>
       </div>
     );
   }

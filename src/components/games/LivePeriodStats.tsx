@@ -93,7 +93,7 @@ export function LivePeriodStats({
           />
           <div className="border-t border-border pt-1.5">
             <UnifiedStatRow 
-              label="Total Shots" 
+              label="Totala skott" 
               homePeriod={getTotalShots(periodHomeStats)} 
               homeTotal={getTotalShots(totalHomeStats)}
               opponentPeriod={getTotalShots(periodOpponentStats)}

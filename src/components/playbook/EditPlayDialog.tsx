@@ -132,7 +132,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
-          <DialogTitle>{play ? 'Edit Play' : 'Add Play'}</DialogTitle>
+          <DialogTitle>{play ? 'Redigera spel' : 'Lägg till spel'}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
@@ -141,19 +141,19 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
               {/* Basic Info */}
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">Namn</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Play name"
+                    placeholder="Spelnamn"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="category">Category</Label>
+                    <Label htmlFor="category">Kategori</Label>
                     <Select
                       value={formData.category}
                       onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -170,12 +170,12 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="tags">Tags</Label>
+                    <Label htmlFor="tags">Taggar</Label>
                     <Input
                       id="tags"
                       value={formData.tags}
                       onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                      placeholder="PP, 5v4, Defense"
+                      placeholder="PP, 5v4, Försvar"
                     />
                   </div>
                 </div>
@@ -183,7 +183,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
                 {/* Key Points */}
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    <Label>Key Points</Label>
+                    <Label>Nyckelpunkter</Label>
                     <Button type="button" variant="ghost" size="sm" onClick={addKeyPoint}>
                       <Plus className="h-4 w-4" />
                     </Button>
@@ -194,7 +194,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
                         <Input
                           value={point}
                           onChange={(e) => updateKeyPoint(index, e.target.value)}
-                          placeholder={`Key point ${index + 1}`}
+                          placeholder={`Nyckelpunkt ${index + 1}`}
                         />
                         {formData.keyPoints.length > 1 && (
                           <Button
@@ -217,7 +217,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="tactics" className="gap-2">
                     <Film className="h-4 w-4" />
-                    Tactics ({formData.linkedLayoutIds.length})
+                    Taktik ({formData.linkedLayoutIds.length})
                   </TabsTrigger>
                   <TabsTrigger value="media" className="gap-2">
                     <ImageIcon className="h-4 w-4" />
@@ -247,7 +247,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
                         <Button variant="outline" size="sm" asChild>
                           <span>
                             <Upload className="h-4 w-4 mr-2" />
-                            Upload Photos/Videos
+                            Ladda upp foton/videor
                           </span>
                         </Button>
                       </label>
@@ -256,7 +256,7 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
                     {formData.mediaFiles.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
                         <ImageIcon className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                        <p className="text-sm">No media uploaded</p>
+                        <p className="text-sm">Ingen media uppladdad</p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-3 gap-2">
@@ -289,10 +289,10 @@ export function EditPlayDialog({ open, onOpenChange, play, onSave }: EditPlayDia
 
           <DialogFooter className="px-6 py-4 border-t shrink-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              {play ? 'Save Changes' : 'Add Play'}
+              {play ? 'Spara ändringar' : 'Lägg till spel'}
             </Button>
           </DialogFooter>
         </form>

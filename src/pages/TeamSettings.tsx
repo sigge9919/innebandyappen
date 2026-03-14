@@ -70,7 +70,7 @@ export default function TeamSettings() {
                 <div key={m.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <div>
                     <p className="font-medium text-sm">
-                      {m.user_id === user?.id ? 'You' : m.invite_email || 'Linked user'}
+                      {m.user_id === user?.id ? 'Du' : m.invite_email || 'Länkad användare'}
                     </p>
                     <Badge variant="secondary" className="mt-1 text-xs">
                       {ROLE_LABELS[m.role]}

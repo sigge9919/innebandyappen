@@ -59,7 +59,7 @@ export function PlayerTestResults({ tests, onTestClick }: PlayerTestResultsProps
                   <p className="font-bold text-foreground">{test.result}</p>
                   {test.previousResult && (
                     <p className="text-xs text-muted-foreground">
-                      prev: {test.previousResult}
+                      förra: {test.previousResult}
                     </p>
                   )}
                 </div>

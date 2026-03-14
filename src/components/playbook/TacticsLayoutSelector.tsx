@@ -71,7 +71,7 @@ export function TacticsLayoutSelector({ selectedIds, onSelect }: TacticsLayoutSe
             <div className="flex-1 min-w-0">
               <p className="font-medium truncate">{layout.name}</p>
               <p className="text-xs text-muted-foreground">
-                {layout.hasAnimation ? 'Animated' : 'Static'}
+                {layout.hasAnimation ? 'Animerad' : 'Statisk'}
               </p>
             </div>
             {isSelected ? (

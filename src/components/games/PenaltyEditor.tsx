@@ -94,7 +94,7 @@ export function PenaltyEditor({
                       <Badge variant="secondary">2 min</Badge>
                       <Badge variant="outline">P{penalty.period}</Badge>
                       <span className="text-sm text-muted-foreground">
-                        Opponent Penalty #{index + 1}
+                        Motståndarutvisning #{index + 1}
                       </span>
                     </div>
                   </div>

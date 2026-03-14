@@ -14,8 +14,8 @@ export function PlayMediaGallery({ media, onRemove, readOnly = false }: PlayMedi
     return (
       <div className="text-center py-8 text-muted-foreground border-2 border-dashed border-muted rounded-lg">
         <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-30" />
-        <p>No media uploaded</p>
-        <p className="text-sm mt-1">Upload photos or videos to document this play</p>
+        <p>Ingen media uppladdad</p>
+        <p className="text-sm mt-1">Ladda upp foton eller videor för att dokumentera detta spel</p>
       </div>
     );
   }

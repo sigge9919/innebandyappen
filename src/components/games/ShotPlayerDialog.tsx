@@ -79,7 +79,7 @@ export function ShotPlayerDialog({
 
            {otherPlayers.length > 0 && (
              <div className="space-y-1">
-               <p className="text-xs text-muted-foreground">Other players:</p>
+               <p className="text-xs text-muted-foreground">Övriga spelare:</p>
                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                  {otherPlayers.map(player => (
                    <button

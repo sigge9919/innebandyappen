@@ -195,7 +195,7 @@ function LineCard({
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground italic">No players assigned</p>
+        <p className="text-sm text-muted-foreground italic">Inga spelare tilldelade</p>
       )}
     </div>
   );

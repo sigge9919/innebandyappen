@@ -86,10 +86,10 @@ export function GoalDetailsEditor({
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="None" />
+                      <SelectValue placeholder="Ingen" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>None</SelectItem>
+                      <SelectItem value={NONE_VALUE}>Ingen</SelectItem>
                       {squadPlayers
                         .filter(p => p.id !== event.playerId)
                         .map(player => (

@@ -401,10 +401,10 @@ export function TrainingFormDialog({
               </Button>
             )}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Avbryt
             </Button>
             <Button type="submit">
-              {session ? 'Save Changes' : 'Create Session'}
+              {session ? 'Spara ändringar' : 'Skapa pass'}
             </Button>
           </DialogFooter>
         </form>
