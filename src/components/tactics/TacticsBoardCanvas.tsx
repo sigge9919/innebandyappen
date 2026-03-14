@@ -1095,7 +1095,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setSelectedTool('erase')}
             >
               <Eraser className="h-4 w-4 mr-2" />
-              Erase
+              Sudda
             </Button>
             
             <div className="w-px h-8 bg-border mx-1" />
