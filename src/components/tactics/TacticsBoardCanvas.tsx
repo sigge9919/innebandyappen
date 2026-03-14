@@ -950,7 +950,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <Save className="h-4 w-4 mr-2" />
-                Save
+                Spara
               </Button>
             </DialogTrigger>
             <DialogContent>
