@@ -337,9 +337,9 @@ export default function PlayerDetail() {
         {/* Test Results */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Test Results</h2>
+            <h2 className="text-lg font-semibold">Testresultat</h2>
             <Button variant="outline" size="sm" onClick={handleAddTest}>
-              Add Test
+              Lägg till test
             </Button>
           </div>
           <PlayerTestResults 
