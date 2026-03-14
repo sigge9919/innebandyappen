@@ -251,11 +251,11 @@ export default function PlayerPortal() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Dumbbell className="h-5 w-5 text-primary" />
-              Personal Trainings
-            </h2>
-            <Button size="sm" className="gap-1" onClick={() => setPtDialogOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Add Session
+              Personliga träningar
+           </h2>
+             <Button size="sm" className="gap-1" onClick={() => setPtDialogOpen(true)}>
+               <Plus className="h-4 w-4" />
+               Lägg till pass
             </Button>
           </div>
 
