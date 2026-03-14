@@ -926,7 +926,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               onClick={() => setMode('edit')}
             >
               <Pencil className="h-4 w-4 mr-2" />
-              Edit Mode
+              Redigeringsläge
             </Button>
             <Button
               variant={mode === 'animate' ? 'default' : 'outline'}
