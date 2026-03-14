@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -43,7 +44,9 @@ export default function TeamSettings() {
   const [loading, setLoading] = useState(false);
   const [newSeasonName, setNewSeasonName] = useState('');
   const [seasonLoading, setSeasonLoading] = useState(false);
+  const [seasonConfirmOpen, setSeasonConfirmOpen] = useState(false);
   const isHeadCoach = activeRole === 'head_coach';
+  const currentActiveSeason = seasons.find(s => s.isActive);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -241,18 +244,10 @@ export default function TeamSettings() {
                   )}
                 </div>
                 <form
-                  onSubmit={async (e) => {
+                  onSubmit={(e) => {
                     e.preventDefault();
                     if (!newSeasonName.trim()) return;
-                    setSeasonLoading(true);
-                    const { error } = await startNewSeason(newSeasonName.trim());
-                    setSeasonLoading(false);
-                    if (error) {
-                      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
-                    } else {
-                      toast({ title: 'Ny säsong startad', description: `${newSeasonName} är nu aktiv.` });
-                      setNewSeasonName('');
-                    }
+                    setSeasonConfirmOpen(true);
                   }}
                   className="flex items-end gap-3"
                 >
@@ -271,6 +266,43 @@ export default function TeamSettings() {
                     {seasonLoading ? 'Startar…' : 'Starta'}
                   </Button>
                 </form>
+
+                <AlertDialog open={seasonConfirmOpen} onOpenChange={setSeasonConfirmOpen}>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Starta ny säsong?</AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-2">
+                        <p>
+                          Du är på väg att starta säsongen <strong>"{newSeasonName}"</strong>.
+                        </p>
+                        {currentActiveSeason && (
+                          <p>
+                            Den nuvarande säsongen <strong>"{currentActiveSeason.name}"</strong> kommer att stängas. All befintlig statistik, matcher och träningar förblir sparade och kan fortfarande visas via säsongsväljaren.
+                          </p>
+                        )}
+                        <p>Ny data (matcher, träningar, RPE) kopplas automatiskt till den nya säsongen.</p>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          setSeasonLoading(true);
+                          const { error } = await startNewSeason(newSeasonName.trim());
+                          setSeasonLoading(false);
+                          if (error) {
+                            toast({ title: 'Fel', description: error.message, variant: 'destructive' });
+                          } else {
+                            toast({ title: 'Ny säsong startad', description: `${newSeasonName} är nu aktiv.` });
+                            setNewSeasonName('');
+                          }
+                        }}
+                      >
+                        Starta ny säsong
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </CardContent>
             </Card>
           )}
