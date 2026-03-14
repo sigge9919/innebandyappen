@@ -54,7 +54,7 @@ export default function TeamSettings() {
       <div className="page-container">
         <div className="section-header">
           <div>
-            <h1 className="section-title">Team Settings</h1>
+            <h1 className="section-title">Laginställningar</h1>
             <p className="text-muted-foreground mt-1">{activeTeam?.name}</p>
           </div>
         </div>
