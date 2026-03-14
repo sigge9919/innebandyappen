@@ -770,7 +770,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
         : kf
     );
     setKeyframes(updatedKeyframes);
-    toast.success('Keyframe updated');
+    toast.success('Nyckelruta uppdaterad');
   };
 
   const deleteCurrentKeyframe = () => {
