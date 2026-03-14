@@ -18,10 +18,10 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
     let label = '';
     if (r.sessionType === 'game') {
       const g = games.find(g => g.id === r.sessionId);
-      label = g ? `vs ${g.opponent}` : 'Game';
-    } else {
-      const s = sessions.find(s => s.id === r.sessionId);
-      label = s?.theme || 'Training';
+       label = g ? `vs ${g.opponent}` : 'Match';
+     } else {
+       const s = sessions.find(s => s.id === r.sessionId);
+       label = s?.theme || 'Träning';
     }
     return {
       label,
