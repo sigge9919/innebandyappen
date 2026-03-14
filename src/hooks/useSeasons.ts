@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useTeam } from '@/contexts/TeamContext';
 
 export interface Season {
   id: string;
@@ -24,19 +23,18 @@ function dbToSeason(row: any): Season {
   };
 }
 
-export function useSeasons() {
+export function useSeasons(activeTeamId: string | null | undefined) {
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [activeSeason, setActiveSeason] = useState<Season | null>(null);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { activeTeam } = useTeam();
 
   const refresh = useCallback(async () => {
-    if (!activeTeam) { setSeasons([]); setActiveSeason(null); setLoading(false); return; }
+    if (!activeTeamId) { setSeasons([]); setActiveSeason(null); setLoading(false); return; }
     const { data } = await supabase
       .from('seasons')
       .select('*')
-      .eq('team_id', activeTeam.id)
+      .eq('team_id', activeTeamId)
       .order('created_at', { ascending: false });
     const list = (data ?? []).map(dbToSeason);
     setSeasons(list);
@@ -46,21 +44,19 @@ export function useSeasons() {
       setSelectedSeasonId(active?.id ?? null);
     }
     setLoading(false);
-  }, [activeTeam]);
+  }, [activeTeamId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const startNewSeason = useCallback(async (name: string, startDate?: string) => {
-    if (!activeTeam) return { error: new Error('No active team') };
-    // Deactivate all existing seasons
+    if (!activeTeamId) return { error: new Error('No active team') };
     await supabase
       .from('seasons')
       .update({ is_active: false, end_date: new Date().toISOString().slice(0, 10) })
-      .eq('team_id', activeTeam.id)
+      .eq('team_id', activeTeamId)
       .eq('is_active', true);
-    // Create new active season
     const { error } = await supabase.from('seasons').insert({
-      team_id: activeTeam.id,
+      team_id: activeTeamId,
       name,
       is_active: true,
       start_date: startDate || new Date().toISOString().slice(0, 10),
@@ -68,7 +64,7 @@ export function useSeasons() {
     if (error) return { error: error as unknown as Error };
     await refresh();
     return { error: null };
-  }, [activeTeam, refresh]);
+  }, [activeTeamId, refresh]);
 
   const selectedSeason = seasons.find(s => s.id === selectedSeasonId) ?? activeSeason;
 
