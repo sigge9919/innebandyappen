@@ -1208,7 +1208,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
             
             {/* Speed control */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Speed:</span>
+              <span className="text-sm text-muted-foreground">Hastighet:</span>
               <Slider
                 value={[animationSpeed]}
                 onValueChange={([val]) => setAnimationSpeed(val)}
