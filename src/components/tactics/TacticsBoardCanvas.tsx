@@ -670,7 +670,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
           const player = findPlayerAtPosition(x, y);
           if (player) {
             setPlayers(prev => prev.filter(p => p.id !== player.id));
-            toast.success('Player removed');
+            toast.success('Spelare borttagen');
           }
         } else if (selectedTool === 'addHome') {
           setPlayers(prev => [...prev, { id: `home-${Date.now()}`, x, y, type: 'home', number: homePlayerCount }]);
