@@ -1159,7 +1159,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                   disabled={keyframes.length < 2}
                 >
                   <Play className="h-4 w-4 mr-2" />
-                  Play
+                   Spela
                 </Button>
               )}
               
