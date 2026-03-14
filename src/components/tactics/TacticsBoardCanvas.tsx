@@ -809,7 +809,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
 
   const playAnimation = () => {
     if (keyframes.length < 2) {
-      toast.error('Add at least 2 keyframes to play animation');
+      toast.error('Lägg till minst 2 nyckelrutor för att spela animation');
       return;
     }
     setPlaybackPosition(0);
