@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { usePlayers } from '@/hooks/useLocalStorage';
+import { useTeam } from '@/contexts/TeamContext';
+import { SeasonSelector } from '@/components/SeasonSelector';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Users, TrendingUp } from 'lucide-react';
 import { getFinishedGames } from '@/lib/seasonStats';
