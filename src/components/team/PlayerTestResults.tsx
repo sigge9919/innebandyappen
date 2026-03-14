@@ -21,7 +21,7 @@ export function PlayerTestResults({ tests, onTestClick }: PlayerTestResultsProps
       <Card>
         <CardContent className="py-8 text-center">
           <ClipboardList className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">No test results yet</p>
+          <p className="text-sm text-muted-foreground">Inga testresultat ännu</p>
         </CardContent>
       </Card>
     );

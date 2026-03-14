@@ -43,7 +43,7 @@ export function PlayerCard({ player, onClick }: PlayerCardProps) {
             {player.positions?.join(' / ') || (player as any).position || 'Forward'}
           </Badge>
           <span className="text-xs text-muted-foreground">
-            {player.stickSide} stick
+            {player.stickSide === 'Left' ? 'Vänster' : player.stickSide === 'Right' ? 'Höger' : player.stickSide}
           </span>
         </div>
       </div>
@@ -53,7 +53,7 @@ export function PlayerCard({ player, onClick }: PlayerCardProps) {
         'status-badge shrink-0',
         player.status === 'Active' ? 'status-active' : 'status-injured'
       )}>
-        {player.status}
+        {player.status === 'Active' ? 'Aktiv' : player.status === 'Injured' ? 'Skadad' : player.status}
       </span>
     </div>
   );

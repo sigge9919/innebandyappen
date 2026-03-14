@@ -71,10 +71,10 @@ export default function PlayerDetail() {
         <div className="page-container">
           <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            Tillbaka
           </Button>
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Player not found</p>
+            <p className="text-muted-foreground">Spelaren hittades inte</p>
           </div>
         </div>
       </AppLayout>
@@ -152,11 +152,11 @@ export default function PlayerDetail() {
       // Create a team_member entry with player role
       const { error } = await inviteCoach(inviteEmail, 'player');
       if (error) throw error;
-      toast({ title: 'Invite sent', description: `${inviteEmail} can now sign up and access their player portal.` });
+      toast({ title: 'Inbjudan skickad', description: `${inviteEmail} kan nu registrera sig och komma åt sin spelarportal.` });
       setInviteDialogOpen(false);
       setInviteEmail('');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast({ title: 'Fel', description: err.message, variant: 'destructive' });
     } finally {
       setInviteLoading(false);
     }
@@ -176,24 +176,24 @@ export default function PlayerDetail() {
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            Tillbaka
           </Button>
           <div className="flex gap-2">
             {!player.userId && (
               <Button variant="outline" onClick={() => setInviteDialogOpen(true)}>
                 <Mail className="h-4 w-4 mr-2" />
-                {player.inviteEmail ? 'Invited' : 'Invite Player'}
+                {player.inviteEmail ? 'Inbjuden' : 'Bjud in spelare'}
               </Button>
             )}
             {player.userId && (
               <Badge variant="secondary" className="flex items-center gap-1 px-3">
                 <CheckCircle2 className="h-3 w-3" />
-                Has Login
+                Har inloggning
               </Badge>
             )}
             <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
               <Edit className="h-4 w-4 mr-2" />
-              Edit Player
+              Redigera spelare
             </Button>
           </div>
         </div>
@@ -213,12 +213,12 @@ export default function PlayerDetail() {
                     className="text-xs"
                   >
                     {player.status === 'Injured' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                    {player.status}
+                    {player.status === 'Active' ? 'Aktiv' : player.status === 'Injured' ? 'Skadad' : player.status}
                   </Badge>
                   {player.focusFlag && (
                     <Badge variant="secondary" className="text-xs">
                       <Target className="h-3 w-3 mr-1" />
-                      Focus
+                      Fokus
                     </Badge>
                   )}
                 </div>
@@ -237,7 +237,7 @@ export default function PlayerDetail() {
         
         {/* Season Statistics */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">Season Statistics</h2>
+          <h2 className="text-lg font-semibold mb-4">Säsongsstatistik</h2>
           <PlayerStatsSection player={player} games={games} />
         </div>
         
@@ -246,10 +246,10 @@ export default function PlayerDetail() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
-              Development Plans
+              Utvecklingsplaner
             </h2>
             <Button variant="outline" size="sm" onClick={handleAddPlan}>
-              <Plus className="h-4 w-4 mr-1" /> Add Plan
+              <Plus className="h-4 w-4 mr-1" /> Lägg till plan
             </Button>
           </div>
 
@@ -262,17 +262,17 @@ export default function PlayerDetail() {
                     key={idp.id}
                     className={cn(
                       "cursor-pointer hover:shadow-md transition-shadow",
-                      status === 'Completed' && "opacity-60"
+                      status === 'Slutförd' && "opacity-60"
                     )}
                     onClick={() => handleEditPlan(idp)}
                   >
                     <CardContent className="pt-6 space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
-                          <p className={cn("font-semibold text-foreground", status === 'Completed' && "line-through")}>{idp.goal}</p>
+                          <p className={cn("font-semibold text-foreground", status === 'Slutförd' && "line-through")}>{idp.goal}</p>
                           <Badge variant={getIDPStatusVariant(status)} className="text-xs shrink-0">
-                            {status === 'Overdue' && <AlertCircle className="h-3 w-3 mr-1" />}
-                            {status === 'Completed' && <CheckCircle2 className="h-3 w-3 mr-1" />}
+                            {status === 'Försenad' && <AlertCircle className="h-3 w-3 mr-1" />}
+                            {status === 'Slutförd' && <CheckCircle2 className="h-3 w-3 mr-1" />}
                             {status}
                           </Badge>
                         </div>
@@ -285,12 +285,12 @@ export default function PlayerDetail() {
                             handleToggleComplete(idp);
                           }}
                         >
-                          {status === 'Completed' ? 'Reactivate' : 'Complete'}
+                          {status === 'Slutförd' ? 'Återaktivera' : 'Slutför'}
                         </Button>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <CalendarDays className="h-3.5 w-3.5" />
-                        {new Date(idp.startDate).toLocaleDateString()} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString() : 'Ongoing'}
+                        {new Date(idp.startDate).toLocaleDateString('sv-SE')} — {idp.endDate ? new Date(idp.endDate).toLocaleDateString('sv-SE') : 'Pågående'}
                       </div>
                       {idp.focusAreas.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
@@ -312,7 +312,7 @@ export default function PlayerDetail() {
                       {idp.coachNotes && (
                         <p className="text-sm text-muted-foreground border-t border-border pt-2">{idp.coachNotes}</p>
                       )}
-                      <p className="text-xs text-muted-foreground">Updated: {new Date(idp.lastUpdated).toLocaleDateString()}</p>
+                      <p className="text-xs text-muted-foreground">Uppdaterad: {new Date(idp.lastUpdated).toLocaleDateString('sv-SE')}</p>
                     </CardContent>
                   </Card>
                 );
@@ -321,7 +321,7 @@ export default function PlayerDetail() {
           ) : (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                No development plans yet
+                Inga utvecklingsplaner ännu
               </CardContent>
             </Card>
           )}
@@ -337,9 +337,9 @@ export default function PlayerDetail() {
         {/* Test Results */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Test Results</h2>
+            <h2 className="text-lg font-semibold">Testresultat</h2>
             <Button variant="outline" size="sm" onClick={handleAddTest}>
-              Add Test
+              Lägg till test
             </Button>
           </div>
           <PlayerTestResults 
@@ -364,7 +364,7 @@ export default function PlayerDetail() {
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary" />
-              RPE Ratings
+              RPE-betyg
             </h2>
             <div className="space-y-2">
               {[...ratings].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 10).map(r => (
@@ -385,13 +385,13 @@ export default function PlayerDetail() {
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Dumbbell className="h-5 w-5 text-primary" />
-              Personal Trainings
+              Personliga träningar
             </h2>
             <div className="space-y-2">
               {personalTrainings.map(t => (
                 <div key={t.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                   <div>
-                    <p className="text-sm font-medium">{t.description || 'Personal Training'}</p>
+                    <p className="text-sm font-medium">{t.description || 'Personlig träning'}</p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                       <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{t.date}</span>
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t.duration} min</span>
@@ -437,11 +437,11 @@ export default function PlayerDetail() {
       <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Invite {player.name} to the app</DialogTitle>
+            <DialogTitle>Bjud in {player.name} till appen</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleInvitePlayer} className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="invite-email">Player's email address</Label>
+              <Label htmlFor="invite-email">Spelarens e-postadress</Label>
               <Input
                 id="invite-email"
                 type="email"
@@ -451,13 +451,13 @@ export default function PlayerDetail() {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                The player can sign up with this email to access their personal portal with stats, RPE tracking, and personal training log.
+                Spelaren kan registrera sig med denna e-post för att komma åt sin personliga portal med statistik, RPE-uppföljning och träningslogg.
               </p>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setInviteDialogOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setInviteDialogOpen(false)}>Avbryt</Button>
               <Button type="submit" disabled={inviteLoading}>
-                {inviteLoading ? 'Sending...' : 'Send Invite'}
+                {inviteLoading ? 'Skickar...' : 'Skicka inbjudan'}
               </Button>
             </DialogFooter>
           </form>

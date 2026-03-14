@@ -28,7 +28,7 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
       return (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
-            No game statistics available yet
+             Ingen matchstatistik tillgänglig ännu
           </CardContent>
         </Card>
       );
@@ -75,7 +75,7 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
                   <TableHead>GP</TableHead>
                   <TableHead>GA</TableHead>
                   <TableHead>SA</TableHead>
-                  <TableHead>Saves</TableHead>
+                  <TableHead>Räddningar</TableHead>
                   <TableHead>SV%</TableHead>
                 </TableRow>
               </TableHeader>
@@ -105,7 +105,7 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground">
-          No game statistics available yet
+          Ingen matchstatistik tillgänglig ännu
         </CardContent>
       </Card>
     );
@@ -124,19 +124,19 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
         <Card>
           <CardContent className="pt-4 pb-4 text-center">
             <p className="text-2xl font-bold text-primary">{stats.goals}</p>
-            <p className="text-xs text-muted-foreground">Goals</p>
+            <p className="text-xs text-muted-foreground">Mål</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-4 text-center">
             <p className="text-2xl font-bold">{stats.assists}</p>
-            <p className="text-xs text-muted-foreground">Assists</p>
+            <p className="text-xs text-muted-foreground">Assist</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-4 text-center">
             <p className="text-2xl font-bold text-primary">{stats.points}</p>
-            <p className="text-xs text-muted-foreground">Points</p>
+            <p className="text-xs text-muted-foreground">Poäng</p>
           </CardContent>
         </Card>
         <Card>

@@ -18,15 +18,15 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
     let label = '';
     if (r.sessionType === 'game') {
       const g = games.find(g => g.id === r.sessionId);
-      label = g ? `vs ${g.opponent}` : 'Game';
-    } else {
-      const s = sessions.find(s => s.id === r.sessionId);
-      label = s?.theme || 'Training';
+       label = g ? `vs ${g.opponent}` : 'Match';
+     } else {
+       const s = sessions.find(s => s.id === r.sessionId);
+       label = s?.theme || 'Träning';
     }
     return {
       label,
       rating: r.rating,
-      date: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      date: new Date(r.createdAt).toLocaleDateString('sv-SE', { month: 'short', day: 'numeric' }),
       type: r.sessionType,
     };
   });
@@ -38,8 +38,8 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary" />
-          RPE Trend
-          <span className="text-sm font-normal text-muted-foreground ml-auto">Avg: {avg}</span>
+           RPE-trend
+           <span className="text-sm font-normal text-muted-foreground ml-auto">Snitt: {avg}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -107,18 +107,18 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
           </ResponsiveContainer>
         </div>
         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-500" /> 1-3 Fresh
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-yellow-500" /> 4-6 Moderate
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-orange-500" /> 7-8 Tired
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-red-500" /> 9-10 Exhausted
-          </span>
+           <span className="flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-green-500" /> 1-3 Pigg
+           </span>
+           <span className="flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-yellow-500" /> 4-6 Måttlig
+           </span>
+           <span className="flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-orange-500" /> 7-8 Trött
+           </span>
+           <span className="flex items-center gap-1">
+             <span className="w-2 h-2 rounded-full bg-red-500" /> 9-10 Utmattad
+           </span>
         </div>
       </CardContent>
     </Card>

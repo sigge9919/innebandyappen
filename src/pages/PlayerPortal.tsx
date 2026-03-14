@@ -100,7 +100,7 @@ export default function PlayerPortal() {
         setCurrentPending(null);
       }
     } catch {
-      toast({ title: 'Failed to save RPE rating', variant: 'destructive' });
+      toast({ title: 'Kunde inte spara RPE-betyg', variant: 'destructive' });
     }
   };
 
@@ -128,11 +128,11 @@ export default function PlayerPortal() {
         duration: ptForm.duration,
         rpeRating: ptForm.rpeRating,
       });
-      toast({ title: 'Personal training saved!' });
+      toast({ title: 'Personlig träning sparad!' });
       setPtDialogOpen(false);
       setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
     } catch {
-      toast({ title: 'Failed to save training', variant: 'destructive' });
+      toast({ title: 'Kunde inte spara träning', variant: 'destructive' });
     }
   };
 
@@ -158,7 +158,7 @@ export default function PlayerPortal() {
     return (
       <AppLayout>
         <div className="page-container text-center py-12">
-          <p className="text-muted-foreground">Your player profile hasn't been linked yet. Please contact your coach.</p>
+          <p className="text-muted-foreground">Din spelarprofil har inte kopplats ännu. Kontakta din tränare.</p>
         </div>
       </AppLayout>
     );
@@ -190,28 +190,28 @@ export default function PlayerPortal() {
             <CardContent className="pt-4 text-center">
               <Activity className="h-5 w-5 text-primary mx-auto mb-1" />
               <p className="text-2xl font-bold">{avgRPE}</p>
-              <p className="text-xs text-muted-foreground">Avg RPE</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 text-center">
-              <TrendingUp className="h-5 w-5 text-primary mx-auto mb-1" />
-              <p className="text-2xl font-bold">{ratings.length}</p>
-              <p className="text-xs text-muted-foreground">Sessions Rated</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 text-center">
-              <Dumbbell className="h-5 w-5 text-primary mx-auto mb-1" />
-              <p className="text-2xl font-bold">{trainings.length}</p>
-              <p className="text-xs text-muted-foreground">Personal Sessions</p>
+               <p className="text-xs text-muted-foreground">Snitt RPE</p>
+             </CardContent>
+           </Card>
+           <Card>
+             <CardContent className="pt-4 text-center">
+               <TrendingUp className="h-5 w-5 text-primary mx-auto mb-1" />
+               <p className="text-2xl font-bold">{ratings.length}</p>
+               <p className="text-xs text-muted-foreground">Bedömda pass</p>
+             </CardContent>
+           </Card>
+           <Card>
+             <CardContent className="pt-4 text-center">
+               <Dumbbell className="h-5 w-5 text-primary mx-auto mb-1" />
+               <p className="text-2xl font-bold">{trainings.length}</p>
+               <p className="text-xs text-muted-foreground">Egna pass</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Season Stats */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">My Season Stats</h2>
+          <h2 className="text-lg font-semibold mb-4">Min säsongsstatistik</h2>
           <PlayerStatsSection player={myPlayer} games={games} />
         </div>
 
@@ -219,14 +219,14 @@ export default function PlayerPortal() {
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" />
-            RPE History
+            RPE-historik
           </h2>
           {recentRatings.length > 0 ? (
             <div className="space-y-2">
               {recentRatings.map(r => {
-                const sessionLabel = r.sessionType === 'game'
-                  ? (() => { const g = games.find(g => g.id === r.sessionId); return g ? `Game vs ${g.opponent}` : 'Game'; })()
-                  : (() => { const s = sessions.find(s => s.id === r.sessionId); return s ? `Training: ${s.theme}` : 'Training'; })();
+                 const sessionLabel = r.sessionType === 'game'
+                   ? (() => { const g = games.find(g => g.id === r.sessionId); return g ? `Match vs ${g.opponent}` : 'Match'; })()
+                   : (() => { const s = sessions.find(s => s.id === r.sessionId); return s ? `Träning: ${s.theme}` : 'Träning'; })();
                 return (
                   <div key={r.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                     <div>
@@ -242,7 +242,7 @@ export default function PlayerPortal() {
               })}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No RPE ratings yet</p>
+            <p className="text-sm text-muted-foreground">Inga RPE-betyg ännu</p>
           )}
         </div>
 
@@ -251,11 +251,11 @@ export default function PlayerPortal() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Dumbbell className="h-5 w-5 text-primary" />
-              Personal Trainings
-            </h2>
-            <Button size="sm" className="gap-1" onClick={() => setPtDialogOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Add Session
+              Personliga träningar
+           </h2>
+             <Button size="sm" className="gap-1" onClick={() => setPtDialogOpen(true)}>
+               <Plus className="h-4 w-4" />
+               Lägg till pass
             </Button>
           </div>
 
@@ -264,7 +264,7 @@ export default function PlayerPortal() {
               {trainings.map(t => (
                 <div key={t.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{t.description || 'Personal Training'}</p>
+                    <p className="text-sm font-medium truncate">{t.description || 'Personlig träning'}</p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                       <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{t.date}</span>
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t.duration} min</span>
@@ -285,7 +285,7 @@ export default function PlayerPortal() {
           ) : (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                No personal trainings logged yet
+                Inga personliga träningar loggade ännu
               </CardContent>
             </Card>
           )}
@@ -296,16 +296,16 @@ export default function PlayerPortal() {
       <Dialog open={rpeDialogOpen} onOpenChange={setRpeDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>How tired are you feeling?</DialogTitle>
+            <DialogTitle>Hur trött känner du dig?</DialogTitle>
           </DialogHeader>
           {currentPending && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">{currentPending.label}</p>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">1 = Fresh</span>
+                  <span className="text-sm text-muted-foreground">1 = Pigg</span>
                   <span className={`text-3xl font-bold ${getRPEColor(currentRPE)}`}>{currentRPE}</span>
-                  <span className="text-sm text-muted-foreground">10 = Exhausted</span>
+                  <span className="text-sm text-muted-foreground">10 = Utmattad</span>
                 </div>
                 <Slider
                   value={[currentRPE]}
@@ -316,13 +316,13 @@ export default function PlayerPortal() {
                 />
               </div>
               {pendingSessions.length > 1 && (
-                <p className="text-xs text-muted-foreground">{pendingSessions.length - 1} more to rate</p>
+                <p className="text-xs text-muted-foreground">{pendingSessions.length - 1} till att bedöma</p>
               )}
             </div>
           )}
           <DialogFooter className="gap-2">
-            <Button variant="ghost" onClick={handleSkipRPE}>Skip</Button>
-            <Button onClick={handleSubmitRPE}>Submit</Button>
+             <Button variant="ghost" onClick={handleSkipRPE}>Hoppa över</Button>
+             <Button onClick={handleSubmitRPE}>Skicka</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -331,24 +331,24 @@ export default function PlayerPortal() {
       <Dialog open={ptDialogOpen} onOpenChange={setPtDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Log Personal Training</DialogTitle>
+            <DialogTitle>Logga personlig träning</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddPersonalTraining} className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="pt-date">Date</Label>
+              <Label htmlFor="pt-date">Datum</Label>
               <Input id="pt-date" type="date" value={ptForm.date} onChange={e => setPtForm(p => ({ ...p, date: e.target.value }))} required />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="pt-desc">Description</Label>
-              <Textarea id="pt-desc" value={ptForm.description} onChange={e => setPtForm(p => ({ ...p, description: e.target.value }))} placeholder="What did you work on?" />
+               <Label htmlFor="pt-desc">Beskrivning</Label>
+               <Textarea id="pt-desc" value={ptForm.description} onChange={e => setPtForm(p => ({ ...p, description: e.target.value }))} placeholder="Vad tränade du på?" />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="pt-dur">Duration (minutes)</Label>
+              <Label htmlFor="pt-dur">Längd (minuter)</Label>
               <Input id="pt-dur" type="number" min="5" max="300" value={ptForm.duration} onChange={e => setPtForm(p => ({ ...p, duration: parseInt(e.target.value) || 60 }))} />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label>How tired do you feel? (RPE)</Label>
+                <Label>Hur trött känner du dig? (RPE)</Label>
                 <span className={`text-xl font-bold ${getRPEColor(ptForm.rpeRating)}`}>{ptForm.rpeRating}</span>
               </div>
               <Slider
@@ -359,13 +359,13 @@ export default function PlayerPortal() {
                 step={1}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>1 = Fresh</span>
-                <span>10 = Exhausted</span>
+                 <span>1 = Pigg</span>
+                 <span>10 = Utmattad</span>
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setPtDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Save</Button>
+               <Button type="button" variant="outline" onClick={() => setPtDialogOpen(false)}>Avbryt</Button>
+               <Button type="submit">Spara</Button>
             </DialogFooter>
           </form>
         </DialogContent>
