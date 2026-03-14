@@ -79,7 +79,7 @@ export function SquadSelection({
       {/* Injured Players */}
       {injuredPlayers.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">Injured Players</p>
+          <p className="text-sm font-medium text-muted-foreground">Skadade spelare</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {injuredPlayers.map(player => (
               <PlayerCheckItem

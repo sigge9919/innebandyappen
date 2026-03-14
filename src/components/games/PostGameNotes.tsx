@@ -35,45 +35,45 @@ export function PostGameNotes({ game, onUpdateNotes }: PostGameNotesProps) {
           <div className="flex gap-2">
             <Button size="sm" variant="ghost" onClick={handleCancel}>
               <X className="h-4 w-4 mr-1" />
-              Cancel
+              Avbryt
             </Button>
             <Button size="sm" onClick={handleSave}>
               <Save className="h-4 w-4 mr-1" />
-              Save
+              Spara
             </Button>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="whatWorked">What Worked</Label>
+            <Label htmlFor="whatWorked">Vad fungerade</Label>
             <Textarea
               id="whatWorked"
               value={notes.whatWorked}
               onChange={(e) => setNotes({ ...notes, whatWorked: e.target.value })}
-              placeholder="What went well in this game?"
+              placeholder="Vad gick bra i matchen?"
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="whatDidnt">What Didn't Work</Label>
+            <Label htmlFor="whatDidnt">Vad fungerade inte</Label>
             <Textarea
               id="whatDidnt"
               value={notes.whatDidnt}
               onChange={(e) => setNotes({ ...notes, whatDidnt: e.target.value })}
-              placeholder="What needs improvement?"
+              placeholder="Vad behöver förbättras?"
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="focusNextWeek">Focus for Next Week</Label>
+            <Label htmlFor="focusNextWeek">Fokus nästa vecka</Label>
             <Textarea
               id="focusNextWeek"
               value={notes.focusNextWeek}
               onChange={(e) => setNotes({ ...notes, focusNextWeek: e.target.value })}
-              placeholder="Key areas to work on"
+              placeholder="Viktiga områden att jobba med"
               rows={3}
             />
           </div>
@@ -86,7 +86,7 @@ export function PostGameNotes({ game, onUpdateNotes }: PostGameNotesProps) {
       <div className="flex items-center justify-end mb-4">
         <Button size="sm" variant="ghost" onClick={() => setIsEditing(true)}>
           <Edit2 className="h-4 w-4 mr-1" />
-          Edit
+          Redigera
         </Button>
       </div>
 
@@ -95,7 +95,7 @@ export function PostGameNotes({ game, onUpdateNotes }: PostGameNotesProps) {
           {game.notes.whatWorked && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase mb-1">
-                What Worked
+                Vad fungerade
               </p>
               <p className="text-sm text-foreground">{game.notes.whatWorked}</p>
             </div>
@@ -103,7 +103,7 @@ export function PostGameNotes({ game, onUpdateNotes }: PostGameNotesProps) {
           {game.notes.whatDidnt && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase mb-1">
-                What Didn't Work
+                Vad fungerade inte
               </p>
               <p className="text-sm text-foreground">{game.notes.whatDidnt}</p>
             </div>
@@ -111,17 +111,17 @@ export function PostGameNotes({ game, onUpdateNotes }: PostGameNotesProps) {
           {game.notes.focusNextWeek && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase mb-1">
-                Focus for Next Week
+                Fokus nästa vecka
               </p>
               <p className="text-sm text-foreground">{game.notes.focusNextWeek}</p>
             </div>
           )}
           {!game.notes.whatWorked && !game.notes.whatDidnt && !game.notes.focusNextWeek && (
-            <p className="text-sm text-muted-foreground italic">No notes added yet</p>
+            <p className="text-sm text-muted-foreground italic">Inga anteckningar tillagda ännu</p>
           )}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground italic">No notes added yet</p>
+        <p className="text-sm text-muted-foreground italic">Inga anteckningar tillagda ännu</p>
       )}
     </div>
   );
