@@ -1183,7 +1183,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               disabled={isPlaying}
             >
               <Circle className="h-4 w-4 mr-2" />
-              Add Keyframe
+              Lägg till nyckelruta
             </Button>
             <Button
               variant="outline"
