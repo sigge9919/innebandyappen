@@ -41,6 +41,8 @@ export default function TeamSettings() {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<TeamRole>('assistant_coach');
   const [loading, setLoading] = useState(false);
+  const [newSeasonName, setNewSeasonName] = useState('');
+  const [seasonLoading, setSeasonLoading] = useState(false);
   const isHeadCoach = activeRole === 'head_coach';
 
   const handleInvite = async (e: React.FormEvent) => {
