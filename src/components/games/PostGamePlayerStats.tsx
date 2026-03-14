@@ -109,7 +109,7 @@ export function PostGamePlayerStats({
     <div className="space-y-6">
       <div>
         <p className="text-xs text-muted-foreground mb-4">
-          G, A, PIM, +/- are auto-calculated from events. Shots can be entered manually.
+          M, A, UM, +/- beräknas automatiskt från händelser. Skott kan anges manuellt.
         </p>
 
         <div className="overflow-x-auto">
