@@ -375,7 +375,7 @@ export function LiveTracking({
           <h4 className="text-center font-semibold text-foreground">{game.opponent}</h4>
           <EventButton
             icon={CircleDot}
-            label="Goal"
+            label="Mål"
             variant="destructive"
             onClick={() => handleGoalClick('opponent')}
           />
