@@ -264,7 +264,7 @@ export function TrainingFormDialog({
                           <details className="group">
                             <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground flex items-center gap-1">
                               <Plus className="h-3 w-3" />
-                              Add drills
+                              Lägg till övningar
                             </summary>
                             <div className="mt-1.5 space-y-1 max-h-28 overflow-y-auto border border-border rounded p-2">
                               {drills.map(drill => (
