@@ -88,7 +88,7 @@ export default function TeamSettings() {
                 </div>
               ))}
               {members.length === 0 && (
-                <p className="text-sm text-muted-foreground">No members yet.</p>
+                <p className="text-sm text-muted-foreground">Inga medlemmar ännu.</p>
               )}
             </CardContent>
           </Card>
