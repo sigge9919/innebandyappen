@@ -357,7 +357,7 @@ export function LiveTracking({
           />
           <EventButton
             icon={Shield}
-            label="Blocked"
+            label="Blockerat"
             variant="muted"
             onClick={() => handleShotClick('shot_blocked', 'home')}
           />
