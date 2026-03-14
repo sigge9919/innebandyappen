@@ -69,10 +69,13 @@ export default function Games() {
               )}
             </p>
           </div>
-          <Button className="gap-2" onClick={() => setDialogOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Lägg till match
-          </Button>
+          <div className="flex items-center gap-3">
+            <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
+            <Button className="gap-2" onClick={() => setDialogOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Lägg till match
+            </Button>
+          </div>
         </div>
 
         {/* Stats Banner */}
