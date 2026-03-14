@@ -343,7 +343,7 @@ export default function PlayerPortal() {
                <Textarea id="pt-desc" value={ptForm.description} onChange={e => setPtForm(p => ({ ...p, description: e.target.value }))} placeholder="Vad tränade du på?" />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="pt-dur">Duration (minutes)</Label>
+              <Label htmlFor="pt-dur">Längd (minuter)</Label>
               <Input id="pt-dur" type="number" min="5" max="300" value={ptForm.duration} onChange={e => setPtForm(p => ({ ...p, duration: parseInt(e.target.value) || 60 }))} />
             </div>
             <div className="grid gap-2">
