@@ -71,7 +71,7 @@ export function LivePeriodStats({
             highlight
           />
           <UnifiedStatRow 
-            label="On Goal" 
+            label="På mål" 
             homePeriod={periodHomeStats.shotsOnGoal} 
             homeTotal={totalHomeStats.shotsOnGoal}
             opponentPeriod={periodOpponentStats.shotsOnGoal}
