@@ -71,7 +71,7 @@ export function PostGameTeamStats({
         <TabsContent value={selectedPeriod} className="mt-0">
           {!isEditable && (
             <p className="text-sm text-muted-foreground mb-3 text-center">
-              Select a period to edit individual stats
+              Välj en period för att redigera statistik
             </p>
           )}
 
