@@ -121,9 +121,9 @@ export default function TeamSettings() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="assistant_coach">Assistant Coach</SelectItem>
-                        <SelectItem value="stats_coach">Stats Coach</SelectItem>
-                        <SelectItem value="viewer">Viewer</SelectItem>
+                        <SelectItem value="assistant_coach">Assisterande tränare</SelectItem>
+                        <SelectItem value="stats_coach">Statistikansvarig</SelectItem>
+                        <SelectItem value="viewer">Åskådare</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
