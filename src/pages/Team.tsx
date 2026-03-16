@@ -10,7 +10,7 @@ import { Plus, Search, Users, AlertTriangle, Target, Archive } from 'lucide-reac
 import { cn } from '@/lib/utils';
 import { Player } from '@/types';
 
-type FilterType = 'all' | 'active' | 'injured' | 'focus';
+type FilterType = 'all' | 'active' | 'injured' | 'focus' | 'archived';
 
 export default function Team() {
   const navigate = useNavigate();
@@ -29,18 +29,23 @@ export default function Team() {
         return matchesSearch && player.status === 'Active';
       case 'injured':
         return matchesSearch && player.status === 'Injured';
+      case 'archived':
+        return matchesSearch && player.status === 'Archived';
       case 'focus':
         return matchesSearch && player.focusFlag;
       default:
-        return matchesSearch;
+        return matchesSearch && player.status !== 'Archived';
     }
   });
 
+  const archivedCount = players.filter(p => p.status === 'Archived').length;
+
   const filterButtons: { value: FilterType; label: string; icon: React.ElementType; count: number }[] = [
-    { value: 'all', label: 'Alla', icon: Users, count: players.length },
+    { value: 'all', label: 'Alla', icon: Users, count: players.filter(p => p.status !== 'Archived').length },
     { value: 'active', label: 'Aktiva', icon: Users, count: players.filter(p => p.status === 'Active').length },
     { value: 'injured', label: 'Skadade', icon: AlertTriangle, count: players.filter(p => p.status === 'Injured').length },
-    { value: 'focus', label: 'Fokus', icon: Target, count: players.filter(p => p.focusFlag).length },
+    { value: 'focus', label: 'Fokus', icon: Target, count: players.filter(p => p.focusFlag && p.status !== 'Archived').length },
+    ...(archivedCount > 0 ? [{ value: 'archived' as FilterType, label: 'Arkiverade', icon: Archive, count: archivedCount }] : []),
   ];
 
   const handlePlayerClick = (player: Player) => {
