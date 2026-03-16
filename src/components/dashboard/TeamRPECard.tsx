@@ -64,10 +64,10 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
   if (ratings.length === 0) return null;
 
   const getLevel = (v: number) => {
-    if (v <= 3) return { label: 'Pigg', color: 'text-green-500', bg: 'bg-green-500' };
-    if (v <= 5) return { label: 'Bra', color: 'text-emerald-500', bg: 'bg-emerald-500' };
-    if (v <= 7) return { label: 'Måttlig', color: 'text-yellow-500', bg: 'bg-yellow-500' };
-    if (v <= 8) return { label: 'Trött', color: 'text-orange-500', bg: 'bg-orange-500' };
+    if (v <= 1.5) return { label: 'Pigg', color: 'text-green-500', bg: 'bg-green-500' };
+    if (v <= 2.5) return { label: 'Bra', color: 'text-emerald-500', bg: 'bg-emerald-500' };
+    if (v <= 3.5) return { label: 'Måttlig', color: 'text-yellow-500', bg: 'bg-yellow-500' };
+    if (v <= 4) return { label: 'Trött', color: 'text-orange-500', bg: 'bg-orange-500' };
     return { label: 'Utmattad', color: 'text-red-500', bg: 'bg-red-500' };
   };
 
@@ -83,7 +83,7 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
     const indices = dailyTrend.map((d, i) => d.avg !== null ? i : -1).filter(i => i >= 0);
     const points = indices.map(i => {
       const x = (i / 6) * sparkW;
-      const y = sparkH - ((dailyTrend[i].avg! - 1) / 9) * sparkH;
+      const y = sparkH - ((dailyTrend[i].avg! - 1) / 4) * sparkH;
       return { x, y };
     });
     return points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
@@ -116,7 +116,7 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">Senaste pass</p>
             <div className="flex items-baseline gap-1">
               <span className={`text-2xl font-bold ${level.color}`}>{latestSessionAvg.toFixed(1)}</span>
-              <span className="text-xs text-muted-foreground">/ 10</span>
+              <span className="text-xs text-muted-foreground">/ 5</span>
             </div>
             <span className={`text-[10px] font-medium ${level.color}`}>{level.label}</span>
           </div>
@@ -126,7 +126,7 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
               <span className={`text-2xl font-bold ${level7d.color}`}>
                 {last7DaysAvg > 0 ? last7DaysAvg.toFixed(1) : '—'}
               </span>
-              {last7DaysAvg > 0 && <span className="text-xs text-muted-foreground">/ 10</span>}
+              {last7DaysAvg > 0 && <span className="text-xs text-muted-foreground">/ 5</span>}
             </div>
             <span className={`text-[10px] font-medium ${level7d.color}`}>
               {last7DaysAvg > 0 ? level7d.label : 'Ingen data'}
@@ -146,7 +146,7 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
                 });
                 if (allIdx < 0) return null;
                 const x = (allIdx / 6) * sparkW;
-                const y = sparkH - ((dailyTrend[allIdx].avg! - 1) / 9) * sparkH;
+                const y = sparkH - ((dailyTrend[allIdx].avg! - 1) / 4) * sparkH;
                 const pointLevel = getLevel(dailyTrend[allIdx].avg!);
                 const fillClass = pointLevel.bg.replace('bg-', '');
                 const colorMap: Record<string, string> = {

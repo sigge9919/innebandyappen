@@ -164,9 +164,9 @@ export default function PlayerDetail() {
   };
 
   const getRPEColor = (rating: number) => {
-    if (rating <= 3) return 'text-green-500';
-    if (rating <= 6) return 'text-yellow-500';
-    if (rating <= 8) return 'text-orange-500';
+    if (rating <= 1) return 'text-green-500';
+    if (rating <= 3) return 'text-yellow-500';
+    if (rating <= 4) return 'text-orange-500';
     return 'text-red-500';
   };
   
@@ -377,7 +377,7 @@ export default function PlayerDetail() {
                     <p className="text-sm font-medium capitalize">{r.sessionType}</p>
                     <p className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</p>
                   </div>
-                  <span className={`text-lg font-bold ${getRPEColor(r.rating)}`}>{r.rating}/10</span>
+                  <span className={`text-lg font-bold ${getRPEColor(r.rating)}`}>{r.rating}/5</span>
                 </div>
               ))}
             </div>
@@ -401,7 +401,7 @@ export default function PlayerDetail() {
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t.duration} min</span>
                     </div>
                   </div>
-                  <span className={`text-lg font-bold ${getRPEColor(t.rpeRating)}`}>{t.rpeRating}/10</span>
+                  <span className={`text-lg font-bold ${getRPEColor(t.rpeRating)}`}>{t.rpeRating}/5</span>
                 </div>
               ))}
             </div>

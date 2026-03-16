@@ -41,7 +41,7 @@ export default function PlayerPortal() {
 
   // Personal training form
   const [ptDialogOpen, setPtDialogOpen] = useState(false);
-  const [ptForm, setPtForm] = useState({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
+  const [ptForm, setPtForm] = useState({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 3 });
 
   // Sync pending from hook
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function PlayerPortal() {
       
       if (remaining.length > 0) {
         setCurrentPending(remaining[0]);
-        setCurrentRPE(5);
+        setCurrentRPE(3);
       } else {
         setRpeDialogOpen(false);
         setCurrentPending(null);
@@ -100,16 +100,16 @@ export default function PlayerPortal() {
       });
       toast({ title: 'Personlig träning sparad!' });
       setPtDialogOpen(false);
-      setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
+      setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 3 });
     } catch {
       toast({ title: 'Kunde inte spara träning', variant: 'destructive' });
     }
   };
 
   const getRPEColor = (rating: number) => {
-    if (rating <= 3) return 'text-green-500';
-    if (rating <= 6) return 'text-yellow-500';
-    if (rating <= 8) return 'text-orange-500';
+    if (rating <= 1) return 'text-green-500';
+    if (rating <= 3) return 'text-yellow-500';
+    if (rating <= 4) return 'text-orange-500';
     return 'text-red-500';
   };
 
@@ -153,8 +153,8 @@ export default function PlayerPortal() {
                 size="sm"
                 onClick={() => {
                   setCurrentPending(pendingSessions[0]);
-                  setCurrentRPE(5);
-                  setRpeDialogOpen(true);
+                   setCurrentRPE(3);
+                   setRpeDialogOpen(true);
                 }}
               >
                 Bedöm nu
@@ -227,7 +227,7 @@ export default function PlayerPortal() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`text-lg font-bold ${getRPEColor(r.rating)}`}>{r.rating}</span>
-                      <span className="text-xs text-muted-foreground">/10</span>
+                      <span className="text-xs text-muted-foreground">/5</span>
                     </div>
                   </div>
                 );
@@ -294,16 +294,16 @@ export default function PlayerPortal() {
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">{currentPending.label}</p>
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">1 = Pigg</span>
-                  <span className={`text-3xl font-bold ${getRPEColor(currentRPE)}`}>{currentRPE}</span>
-                  <span className="text-sm text-muted-foreground">10 = Utmattad</span>
-                </div>
-                <Slider
-                  value={[currentRPE]}
-                  onValueChange={([v]) => setCurrentRPE(v)}
-                  min={1}
-                  max={10}
+                 <div className="flex items-center justify-between">
+                   <span className="text-sm text-muted-foreground">1 = Pigg</span>
+                   <span className={`text-3xl font-bold ${getRPEColor(currentRPE)}`}>{currentRPE}</span>
+                   <span className="text-sm text-muted-foreground">5 = Utmattad</span>
+                 </div>
+                 <Slider
+                   value={[currentRPE]}
+                   onValueChange={([v]) => setCurrentRPE(v)}
+                   min={1}
+                   max={5}
                   step={1}
                 />
               </div>
@@ -346,13 +346,13 @@ export default function PlayerPortal() {
               <Slider
                 value={[ptForm.rpeRating]}
                 onValueChange={([v]) => setPtForm(p => ({ ...p, rpeRating: v }))}
-                min={1}
-                max={10}
-                step={1}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                 <span>1 = Pigg</span>
-                 <span>10 = Utmattad</span>
+                 min={1}
+                 max={5}
+                 step={1}
+               />
+               <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>1 = Pigg</span>
+                  <span>5 = Utmattad</span>
               </div>
             </div>
             <DialogFooter>

@@ -54,8 +54,8 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
                 axisLine={false}
               />
               <YAxis
-                domain={[1, 10]}
-                ticks={[1, 3, 5, 7, 10]}
+                domain={[1, 5]}
+                ticks={[1, 2, 3, 4, 5]}
                 tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                 tickLine={false}
                 axisLine={false}
@@ -69,14 +69,14 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
                       <p className="font-medium">{d.label}</p>
                       <p className="text-muted-foreground text-xs">{d.date} • {d.type}</p>
                       <p className="font-bold mt-1" style={{ color: getRPEChartColor(d.rating) }}>
-                        RPE: {d.rating}/10
+                        RPE: {d.rating}/5
                       </p>
                     </div>
                   );
                 }}
               />
               <ReferenceLine
-                y={8}
+                y={4}
                 stroke="hsl(var(--destructive))"
                 strokeDasharray="4 4"
                 strokeOpacity={0.5}
@@ -108,16 +108,16 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
         </div>
         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
            <span className="flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-green-500" /> 1-3 Pigg
+             <span className="w-2 h-2 rounded-full bg-green-500" /> 1 Pigg
            </span>
            <span className="flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-yellow-500" /> 4-6 Måttlig
+             <span className="w-2 h-2 rounded-full bg-yellow-500" /> 2-3 Måttlig
            </span>
            <span className="flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-orange-500" /> 7-8 Trött
+             <span className="w-2 h-2 rounded-full bg-orange-500" /> 4 Trött
            </span>
            <span className="flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-red-500" /> 9-10 Utmattad
+             <span className="w-2 h-2 rounded-full bg-red-500" /> 5 Utmattad
            </span>
         </div>
       </CardContent>
@@ -126,8 +126,8 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
 }
 
 function getRPEChartColor(rating: number): string {
-  if (rating <= 3) return '#22c55e';
-  if (rating <= 6) return '#eab308';
-  if (rating <= 8) return '#f97316';
+  if (rating <= 1) return '#22c55e';
+  if (rating <= 3) return '#eab308';
+  if (rating <= 4) return '#f97316';
   return '#ef4444';
 }
