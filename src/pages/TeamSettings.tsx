@@ -38,6 +38,7 @@ const ACCESS_LABELS: Record<AccessLevel, string> = {
 export default function TeamSettings() {
   const { activeTeam, activeRole, members, inviteCoach, removeMember, seasons, startNewSeason } = useTeam();
   const { user } = useAuth();
+  const { players, refresh: refreshPlayers } = usePlayers();
   const { toast } = useToast();
   const { permissions, savePermissions } = usePermissions();
   const [email, setEmail] = useState('');
@@ -46,8 +47,16 @@ export default function TeamSettings() {
   const [newSeasonName, setNewSeasonName] = useState('');
   const [seasonLoading, setSeasonLoading] = useState(false);
   const [seasonConfirmOpen, setSeasonConfirmOpen] = useState(false);
+  const [seasonPlayerIds, setSeasonPlayerIds] = useState<string[]>([]);
   const isHeadCoach = activeRole === 'head_coach';
   const currentActiveSeason = seasons.find(s => s.isActive);
+
+  // Pre-select all non-archived players when dialog opens
+  useEffect(() => {
+    if (seasonConfirmOpen) {
+      setSeasonPlayerIds(players.filter(p => p.status !== 'Archived').map(p => p.id));
+    }
+  }, [seasonConfirmOpen, players]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
