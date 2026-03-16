@@ -8,7 +8,7 @@ import { SeasonSelector } from '@/components/SeasonSelector';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Search, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Activity, Search, TrendingUp, TrendingDown, Minus, Users } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { Player, PlayerRPERating } from '@/types';
 
