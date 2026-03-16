@@ -54,8 +54,8 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
                 axisLine={false}
               />
               <YAxis
-                domain={[1, 10]}
-                ticks={[1, 3, 5, 7, 10]}
+                domain={[1, 5]}
+                ticks={[1, 2, 3, 4, 5]}
                 tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                 tickLine={false}
                 axisLine={false}
