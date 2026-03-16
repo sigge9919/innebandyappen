@@ -100,7 +100,7 @@ export default function PlayerPortal() {
       });
       toast({ title: 'Personlig träning sparad!' });
       setPtDialogOpen(false);
-      setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
+      setPtForm({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 3 });
     } catch {
       toast({ title: 'Kunde inte spara träning', variant: 'destructive' });
     }
