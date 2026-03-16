@@ -69,7 +69,7 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
                       <p className="font-medium">{d.label}</p>
                       <p className="text-muted-foreground text-xs">{d.date} • {d.type}</p>
                       <p className="font-bold mt-1" style={{ color: getRPEChartColor(d.rating) }}>
-                        RPE: {d.rating}/10
+                        RPE: {d.rating}/5
                       </p>
                     </div>
                   );
