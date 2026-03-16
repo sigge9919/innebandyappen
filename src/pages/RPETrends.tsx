@@ -8,7 +8,7 @@ import { SeasonSelector } from '@/components/SeasonSelector';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Search, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Activity, Search, TrendingUp, TrendingDown, Minus, Users } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { Player, PlayerRPERating } from '@/types';
 
@@ -71,6 +71,39 @@ export default function RPETrends() {
       .filter(Boolean) as PlayerRPESummary[];
   }, [activePlayers, allRatings]);
 
+  // Team-level stats
+  const teamStats = useMemo(() => {
+    if (allRatings.length === 0) return null;
+
+    // Latest session average: find the most recent session, get all ratings for it
+    const sorted = [...allRatings].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const latestSessionId = sorted[0]?.sessionId;
+    const latestSessionRatings = allRatings.filter(r => r.sessionId === latestSessionId);
+    const latestAvg = latestSessionRatings.length > 0
+      ? latestSessionRatings.reduce((s, r) => s + r.rating, 0) / latestSessionRatings.length
+      : 0;
+    const latestType = sorted[0]?.sessionType;
+
+    // 7-day average
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const last7 = allRatings.filter(r => new Date(r.createdAt) >= sevenDaysAgo);
+    const weekAvg = last7.length > 0
+      ? last7.reduce((s, r) => s + r.rating, 0) / last7.length
+      : 0;
+
+    return { latestAvg, latestType, weekAvg, latestCount: latestSessionRatings.length, weekCount: last7.length };
+  }, [allRatings]);
+
+  const getLevel = (v: number) => {
+    if (v <= 1.5) return { label: 'Pigg', color: 'text-green-500' };
+    if (v <= 2.5) return { label: 'Bra', color: 'text-emerald-500' };
+    if (v <= 3.5) return { label: 'Måttlig', color: 'text-yellow-500' };
+    if (v <= 4) return { label: 'Trött', color: 'text-orange-500' };
+    return { label: 'Utmattad', color: 'text-red-500' };
+  };
+
   const filteredSummaries = playerSummaries.filter(s =>
     s.player.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -110,6 +143,56 @@ export default function RPETrends() {
             onSeasonChange={setSelectedSeasonId}
           />
         </div>
+
+        {/* Team summary cards */}
+        {teamStats && (
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <Card>
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Senaste {teamStats.latestType === 'game' ? 'matchen' : 'träningen'}
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-3xl font-bold ${getLevel(teamStats.latestAvg).color}`}>
+                    {teamStats.latestAvg.toFixed(1)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">/ 5</span>
+                </div>
+                <p className={`text-xs font-medium mt-0.5 ${getLevel(teamStats.latestAvg).color}`}>
+                  {getLevel(teamStats.latestAvg).label}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Baserat på {teamStats.latestCount} spelares betyg
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Activity className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    7 dagars snitt
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-3xl font-bold ${teamStats.weekAvg > 0 ? getLevel(teamStats.weekAvg).color : 'text-muted-foreground'}`}>
+                    {teamStats.weekAvg > 0 ? teamStats.weekAvg.toFixed(1) : '—'}
+                  </span>
+                  {teamStats.weekAvg > 0 && <span className="text-sm text-muted-foreground">/ 5</span>}
+                </div>
+                <p className={`text-xs font-medium mt-0.5 ${teamStats.weekAvg > 0 ? getLevel(teamStats.weekAvg).color : 'text-muted-foreground'}`}>
+                  {teamStats.weekAvg > 0 ? getLevel(teamStats.weekAvg).label : 'Ingen data'}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {teamStats.weekCount} betyg senaste 7 dagarna
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
