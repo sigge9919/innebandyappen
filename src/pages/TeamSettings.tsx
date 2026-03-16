@@ -279,33 +279,108 @@ export default function TeamSettings() {
                 </form>
 
                 <AlertDialog open={seasonConfirmOpen} onOpenChange={setSeasonConfirmOpen}>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
                     <AlertDialogHeader>
                       <AlertDialogTitle>Starta ny säsong?</AlertDialogTitle>
-                      <AlertDialogDescription className="space-y-2">
-                        <p>
-                          Du är på väg att starta säsongen <strong>"{newSeasonName}"</strong>.
-                        </p>
-                        {currentActiveSeason && (
+                      <AlertDialogDescription asChild>
+                        <div className="space-y-2">
                           <p>
-                            Den nuvarande säsongen <strong>"{currentActiveSeason.name}"</strong> kommer att stängas. All befintlig statistik, matcher och träningar förblir sparade och kan fortfarande visas via säsongsväljaren.
+                            Du är på väg att starta säsongen <strong>"{newSeasonName}"</strong>.
                           </p>
-                        )}
-                        <p>Ny data (matcher, träningar, RPE) kopplas automatiskt till den nya säsongen.</p>
+                          {currentActiveSeason && (
+                            <p>
+                              Den nuvarande säsongen <strong>"{currentActiveSeason.name}"</strong> kommer att stängas. All befintlig statistik, matcher och träningar förblir sparade och kan fortfarande visas via säsongsväljaren.
+                            </p>
+                          )}
+                          <p>Ny data (matcher, träningar, RPE) kopplas automatiskt till den nya säsongen.</p>
+                        </div>
                       </AlertDialogDescription>
                     </AlertDialogHeader>
+
+                    {/* Player selection for new season */}
+                    {players.filter(p => p.status !== 'Archived').length > 0 && (
+                      <div className="space-y-3 py-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium">Välj spelare som följer med till nya säsongen</p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-7"
+                              onClick={() => setSeasonPlayerIds(players.filter(p => p.status !== 'Archived').map(p => p.id))}
+                            >
+                              Välj alla
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-7"
+                              onClick={() => setSeasonPlayerIds([])}
+                            >
+                              Rensa
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Spelare som inte väljs arkiveras och visas inte längre i aktiva listor.
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {players.filter(p => p.status !== 'Archived').map(player => {
+                            const checked = seasonPlayerIds.includes(player.id);
+                            return (
+                              <button
+                                key={player.id}
+                                onClick={() => {
+                                  setSeasonPlayerIds(prev =>
+                                    checked ? prev.filter(id => id !== player.id) : [...prev, player.id]
+                                  );
+                                }}
+                                className={cn(
+                                  'flex items-center gap-3 p-3 rounded-lg border transition-all text-left w-full',
+                                  checked
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-border bg-card hover:border-primary/50',
+                                  player.status === 'Injured' && 'opacity-60'
+                                )}
+                              >
+                                <div className={cn(
+                                  'w-5 h-5 rounded border-2 flex items-center justify-center transition-colors shrink-0',
+                                  checked ? 'bg-primary border-primary' : 'border-muted-foreground'
+                                )}>
+                                  {checked && <Check className="h-3 w-3 text-primary-foreground" />}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-foreground text-sm truncate">
+                                    #{player.jerseyNumber} {player.name}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {player.positions?.join('/') || 'Forward'}
+                                    {player.status === 'Injured' && ' • Skadad'}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {seasonPlayerIds.length} av {players.filter(p => p.status !== 'Archived').length} spelare valda
+                        </p>
+                      </div>
+                    )}
+
                     <AlertDialogFooter>
                       <AlertDialogCancel>Avbryt</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={async () => {
                           setSeasonLoading(true);
-                          const { error } = await startNewSeason(newSeasonName.trim());
+                          const { error } = await startNewSeason(newSeasonName.trim(), seasonPlayerIds);
                           setSeasonLoading(false);
                           if (error) {
                             toast({ title: 'Fel', description: error.message, variant: 'destructive' });
                           } else {
                             toast({ title: 'Ny säsong startad', description: `${newSeasonName} är nu aktiv.` });
                             setNewSeasonName('');
+                            refreshPlayers();
                           }
                         }}
                       >
