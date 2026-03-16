@@ -377,7 +377,7 @@ export default function PlayerDetail() {
                     <p className="text-sm font-medium capitalize">{r.sessionType}</p>
                     <p className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</p>
                   </div>
-                  <span className={`text-lg font-bold ${getRPEColor(r.rating)}`}>{r.rating}/10</span>
+                  <span className={`text-lg font-bold ${getRPEColor(r.rating)}`}>{r.rating}/5</span>
                 </div>
               ))}
             </div>
