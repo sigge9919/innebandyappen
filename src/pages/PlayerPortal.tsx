@@ -227,7 +227,7 @@ export default function PlayerPortal() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`text-lg font-bold ${getRPEColor(r.rating)}`}>{r.rating}</span>
-                      <span className="text-xs text-muted-foreground">/10</span>
+                      <span className="text-xs text-muted-foreground">/5</span>
                     </div>
                   </div>
                 );
