@@ -64,7 +64,7 @@ export default function PlayerPortal() {
       
       if (remaining.length > 0) {
         setCurrentPending(remaining[0]);
-        setCurrentRPE(5);
+        setCurrentRPE(3);
       } else {
         setRpeDialogOpen(false);
         setCurrentPending(null);
