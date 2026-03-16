@@ -41,7 +41,7 @@ export default function PlayerPortal() {
 
   // Personal training form
   const [ptDialogOpen, setPtDialogOpen] = useState(false);
-  const [ptForm, setPtForm] = useState({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 5 });
+  const [ptForm, setPtForm] = useState({ date: format(new Date(), 'yyyy-MM-dd'), description: '', duration: 60, rpeRating: 3 });
 
   // Sync pending from hook
   useEffect(() => {
