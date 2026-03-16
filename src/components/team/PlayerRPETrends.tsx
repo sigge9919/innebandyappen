@@ -108,16 +108,16 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
         </div>
         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
            <span className="flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-green-500" /> 1-3 Pigg
+             <span className="w-2 h-2 rounded-full bg-green-500" /> 1 Pigg
            </span>
            <span className="flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-yellow-500" /> 4-6 Måttlig
+             <span className="w-2 h-2 rounded-full bg-yellow-500" /> 2-3 Måttlig
            </span>
            <span className="flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-orange-500" /> 7-8 Trött
+             <span className="w-2 h-2 rounded-full bg-orange-500" /> 4 Trött
            </span>
            <span className="flex items-center gap-1">
-             <span className="w-2 h-2 rounded-full bg-red-500" /> 9-10 Utmattad
+             <span className="w-2 h-2 rounded-full bg-red-500" /> 5 Utmattad
            </span>
         </div>
       </CardContent>
