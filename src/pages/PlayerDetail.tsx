@@ -401,7 +401,7 @@ export default function PlayerDetail() {
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t.duration} min</span>
                     </div>
                   </div>
-                  <span className={`text-lg font-bold ${getRPEColor(t.rpeRating)}`}>{t.rpeRating}/10</span>
+                  <span className={`text-lg font-bold ${getRPEColor(t.rpeRating)}`}>{t.rpeRating}/5</span>
                 </div>
               ))}
             </div>

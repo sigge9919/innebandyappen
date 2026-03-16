@@ -346,13 +346,13 @@ export default function PlayerPortal() {
               <Slider
                 value={[ptForm.rpeRating]}
                 onValueChange={([v]) => setPtForm(p => ({ ...p, rpeRating: v }))}
-                min={1}
-                max={10}
-                step={1}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                 <span>1 = Pigg</span>
-                 <span>10 = Utmattad</span>
+                 min={1}
+                 max={5}
+                 step={1}
+               />
+               <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>1 = Pigg</span>
+                  <span>5 = Utmattad</span>
               </div>
             </div>
             <DialogFooter>
