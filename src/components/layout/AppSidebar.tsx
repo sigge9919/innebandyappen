@@ -37,6 +37,7 @@ const navItems = [
   { to: '/games', icon: Trophy, label: 'Matcher' },
   { to: '/stats', icon: BarChart3, label: 'Statistik' },
   { to: '/training', icon: Calendar, label: 'Träning' },
+  { to: '/rpe', icon: Activity, label: 'RPE-trender' },
   { to: '/playbook', icon: BookOpen, label: 'Spelbok' },
   { to: '/development', icon: TrendingUp, label: 'Utveckling' },
   { to: '/tactics', icon: PenTool, label: 'Taktiktavla' },
