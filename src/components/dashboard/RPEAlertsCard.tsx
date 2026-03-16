@@ -19,7 +19,7 @@ export function RPEAlertsCard({ ratings, players, onPlayerClick }: RPEAlertsCard
   }
 
   const highRPE = Array.from(latestByPlayer.values())
-    .filter(r => r.rating >= 8)
+    .filter(r => r.rating >= 4)
     .sort((a, b) => b.rating - a.rating);
 
   if (highRPE.length === 0) return null;
