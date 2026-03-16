@@ -153,8 +153,8 @@ export default function PlayerPortal() {
                 size="sm"
                 onClick={() => {
                   setCurrentPending(pendingSessions[0]);
-                  setCurrentRPE(5);
-                  setRpeDialogOpen(true);
+                   setCurrentRPE(3);
+                   setRpeDialogOpen(true);
                 }}
               >
                 Bedöm nu
