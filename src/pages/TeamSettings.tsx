@@ -11,7 +11,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Trash2, Shield, CalendarDays, Plus } from 'lucide-react';
+import { UserPlus, Trash2, Shield, CalendarDays, Plus, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   usePermissions,
   APP_SECTIONS,
