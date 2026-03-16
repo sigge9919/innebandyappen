@@ -294,16 +294,16 @@ export default function PlayerPortal() {
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">{currentPending.label}</p>
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">1 = Pigg</span>
-                  <span className={`text-3xl font-bold ${getRPEColor(currentRPE)}`}>{currentRPE}</span>
-                  <span className="text-sm text-muted-foreground">10 = Utmattad</span>
-                </div>
-                <Slider
-                  value={[currentRPE]}
-                  onValueChange={([v]) => setCurrentRPE(v)}
-                  min={1}
-                  max={10}
+                 <div className="flex items-center justify-between">
+                   <span className="text-sm text-muted-foreground">1 = Pigg</span>
+                   <span className={`text-3xl font-bold ${getRPEColor(currentRPE)}`}>{currentRPE}</span>
+                   <span className="text-sm text-muted-foreground">5 = Utmattad</span>
+                 </div>
+                 <Slider
+                   value={[currentRPE]}
+                   onValueChange={([v]) => setCurrentRPE(v)}
+                   min={1}
+                   max={5}
                   step={1}
                 />
               </div>
