@@ -107,9 +107,9 @@ export default function PlayerPortal() {
   };
 
   const getRPEColor = (rating: number) => {
-    if (rating <= 3) return 'text-green-500';
-    if (rating <= 6) return 'text-yellow-500';
-    if (rating <= 8) return 'text-orange-500';
+    if (rating <= 1) return 'text-green-500';
+    if (rating <= 3) return 'text-yellow-500';
+    if (rating <= 4) return 'text-orange-500';
     return 'text-red-500';
   };
 
