@@ -48,13 +48,15 @@ export function useSeasons(activeTeamId: string | null | undefined) {
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  const startNewSeason = useCallback(async (name: string, startDate?: string) => {
+  const startNewSeason = useCallback(async (name: string, selectedPlayerIds?: string[], startDate?: string) => {
     if (!activeTeamId) return { error: new Error('No active team') };
+    // Close current active season
     await supabase
       .from('seasons')
       .update({ is_active: false, end_date: new Date().toISOString().slice(0, 10) })
       .eq('team_id', activeTeamId)
       .eq('is_active', true);
+    // Create new season
     const { error } = await supabase.from('seasons').insert({
       team_id: activeTeamId,
       name,
@@ -62,6 +64,24 @@ export function useSeasons(activeTeamId: string | null | undefined) {
       start_date: startDate || new Date().toISOString().slice(0, 10),
     });
     if (error) return { error: error as unknown as Error };
+    // Archive unselected players if selection provided
+    if (selectedPlayerIds) {
+      // Get all non-archived players
+      const { data: allPlayers } = await supabase
+        .from('players')
+        .select('id')
+        .eq('team_id', activeTeamId)
+        .neq('status', 'Archived');
+      const allIds = (allPlayers ?? []).map(p => p.id);
+      const toArchive = allIds.filter(id => !selectedPlayerIds.includes(id));
+      if (toArchive.length > 0) {
+        await supabase
+          .from('players')
+          .update({ status: 'Archived' })
+          .eq('team_id', activeTeamId)
+          .in('id', toArchive);
+      }
+    }
     await refresh();
     return { error: null };
   }, [activeTeamId, refresh]);
