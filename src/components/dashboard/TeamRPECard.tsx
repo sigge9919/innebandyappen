@@ -83,7 +83,7 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
     const indices = dailyTrend.map((d, i) => d.avg !== null ? i : -1).filter(i => i >= 0);
     const points = indices.map(i => {
       const x = (i / 6) * sparkW;
-      const y = sparkH - ((dailyTrend[i].avg! - 1) / 9) * sparkH;
+      const y = sparkH - ((dailyTrend[i].avg! - 1) / 4) * sparkH;
       return { x, y };
     });
     return points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
