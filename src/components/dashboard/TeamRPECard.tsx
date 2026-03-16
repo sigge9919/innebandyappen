@@ -64,10 +64,10 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
   if (ratings.length === 0) return null;
 
   const getLevel = (v: number) => {
-    if (v <= 3) return { label: 'Pigg', color: 'text-green-500', bg: 'bg-green-500' };
-    if (v <= 5) return { label: 'Bra', color: 'text-emerald-500', bg: 'bg-emerald-500' };
-    if (v <= 7) return { label: 'Måttlig', color: 'text-yellow-500', bg: 'bg-yellow-500' };
-    if (v <= 8) return { label: 'Trött', color: 'text-orange-500', bg: 'bg-orange-500' };
+    if (v <= 1.5) return { label: 'Pigg', color: 'text-green-500', bg: 'bg-green-500' };
+    if (v <= 2.5) return { label: 'Bra', color: 'text-emerald-500', bg: 'bg-emerald-500' };
+    if (v <= 3.5) return { label: 'Måttlig', color: 'text-yellow-500', bg: 'bg-yellow-500' };
+    if (v <= 4) return { label: 'Trött', color: 'text-orange-500', bg: 'bg-orange-500' };
     return { label: 'Utmattad', color: 'text-red-500', bg: 'bg-red-500' };
   };
 
