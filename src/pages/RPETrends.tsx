@@ -144,6 +144,56 @@ export default function RPETrends() {
           />
         </div>
 
+        {/* Team summary cards */}
+        {teamStats && (
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <Card>
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Senaste {teamStats.latestType === 'game' ? 'matchen' : 'träningen'}
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-3xl font-bold ${getLevel(teamStats.latestAvg).color}`}>
+                    {teamStats.latestAvg.toFixed(1)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">/ 5</span>
+                </div>
+                <p className={`text-xs font-medium mt-0.5 ${getLevel(teamStats.latestAvg).color}`}>
+                  {getLevel(teamStats.latestAvg).label}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Baserat på {teamStats.latestCount} spelares betyg
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Activity className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    7 dagars snitt
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-3xl font-bold ${teamStats.weekAvg > 0 ? getLevel(teamStats.weekAvg).color : 'text-muted-foreground'}`}>
+                    {teamStats.weekAvg > 0 ? teamStats.weekAvg.toFixed(1) : '—'}
+                  </span>
+                  {teamStats.weekAvg > 0 && <span className="text-sm text-muted-foreground">/ 5</span>}
+                </div>
+                <p className={`text-xs font-medium mt-0.5 ${teamStats.weekAvg > 0 ? getLevel(teamStats.weekAvg).color : 'text-muted-foreground'}`}>
+                  {teamStats.weekAvg > 0 ? getLevel(teamStats.weekAvg).label : 'Ingen data'}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {teamStats.weekCount} betyg senaste 7 dagarna
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
