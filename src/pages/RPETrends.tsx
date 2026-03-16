@@ -71,6 +71,39 @@ export default function RPETrends() {
       .filter(Boolean) as PlayerRPESummary[];
   }, [activePlayers, allRatings]);
 
+  // Team-level stats
+  const teamStats = useMemo(() => {
+    if (allRatings.length === 0) return null;
+
+    // Latest session average: find the most recent session, get all ratings for it
+    const sorted = [...allRatings].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const latestSessionId = sorted[0]?.sessionId;
+    const latestSessionRatings = allRatings.filter(r => r.sessionId === latestSessionId);
+    const latestAvg = latestSessionRatings.length > 0
+      ? latestSessionRatings.reduce((s, r) => s + r.rating, 0) / latestSessionRatings.length
+      : 0;
+    const latestType = sorted[0]?.sessionType;
+
+    // 7-day average
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const last7 = allRatings.filter(r => new Date(r.createdAt) >= sevenDaysAgo);
+    const weekAvg = last7.length > 0
+      ? last7.reduce((s, r) => s + r.rating, 0) / last7.length
+      : 0;
+
+    return { latestAvg, latestType, weekAvg, latestCount: latestSessionRatings.length, weekCount: last7.length };
+  }, [allRatings]);
+
+  const getLevel = (v: number) => {
+    if (v <= 1.5) return { label: 'Pigg', color: 'text-green-500' };
+    if (v <= 2.5) return { label: 'Bra', color: 'text-emerald-500' };
+    if (v <= 3.5) return { label: 'Måttlig', color: 'text-yellow-500' };
+    if (v <= 4) return { label: 'Trött', color: 'text-orange-500' };
+    return { label: 'Utmattad', color: 'text-red-500' };
+  };
+
   const filteredSummaries = playerSummaries.filter(s =>
     s.player.name.toLowerCase().includes(search.toLowerCase())
   );
