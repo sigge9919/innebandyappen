@@ -6,7 +6,7 @@ import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
 import { usePlayers } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Users, AlertTriangle, Target } from 'lucide-react';
+import { Plus, Search, Users, AlertTriangle, Target, Archive } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Player } from '@/types';
 
