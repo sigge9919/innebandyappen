@@ -146,7 +146,7 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
                 });
                 if (allIdx < 0) return null;
                 const x = (allIdx / 6) * sparkW;
-                const y = sparkH - ((dailyTrend[allIdx].avg! - 1) / 9) * sparkH;
+                const y = sparkH - ((dailyTrend[allIdx].avg! - 1) / 4) * sparkH;
                 const pointLevel = getLevel(dailyTrend[allIdx].avg!);
                 const fillClass = pointLevel.bg.replace('bg-', '');
                 const colorMap: Record<string, string> = {

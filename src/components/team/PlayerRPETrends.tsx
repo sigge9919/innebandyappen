@@ -126,8 +126,8 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
 }
 
 function getRPEChartColor(rating: number): string {
-  if (rating <= 3) return '#22c55e';
-  if (rating <= 6) return '#eab308';
-  if (rating <= 8) return '#f97316';
+  if (rating <= 1) return '#22c55e';
+  if (rating <= 3) return '#eab308';
+  if (rating <= 4) return '#f97316';
   return '#ef4444';
 }

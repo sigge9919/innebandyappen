@@ -54,8 +54,8 @@ export function RPEAlertsCard({ ratings, players, onPlayerClick }: RPEAlertsCard
                   </p>
                 </div>
               </div>
-              <span className={`text-lg font-bold ${r.rating >= 9 ? 'text-red-500' : 'text-orange-500'}`}>
-                {r.rating}/10
+              <span className={`text-lg font-bold ${r.rating >= 5 ? 'text-red-500' : 'text-orange-500'}`}>
+                {r.rating}/5
               </span>
             </div>
           );
