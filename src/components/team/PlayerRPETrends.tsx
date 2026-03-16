@@ -76,7 +76,7 @@ export function PlayerRPETrends({ ratings, sessions = [], games = [] }: PlayerRP
                 }}
               />
               <ReferenceLine
-                y={8}
+                y={4}
                 stroke="hsl(var(--destructive))"
                 strokeDasharray="4 4"
                 strokeOpacity={0.5}
