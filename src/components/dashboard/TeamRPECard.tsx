@@ -116,7 +116,7 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">Senaste pass</p>
             <div className="flex items-baseline gap-1">
               <span className={`text-2xl font-bold ${level.color}`}>{latestSessionAvg.toFixed(1)}</span>
-              <span className="text-xs text-muted-foreground">/ 10</span>
+              <span className="text-xs text-muted-foreground">/ 5</span>
             </div>
             <span className={`text-[10px] font-medium ${level.color}`}>{level.label}</span>
           </div>
