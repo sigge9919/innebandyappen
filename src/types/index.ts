@@ -7,7 +7,7 @@ export interface Player {
   positions: PlayerPosition[];
   stickSide: 'Left' | 'Right';
   jerseyNumber: number;
-  status: 'Active' | 'Injured';
+  status: 'Active' | 'Injured' | 'Archived';
   notes: string;
   focusFlag: boolean;
   userId?: string;

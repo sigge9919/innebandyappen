@@ -39,7 +39,7 @@ interface TeamContextValue {
   selectedSeason: Season | null;
   selectedSeasonId: string | null;
   setSelectedSeasonId: (id: string) => void;
-  startNewSeason: (name: string, startDate?: string) => Promise<{ error: Error | null }>;
+  startNewSeason: (name: string, selectedPlayerIds?: string[], startDate?: string) => Promise<{ error: Error | null }>;
   seasonsLoading: boolean;
   refreshSeasons: () => Promise<void>;
 }
