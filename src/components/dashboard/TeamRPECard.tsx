@@ -126,7 +126,7 @@ export function TeamRPECard({ ratings, players }: TeamRPECardProps) {
               <span className={`text-2xl font-bold ${level7d.color}`}>
                 {last7DaysAvg > 0 ? last7DaysAvg.toFixed(1) : '—'}
               </span>
-              {last7DaysAvg > 0 && <span className="text-xs text-muted-foreground">/ 10</span>}
+              {last7DaysAvg > 0 && <span className="text-xs text-muted-foreground">/ 5</span>}
             </div>
             <span className={`text-[10px] font-medium ${level7d.color}`}>
               {last7DaysAvg > 0 ? level7d.label : 'Ingen data'}
