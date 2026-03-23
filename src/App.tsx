@@ -64,6 +64,7 @@ const App = () => (
               </TeamProvider>
             } />
           </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
