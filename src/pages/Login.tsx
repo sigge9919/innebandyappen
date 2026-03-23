@@ -7,16 +7,30 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/hooks/use-toast';
 
 export default function Login() {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, resetPassword } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (isForgot) {
+      const { error } = await resetPassword(email);
+      setLoading(false);
+      if (error) {
+        toast({ title: 'Fel', description: error.message, variant: 'destructive' });
+      } else {
+        toast({ title: 'Kolla din e-post', description: 'Vi har skickat en länk för att återställa ditt lösenord.' });
+        setIsForgot(false);
+      }
+      return;
+    }
+
     const { error } = isSignUp
       ? await signUp(email, password)
       : await signIn(email, password);
@@ -38,7 +52,11 @@ export default function Login() {
           </div>
           <CardTitle className="text-xl">Coach OS</CardTitle>
           <CardDescription>
-            {isSignUp ? 'Skapa ditt konto' : 'Logga in för att fortsätta'}
+            {isForgot
+              ? 'Ange din e-post för att återställa lösenordet'
+              : isSignUp
+                ? 'Skapa ditt konto'
+                : 'Logga in för att fortsätta'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -54,29 +72,50 @@ export default function Login() {
                 placeholder="coach@team.com"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Lösenord</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                minLength={6}
-                placeholder="••••••••"
-              />
-            </div>
+            {!isForgot && (
+              <div className="space-y-2">
+                <Label htmlFor="password">Lösenord</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                />
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Vänta…' : isSignUp ? 'Skapa konto' : 'Logga in'}
+              {loading
+                ? 'Vänta…'
+                : isForgot
+                  ? 'Skicka återställningslänk'
+                  : isSignUp
+                    ? 'Skapa konto'
+                    : 'Logga in'}
             </Button>
           </form>
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-2">
+            {!isForgot && !isSignUp && (
+              <button
+                type="button"
+                onClick={() => setIsForgot(true)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors block w-full"
+              >
+                Glömt lösenord?
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => { setIsSignUp(!isSignUp); setIsForgot(false); }}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors block w-full"
             >
-              {isSignUp ? 'Har du redan ett konto? Logga in' : 'Har du inget konto? Skapa ett'}
+              {isForgot
+                ? 'Tillbaka till inloggning'
+                : isSignUp
+                  ? 'Har du redan ett konto? Logga in'
+                  : 'Har du inget konto? Skapa ett'}
             </button>
           </div>
         </CardContent>

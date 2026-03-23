@@ -24,6 +24,7 @@ import TeamSetup from "./pages/TeamSetup";
 import PlayerPortal from "./pages/PlayerPortal";
 import NotFound from "./pages/NotFound";
 import RPETrends from "./pages/RPETrends";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
                 <Route path="/rpe" element={<RPETrends />} />
                 <Route path="/player-portal" element={<PlayerPortal />} />
                 <Route path="/team-setup" element={<TeamSetup />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
