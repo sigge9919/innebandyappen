@@ -123,7 +123,6 @@ export default function Login() {
     </div>
   );
 }
-  const { signIn, signUp } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
