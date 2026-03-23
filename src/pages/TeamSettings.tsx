@@ -136,6 +136,39 @@ export default function TeamSettings() {
             </CardContent>
           </Card>
 
+          {/* Player-Email mapping */}
+          {isHeadCoach && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <UserPlus className="h-5 w-5" /> Spelare & e-postkopplingar
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                {players.filter(p => p.status !== 'Archived').length === 0 && (
+                  <p className="text-sm text-muted-foreground">Inga spelare tillagda.</p>
+                )}
+                {players.filter(p => p.status !== 'Archived').map(p => (
+                  <div key={p.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
+                        {p.jerseyNumber}
+                      </div>
+                      <p className="font-medium text-sm">{p.name}</p>
+                    </div>
+                    <div className="text-right">
+                      {p.inviteEmail ? (
+                        <p className="text-sm text-muted-foreground">{p.inviteEmail}</p>
+                      ) : (
+                        <Badge variant="outline" className="text-xs text-muted-foreground">Ingen e-post kopplad</Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Invite */}
           {isHeadCoach && (
             <Card>
