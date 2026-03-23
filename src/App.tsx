@@ -35,32 +35,35 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <TeamProvider>
-            <AppGuard>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/team" element={<Team />} />
-                <Route path="/team/:playerId" element={<PlayerDetail />} />
-                <Route path="/games" element={<Games />} />
-                <Route path="/games/:gameId" element={<GameDetail />} />
-                <Route path="/stats" element={<Stats />} />
-                <Route path="/training" element={<Training />} />
-                <Route path="/training/session/:sessionId" element={<TrainingSessionForm />} />
-                <Route path="/training/drill/:drillId" element={<DrillDetail />} />
-                <Route path="/playbook" element={<Playbook />} />
-                <Route path="/playbook/:playId" element={<PlayDetail />} />
-                <Route path="/development" element={<Development />} />
-                <Route path="/tactics" element={<TacticsBoard />} />
-                <Route path="/settings" element={<TeamSettings />} />
-                <Route path="/rpe" element={<RPETrends />} />
-                <Route path="/player-portal" element={<PlayerPortal />} />
-                <Route path="/team-setup" element={<TeamSetup />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AppGuard>
-          </TeamProvider>
+          <Routes>
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="*" element={
+              <TeamProvider>
+                <AppGuard>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/team" element={<Team />} />
+                    <Route path="/team/:playerId" element={<PlayerDetail />} />
+                    <Route path="/games" element={<Games />} />
+                    <Route path="/games/:gameId" element={<GameDetail />} />
+                    <Route path="/stats" element={<Stats />} />
+                    <Route path="/training" element={<Training />} />
+                    <Route path="/training/session/:sessionId" element={<TrainingSessionForm />} />
+                    <Route path="/training/drill/:drillId" element={<DrillDetail />} />
+                    <Route path="/playbook" element={<Playbook />} />
+                    <Route path="/playbook/:playId" element={<PlayDetail />} />
+                    <Route path="/development" element={<Development />} />
+                    <Route path="/tactics" element={<TacticsBoard />} />
+                    <Route path="/settings" element={<TeamSettings />} />
+                    <Route path="/rpe" element={<RPETrends />} />
+                    <Route path="/player-portal" element={<PlayerPortal />} />
+                    <Route path="/team-setup" element={<TeamSetup />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppGuard>
+              </TeamProvider>
+            } />
+          </Routes>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
