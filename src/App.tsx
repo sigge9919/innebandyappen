@@ -24,6 +24,7 @@ import TeamSetup from "./pages/TeamSetup";
 import PlayerPortal from "./pages/PlayerPortal";
 import NotFound from "./pages/NotFound";
 import RPETrends from "./pages/RPETrends";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
