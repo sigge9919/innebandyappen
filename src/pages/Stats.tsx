@@ -11,6 +11,7 @@ import { SeasonPlayerStats } from '@/components/stats/SeasonPlayerStats';
 import { SeasonTeamStats } from '@/components/stats/SeasonTeamStats';
 import { TeamTrends } from '@/components/stats/TeamTrends';
 import { PlayerTrends } from '@/components/stats/PlayerTrends';
+import { LineCombinationStats } from '@/components/stats/LineCombinationStats';
 
 type StatsViewType = 'player' | 'team' | 'trends';
 type StatsPeriodType = 'season' | 'last3';
