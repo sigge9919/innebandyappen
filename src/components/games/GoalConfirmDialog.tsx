@@ -44,6 +44,15 @@ export function GoalConfirmDialog({
   const [selectedAssists, setSelectedAssists] = useState<string[]>([]);
   const [selectedLineId, setSelectedLineId] = useState<string | undefined>(activeLineId);
 
+  // Sync selected line when dialog opens or active line changes
+  useEffect(() => {
+    if (open) {
+      setSelectedLineId(activeLineId);
+      setSelectedScorer(undefined);
+      setSelectedAssists([]);
+    }
+  }, [open, activeLineId]);
+
   const isHomeGoal = team === 'home';
   
   // Get players on the selected line for quick selection
