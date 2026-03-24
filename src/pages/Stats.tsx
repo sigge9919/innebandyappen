@@ -5,7 +5,7 @@ import { usePlayers } from '@/hooks/useLocalStorage';
 import { useTeam } from '@/contexts/TeamContext';
 import { SeasonSelector } from '@/components/SeasonSelector';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Users, TrendingUp } from 'lucide-react';
+import { BarChart3, Users, TrendingUp, Link2 } from 'lucide-react';
 import { getFinishedGames } from '@/lib/seasonStats';
 import { SeasonPlayerStats } from '@/components/stats/SeasonPlayerStats';
 import { SeasonTeamStats } from '@/components/stats/SeasonTeamStats';
