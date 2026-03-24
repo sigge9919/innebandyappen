@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Player } from '@/types';
 import { GameLine, Team } from '@/types/game';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,15 @@ export function GoalConfirmDialog({
   const [selectedScorer, setSelectedScorer] = useState<string | undefined>();
   const [selectedAssists, setSelectedAssists] = useState<string[]>([]);
   const [selectedLineId, setSelectedLineId] = useState<string | undefined>(activeLineId);
+
+  // Sync selected line when dialog opens or active line changes
+  useEffect(() => {
+    if (open) {
+      setSelectedLineId(activeLineId);
+      setSelectedScorer(undefined);
+      setSelectedAssists([]);
+    }
+  }, [open, activeLineId]);
 
   const isHomeGoal = team === 'home';
   
