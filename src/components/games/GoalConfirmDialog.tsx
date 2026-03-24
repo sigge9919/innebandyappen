@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Player } from '@/types';
 import { GameLine, Team } from '@/types/game';
 import { Button } from '@/components/ui/button';
