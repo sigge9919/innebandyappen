@@ -5,14 +5,15 @@ import { usePlayers } from '@/hooks/useLocalStorage';
 import { useTeam } from '@/contexts/TeamContext';
 import { SeasonSelector } from '@/components/SeasonSelector';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Users, TrendingUp } from 'lucide-react';
+import { BarChart3, Users, TrendingUp, Link2 } from 'lucide-react';
 import { getFinishedGames } from '@/lib/seasonStats';
 import { SeasonPlayerStats } from '@/components/stats/SeasonPlayerStats';
 import { SeasonTeamStats } from '@/components/stats/SeasonTeamStats';
 import { TeamTrends } from '@/components/stats/TeamTrends';
 import { PlayerTrends } from '@/components/stats/PlayerTrends';
+import { LineCombinationStats } from '@/components/stats/LineCombinationStats';
 
-type StatsViewType = 'player' | 'team' | 'trends';
+type StatsViewType = 'player' | 'team' | 'trends' | 'combos';
 type StatsPeriodType = 'season' | 'last3';
 type TrendsSubView = 'team' | 'player';
 
@@ -68,6 +69,10 @@ export default function Stats() {
                   <TrendingUp className="h-4 w-4" />
                   Trender
                 </Button>
+                <Button variant={statsView === 'combos' ? 'default' : 'outline'} size="sm" onClick={() => setStatsView('combos')} className="gap-2">
+                  <Link2 className="h-4 w-4" />
+                  Kombinationer
+                </Button>
               </div>
 
               <div className="flex gap-2">
@@ -88,6 +93,8 @@ export default function Stats() {
               <SeasonPlayerStats games={statsGames} players={players} />
             ) : statsView === 'team' ? (
               <SeasonTeamStats games={statsGames} />
+            ) : statsView === 'combos' ? (
+              <LineCombinationStats games={statsGames} players={players} />
             ) : (
               <div className="space-y-4">
                 <div className="flex gap-2">
