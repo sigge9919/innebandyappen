@@ -93,6 +93,8 @@ export default function Stats() {
               <SeasonPlayerStats games={statsGames} players={players} />
             ) : statsView === 'team' ? (
               <SeasonTeamStats games={statsGames} />
+            ) : statsView === 'combos' ? (
+              <LineCombinationStats games={statsGames} players={players} />
             ) : (
               <div className="space-y-4">
                 <div className="flex gap-2">

@@ -247,7 +247,8 @@ export default function GameDetail() {
             {/* Line Setup */}
             {game.squadPlayerIds.length > 0 && (
               <div className="stat-card">
-                <h3 className="text-lg font-semibold mb-4">Kedjor</h3>
+                <h3 className="text-lg font-semibold mb-1">Kedjor</h3>
+                <p className="text-sm text-muted-foreground mb-4">Sätt upp kedjor redan nu — du behöver inte starta matchen först.</p>
                 <LineSetup
                   lines={game.lines}
                   squadPlayers={squadPlayers}
