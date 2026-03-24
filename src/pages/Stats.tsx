@@ -13,7 +13,7 @@ import { TeamTrends } from '@/components/stats/TeamTrends';
 import { PlayerTrends } from '@/components/stats/PlayerTrends';
 import { LineCombinationStats } from '@/components/stats/LineCombinationStats';
 
-type StatsViewType = 'player' | 'team' | 'trends';
+type StatsViewType = 'player' | 'team' | 'trends' | 'combos';
 type StatsPeriodType = 'season' | 'last3';
 type TrendsSubView = 'team' | 'player';
 
