@@ -69,6 +69,10 @@ export default function Stats() {
                   <TrendingUp className="h-4 w-4" />
                   Trender
                 </Button>
+                <Button variant={statsView === 'combos' ? 'default' : 'outline'} size="sm" onClick={() => setStatsView('combos')} className="gap-2">
+                  <Link2 className="h-4 w-4" />
+                  Kombinationer
+                </Button>
               </div>
 
               <div className="flex gap-2">
