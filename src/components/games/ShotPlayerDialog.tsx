@@ -62,13 +62,15 @@ export function ShotPlayerDialog({
 
            {linePlayers.length > 0 && (
              <div className="space-y-1">
-               <p className="text-xs text-muted-foreground">Kedjespelare:</p>
+               <p className="text-xs font-medium text-primary">
+                 {activeLine ? `${activeLine.name} (aktiv kedja)` : 'Kedjespelare'}:
+               </p>
                <div className="flex flex-wrap gap-2">
                  {linePlayers.map(player => (
                    <button
                      key={player.id}
                      onClick={() => handleSelect(player.id)}
-                     className="px-4 py-3 rounded text-base font-medium transition-colors bg-muted hover:bg-primary hover:text-primary-foreground"
+                     className="px-4 py-3 rounded text-base font-medium transition-colors bg-primary/10 border border-primary/30 hover:bg-primary hover:text-primary-foreground"
                    >
                      #{player.jerseyNumber} {player.name.split(' ')[0]}
                    </button>
