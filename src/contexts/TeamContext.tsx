@@ -119,6 +119,18 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       role,
     });
     if (error) return { error: error as unknown as Error };
+
+    // Send invite email via edge function
+    const inviterName = user?.email ?? 'En tränare';
+    await supabase.functions.invoke('send-invite', {
+      body: {
+        email: email.toLowerCase(),
+        teamName: activeTeam.name,
+        role,
+        inviterName,
+      },
+    });
+
     await refreshMembers();
     return { error: null };
   };
