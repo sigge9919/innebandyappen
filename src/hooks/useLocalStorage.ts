@@ -747,5 +747,3 @@ export function useAllTrainingSessions() {
 
   return { sessions, isLoading, refresh };
 }
-  };
-}
