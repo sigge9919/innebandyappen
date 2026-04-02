@@ -71,6 +71,9 @@ export interface TrainingSession {
   playerIds: string[];
   sections: TrainingSection[];
   teams?: TrainingTeam[];
+  isPersonal?: boolean;
+  createdByPlayerId?: string;
+  rpeRating?: number;
 }
 
 export interface TrainingTeam {
