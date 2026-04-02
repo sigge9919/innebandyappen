@@ -83,7 +83,7 @@ export function useTrainingSessions(seasonId?: string | null) {
 
   const refresh = useCallback(async () => {
     if (!activeTeam) { setSessions([]); setIsLoading(false); return; }
-    let query = supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id);
+    let query = supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id).eq('is_personal', false);
     if (effectiveSeasonId) query = query.eq('season_id', effectiveSeasonId);
     const { data } = await query;
     setSessions((data ?? []).map(dbToTraining));
@@ -398,6 +398,9 @@ function dbToTraining(row: any): TrainingSession {
     playerIds: row.player_ids ?? [],
     sections,
     teams: teamsMeta?.teams,
+    isPersonal: row.is_personal ?? false,
+    createdByPlayerId: row.created_by_player_id ?? undefined,
+    rpeRating: row.rpe_rating ?? undefined,
   };
 }
 
@@ -413,6 +416,9 @@ function trainingToDb(s: TrainingSession, teamId: string) {
     duration: s.duration,
     player_ids: s.playerIds,
     sections: sectionsWithMeta,
+    is_personal: s.isPersonal ?? false,
+    created_by_player_id: s.createdByPlayerId ?? null,
+    rpe_rating: s.rpeRating ?? null,
   };
 }
 
@@ -429,6 +435,9 @@ function trainingUpdatesToDb(u: Partial<TrainingSession>) {
       ? [...(sections as any), { _type: 'teams_meta', teams }]
       : sections;
   }
+  if (u.isPersonal !== undefined) r.is_personal = u.isPersonal;
+  if (u.createdByPlayerId !== undefined) r.created_by_player_id = u.createdByPlayerId;
+  if (u.rpeRating !== undefined) r.rpe_rating = u.rpeRating;
   return r;
 }
 
@@ -655,7 +664,7 @@ function dbToRPE(row: any): PlayerRPERating {
   };
 }
 
-// ── Personal Trainings ──────────────────────────────────────
+// ── Personal Trainings (now stored in training_sessions with is_personal=true) ──
 
 export function usePersonalTrainings(playerId?: string) {
   const [trainings, setTrainings] = useState<PersonalTraining[]>([]);
@@ -665,13 +674,14 @@ export function usePersonalTrainings(playerId?: string) {
   const refresh = useCallback(async () => {
     if (!activeTeam) { setTrainings([]); setIsLoading(false); return; }
     let query = supabase
-      .from('personal_trainings')
+      .from('training_sessions')
       .select('*')
       .eq('team_id', activeTeam.id)
+      .eq('is_personal', true)
       .order('date', { ascending: false });
-    if (playerId) query = query.eq('player_id', playerId);
+    if (playerId) query = query.eq('created_by_player_id', playerId);
     const { data } = await query;
-    setTrainings((data ?? []).map(dbToPersonalTraining));
+    setTrainings((data ?? []).map(dbTrainingToPersonal));
     setIsLoading(false);
   }, [activeTeam, playerId]);
 
@@ -679,35 +689,61 @@ export function usePersonalTrainings(playerId?: string) {
 
   const addTraining = useCallback(async (training: Omit<PersonalTraining, 'id' | 'createdAt'>) => {
     if (!activeTeam) return;
-    const { error } = await supabase.from('personal_trainings').insert({
-      player_id: training.playerId,
+    const { error } = await supabase.from('training_sessions').insert({
       team_id: activeTeam.id,
       date: training.date,
-      description: training.description,
+      theme: training.description || 'Personlig träning',
       duration: training.duration,
+      is_personal: true,
+      created_by_player_id: training.playerId,
       rpe_rating: training.rpeRating,
+      player_ids: [training.playerId],
+      sections: [],
     });
     if (error) throw error;
     refresh();
   }, [activeTeam, refresh]);
 
   const deleteTraining = useCallback(async (id: string) => {
-    await supabase.from('personal_trainings').delete().eq('id', id);
+    await supabase.from('training_sessions').delete().eq('id', id).eq('is_personal', true);
     refresh();
   }, [refresh]);
 
   return { trainings, isLoading, addTraining, deleteTraining, refresh };
 }
 
-function dbToPersonalTraining(row: any): PersonalTraining {
+function dbTrainingToPersonal(row: any): PersonalTraining {
   return {
     id: row.id,
-    playerId: row.player_id,
+    playerId: row.created_by_player_id ?? '',
     teamId: row.team_id,
     date: row.date,
-    description: row.description ?? '',
+    description: row.theme ?? '',
     duration: row.duration ?? 60,
-    rpeRating: row.rpe_rating,
+    rpeRating: row.rpe_rating ?? 3,
     createdAt: row.created_at,
   };
+}
+
+// ── All Training Sessions (including personal) for history/coach views ──
+
+export function useAllTrainingSessions() {
+  const [sessions, setSessions] = useState<TrainingSession[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { activeTeam } = useTeam();
+
+  const refresh = useCallback(async () => {
+    if (!activeTeam) { setSessions([]); setIsLoading(false); return; }
+    const { data } = await supabase
+      .from('training_sessions')
+      .select('*')
+      .eq('team_id', activeTeam.id)
+      .order('date', { ascending: false });
+    setSessions((data ?? []).map(dbToTraining));
+    setIsLoading(false);
+  }, [activeTeam]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  return { sessions, isLoading, refresh };
 }
