@@ -1,40 +1,32 @@
+## Plan: Egna pass som lagträningar + RPE-historik
 
+### 1. Databasmigrering
+- Lägg till kolumner i `training_sessions`:
+  - `is_personal` (boolean, default false) — markerar personliga pass
+  - `created_by_player_id` (uuid, nullable) — vilken spelare som skapade passet
+- Migrera befintlig data från `personal_trainings` till `training_sessions`
+- Uppdatera RLS: spelare kan skapa/redigera egna personliga pass
+- Behåll `personal_trainings`-tabellen tills vidare (bakåtkompatibilitet)
 
-## Plan: Kedjor utan matchstart + Kombinationsstatistik
+### 2. Kod: useLocalStorage-hook
+- Uppdatera `useTrainingSessions` för att hantera personliga pass (is_personal-filter)
+- Uppdatera `usePersonalTrainings` att skriva till `training_sessions` istället
+- Spelarportalen använder samma hook med is_personal=true filter
 
-### Vad som ändras
+### 3. Träningssidan — RPE på kort
+- Visa snitt-RPE badge på varje TrainingCard (beräknat från `player_rpe_ratings`)
+- Klickbar för att se individuella RPE-betyg per spelare
 
-**1. Tillåt kedjeuppställning på "Ej startade" matcher (redan fungerar)**
+### 4. Träningssidan — Historikvy
+- Ny flik "Historik" på Training-sidan
+- Tabell med alla genomförda pass (datum, tema, längd, snitt-RPE, antal spelare)
+- Filter: tidsperiod, personligt/gemensamt, tematext
+- Klick öppnar detaljer med RPE per spelare
 
-Nuvarande kod visar redan kedjor (LineSetup) i "Not Started"-vyn i `GameDetail.tsx` (rad 247-257). Kedjorna sparas direkt via `updateLine` → `saveGame` till databasen. Så kedjeuppställning *utan att starta matchen* fungerar redan.
-
-Det som behövs är att göra detta tydligare i UX: lägga till en rubrik/sektion som gör det klart att man kan sätta upp kedjor oberoende av matchstart.
-
-**2. Ny statistikvy: "Bästa kombinationer" (Line Chemistry)**
-
-Skapa en ny komponent som analyserar alla avslutade matcher och visar vilka spelargrupper (kedjor) som presterat bäst tillsammans, baserat på +/- och mål.
-
-### Tekniska detaljer
-
-**Fil: `src/components/stats/LineCombinationStats.tsx` (ny)**
-- Analyserar alla `Finished`-matcher
-- Itererar genom varje matchs `lines` och `events`
-- Aggregerar per unik spelarkombination (sorterade spelar-ID:n som nyckel):
-  - Antal matcher tillsammans
-  - Totala mål för/emot
-  - Total +/-
-  - Mål per match
-- Sorterar på +/- per match eller total +/-
-- Visar spelarnamn, antal matcher, GF, GA, +/- i en tabell
-
-**Fil: `src/pages/Stats.tsx` (ändra)**
-- Lägg till ny flik/vy "Kedjor" (eller "Kombinationer") bredvid befintliga "Spelare", "Lag", "Trender"
-- Visa `LineCombinationStats` i den nya vyn
-
-**Fil: `src/pages/GameDetail.tsx` (mindre ändring)**
-- Förtydliga UX i "Not Started"-vyn: lägg till en kort beskrivande text under kedjerubriken som indikerar att kedjor kan sättas upp innan match
+### 5. Spelarportalen
+- Uppdatera formuläret för "Logga personlig träning" att spara som training_session med is_personal=true
+- Lista personliga pass från samma källa
 
 ### Avgränsning
-- Statistiken baseras på de kedjor (lines) som redan finns sparade per match
-- Inga databasändringar behövs — all data finns redan i `games`-tabellens `lines` och `events` JSON-kolumner
-
+- Personliga pass får förenklat formulär (ingen sektionsuppdelning/övningar)
+- Befintlig data i personal_trainings migreras men tabellen tas inte bort ännu
