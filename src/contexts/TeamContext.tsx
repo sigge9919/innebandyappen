@@ -122,7 +122,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
     // Send invite email via edge function
     const inviterName = user?.email ?? 'En tränare';
-    await supabase.functions.invoke('send-invite', {
+    const { data, error: fnError } = await supabase.functions.invoke('send-invite', {
       body: {
         email: email.toLowerCase(),
         teamName: activeTeam.name,
@@ -130,6 +130,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         inviterName,
       },
     });
+    console.log('Edge function svar:', data, fnError);
 
     await refreshMembers();
     return { error: null };
