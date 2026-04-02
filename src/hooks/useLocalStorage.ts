@@ -83,7 +83,7 @@ export function useTrainingSessions(seasonId?: string | null) {
 
   const refresh = useCallback(async () => {
     if (!activeTeam) { setSessions([]); setIsLoading(false); return; }
-    let query = supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id);
+    let query = supabase.from('training_sessions').select('*').eq('team_id', activeTeam.id).eq('is_personal', false);
     if (effectiveSeasonId) query = query.eq('season_id', effectiveSeasonId);
     const { data } = await query;
     setSessions((data ?? []).map(dbToTraining));
