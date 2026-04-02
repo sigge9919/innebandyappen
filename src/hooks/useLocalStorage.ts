@@ -398,6 +398,9 @@ function dbToTraining(row: any): TrainingSession {
     playerIds: row.player_ids ?? [],
     sections,
     teams: teamsMeta?.teams,
+    isPersonal: row.is_personal ?? false,
+    createdByPlayerId: row.created_by_player_id ?? undefined,
+    rpeRating: row.rpe_rating ?? undefined,
   };
 }
 
@@ -413,6 +416,9 @@ function trainingToDb(s: TrainingSession, teamId: string) {
     duration: s.duration,
     player_ids: s.playerIds,
     sections: sectionsWithMeta,
+    is_personal: s.isPersonal ?? false,
+    created_by_player_id: s.createdByPlayerId ?? null,
+    rpe_rating: s.rpeRating ?? null,
   };
 }
 
@@ -429,6 +435,9 @@ function trainingUpdatesToDb(u: Partial<TrainingSession>) {
       ? [...(sections as any), { _type: 'teams_meta', teams }]
       : sections;
   }
+  if (u.isPersonal !== undefined) r.is_personal = u.isPersonal;
+  if (u.createdByPlayerId !== undefined) r.created_by_player_id = u.createdByPlayerId;
+  if (u.rpeRating !== undefined) r.rpe_rating = u.rpeRating;
   return r;
 }
 
