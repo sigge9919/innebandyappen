@@ -615,10 +615,13 @@ export type Database = {
       training_sessions: {
         Row: {
           created_at: string
+          created_by_player_id: string | null
           date: string
           duration: number
           id: string
+          is_personal: boolean
           player_ids: string[] | null
+          rpe_rating: number | null
           season_id: string | null
           sections: Json | null
           team_id: string
@@ -626,10 +629,13 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by_player_id?: string | null
           date: string
           duration?: number
           id?: string
+          is_personal?: boolean
           player_ids?: string[] | null
+          rpe_rating?: number | null
           season_id?: string | null
           sections?: Json | null
           team_id: string
@@ -637,16 +643,26 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by_player_id?: string | null
           date?: string
           duration?: number
           id?: string
+          is_personal?: boolean
           player_ids?: string[] | null
+          rpe_rating?: number | null
           season_id?: string | null
           sections?: Json | null
           team_id?: string
           theme?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "training_sessions_created_by_player_id_fkey"
+            columns: ["created_by_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "training_sessions_season_id_fkey"
             columns: ["season_id"]
