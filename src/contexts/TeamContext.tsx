@@ -130,7 +130,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         inviterName,
       },
     });
-    console.log('Edge function svar:', data, fnError);
+    console.log('Edge function svar:', JSON.stringify({ data, error: fnError, errorMessage: fnError?.message, errorStatus: fnError?.status, errorContext: fnError?.context }, null, 2));
 
     await refreshMembers();
     return { error: null };
