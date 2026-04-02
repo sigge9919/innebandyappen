@@ -120,6 +120,8 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     });
     if (error) return { error: error as unknown as Error };
 
+    console.log('Försöker anropa Edge Function...');
+
     // Send invite email via edge function
     const inviterName = user?.email ?? 'En tränare';
     const { data, error: fnError } = await supabase.functions.invoke('send-invite', {
