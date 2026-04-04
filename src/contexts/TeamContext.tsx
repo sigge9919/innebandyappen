@@ -81,7 +81,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       setActiveTeamState(null);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, pendingSetup]);
 
   useEffect(() => {
     refreshTeams();
