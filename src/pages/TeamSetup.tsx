@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { LogOut } from 'lucide-react';
+import { DrillCatalogPicker } from '@/components/team/DrillCatalogPicker';
 
 export default function TeamSetup() {
   const { teams, createTeam, setActiveTeam } = useTeam();
@@ -14,18 +15,36 @@ export default function TeamSetup() {
   const { toast } = useToast();
   const [teamName, setTeamName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'choose' | 'create'>(teams.length > 0 ? 'choose' : 'create');
+  const [mode, setMode] = useState<'choose' | 'create' | 'pick-drills'>(teams.length > 0 ? 'choose' : 'create');
+  const [newTeamId, setNewTeamId] = useState<string | null>(null);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!teamName.trim()) return;
     setLoading(true);
-    const { error } = await createTeam(teamName.trim());
+    const { error, teamId } = await createTeam(teamName.trim());
     setLoading(false);
     if (error) {
       toast({ title: 'Fel', description: error.message, variant: 'destructive' });
+    } else if (teamId) {
+      setNewTeamId(teamId);
+      setMode('pick-drills');
     }
   };
+
+  const handleDrillsComplete = () => {
+    // Team is already set as active by createTeam, just reset state
+    setMode('choose');
+    setNewTeamId(null);
+  };
+
+  if (mode === 'pick-drills' && newTeamId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <DrillCatalogPicker teamId={newTeamId} onComplete={handleDrillsComplete} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
