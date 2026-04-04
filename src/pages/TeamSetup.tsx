@@ -33,7 +33,9 @@ export default function TeamSetup() {
   };
 
   const handleDrillsComplete = () => {
-    // Team is already set as active by createTeam, just reset state
+    // Now activate the team after drill selection is done
+    const team = teams.find(t => t.id === newTeamId);
+    if (team) setActiveTeam(team);
     setMode('choose');
     setNewTeamId(null);
   };

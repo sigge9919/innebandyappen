@@ -33,6 +33,7 @@ interface TeamContextValue {
   removeMember: (memberId: string) => Promise<{ error: Error | null }>;
   refreshTeams: () => Promise<void>;
   refreshMembers: () => Promise<void>;
+  pendingSetup: boolean;
   // Season-related
   seasons: Season[];
   activeSeason: Season | null;
@@ -53,6 +54,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const [activeRole, setActiveRole] = useState<TeamRole | null>(null);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pendingSetup, setPendingSetup] = useState(false);
 
   const {
     seasons, activeSeason, selectedSeason, selectedSeasonId,
@@ -67,7 +69,10 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
     const storedId = localStorage.getItem('coachOS_activeTeamId');
     const stored = teamList.find(t => t.id === storedId);
-    if (stored) {
+    if (pendingSetup) {
+      // Don't auto-select while drill picker is showing
+      setActiveTeamState(null);
+    } else if (stored) {
       setActiveTeamState(stored);
     } else if (teamList.length === 1) {
       setActiveTeamState(teamList[0]);
@@ -76,7 +81,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       setActiveTeamState(null);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, pendingSetup]);
 
   useEffect(() => {
     refreshTeams();
@@ -96,6 +101,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   }, [refreshMembers]);
 
   const setActiveTeam = (team: Team) => {
+    setPendingSetup(false);
     setActiveTeamState(team);
     localStorage.setItem('coachOS_activeTeamId', team.id);
   };
@@ -105,9 +111,9 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     const { data: teamId, error } = await supabase.rpc('create_team', { _name: name });
     if (error) return { error: error as unknown as Error };
 
+    // Don't set active team yet — TeamSetup will do it after drill selection
+    setPendingSetup(true);
     await refreshTeams();
-    const { data: newTeam } = await supabase.from('teams').select('*').eq('id', teamId).single();
-    if (newTeam) setActiveTeam(newTeam as Team);
     return { error: null, teamId: teamId as string };
   };
 
@@ -147,7 +153,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <TeamContext.Provider value={{
-      teams, activeTeam, activeRole, members, loading,
+      teams, activeTeam, activeRole, members, loading, pendingSetup,
       setActiveTeam, createTeam, inviteCoach, removeMember, refreshTeams, refreshMembers,
       seasons, activeSeason, selectedSeason, selectedSeasonId,
       setSelectedSeasonId, startNewSeason, seasonsLoading, refreshSeasons,
