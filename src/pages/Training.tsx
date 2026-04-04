@@ -8,9 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Calendar, Dumbbell, Search, Star, History, Activity, User } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Plus, Calendar, Dumbbell, Search, Star, History, Activity, User, Download } from 'lucide-react';
 import { Drill } from '@/types';
 import { format } from 'date-fns';
+import { DrillCatalogPicker } from '@/components/team/DrillCatalogPicker';
+import { useTeam } from '@/contexts/TeamContext';
 
 function getRPEColor(rating: number) {
   if (rating <= 1) return 'text-green-500';
