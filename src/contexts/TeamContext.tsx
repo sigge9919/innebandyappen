@@ -54,6 +54,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const [activeRole, setActiveRole] = useState<TeamRole | null>(null);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pendingSetup, setPendingSetup] = useState(false);
 
   const {
     seasons, activeSeason, selectedSeason, selectedSeasonId,
