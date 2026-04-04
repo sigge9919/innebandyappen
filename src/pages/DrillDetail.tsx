@@ -55,6 +55,7 @@ export default function DrillDetail() {
 
     const fetchMedia = async () => {
       setFetchingMedia(true);
+        console.log('Anropar scrape-drill-media för:', drill.videoUrl, 'mediaFetched:', drill.mediaFetched);
       try {
         const { data, error } = await supabase.functions.invoke('scrape-drill-media', {
           body: { url: drill.videoUrl },
