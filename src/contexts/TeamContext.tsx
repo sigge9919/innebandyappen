@@ -111,6 +111,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     if (error) return { error: error as unknown as Error };
 
     // Don't set active team yet — TeamSetup will do it after drill selection
+    setPendingSetup(true);
     await refreshTeams();
     return { error: null, teamId: teamId as string };
   };
