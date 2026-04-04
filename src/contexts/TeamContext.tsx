@@ -152,7 +152,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <TeamContext.Provider value={{
-      teams, activeTeam, activeRole, members, loading,
+      teams, activeTeam, activeRole, members, loading, pendingSetup,
       setActiveTeam, createTeam, inviteCoach, removeMember, refreshTeams, refreshMembers,
       seasons, activeSeason, selectedSeason, selectedSeasonId,
       setSelectedSeasonId, startNewSeason, seasonsLoading, refreshSeasons,
