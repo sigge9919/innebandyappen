@@ -30,10 +30,12 @@ export default function Training() {
   const { drills, updateDrill } = useDrills();
   const { ratings } = useRPERatings();
 
+  const { activeTeam } = useTeam();
   const [drillSearch, setDrillSearch] = useState('');
   const [drillFilter, setDrillFilter] = useState<string>('all');
   const [historyFilter, setHistoryFilter] = useState<'all' | 'team' | 'personal'>('all');
   const [historySearch, setHistorySearch] = useState('');
+  const [showCatalog, setShowCatalog] = useState(false);
 
   // Compute average RPE per session
   const sessionRPEMap = useMemo(() => {
