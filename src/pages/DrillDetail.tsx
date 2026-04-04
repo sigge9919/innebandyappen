@@ -63,8 +63,8 @@ export default function DrillDetail() {
         
         const updates: Partial<Drill> = {
           mediaFetched: true,
-          directVideoUrl: data?.videoSrc || undefined,
-          thumbnailUrl: data?.thumbnailSrc || undefined,
+          directVideoUrl: data?.directVideoUrl || undefined,
+          thumbnailUrl: data?.thumbnailUrl || undefined,
         };
         
         await updateDrill(drill.id, updates);
