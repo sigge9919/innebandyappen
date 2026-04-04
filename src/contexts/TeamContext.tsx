@@ -105,9 +105,8 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     const { data: teamId, error } = await supabase.rpc('create_team', { _name: name });
     if (error) return { error: error as unknown as Error };
 
+    // Don't set active team yet — TeamSetup will do it after drill selection
     await refreshTeams();
-    const { data: newTeam } = await supabase.from('teams').select('*').eq('id', teamId).single();
-    if (newTeam) setActiveTeam(newTeam as Team);
     return { error: null, teamId: teamId as string };
   };
 
