@@ -301,6 +301,20 @@ export default function Training() {
             </div>
           )}
         </div>
+
+        {activeTeam && (
+          <Dialog open={showCatalog} onOpenChange={setShowCatalog}>
+            <DialogContent className="max-w-2xl p-0 gap-0">
+              <DrillCatalogPicker
+                teamId={activeTeam.id}
+                onComplete={() => {
+                  setShowCatalog(false);
+                  window.location.reload();
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </AppLayout>
   );
