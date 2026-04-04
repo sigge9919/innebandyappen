@@ -69,7 +69,10 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
     const storedId = localStorage.getItem('coachOS_activeTeamId');
     const stored = teamList.find(t => t.id === storedId);
-    if (stored) {
+    if (pendingSetup) {
+      // Don't auto-select while drill picker is showing
+      setActiveTeamState(null);
+    } else if (stored) {
       setActiveTeamState(stored);
     } else if (teamList.length === 1) {
       setActiveTeamState(teamList[0]);
