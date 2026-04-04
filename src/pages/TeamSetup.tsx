@@ -22,12 +22,12 @@ export default function TeamSetup() {
     e.preventDefault();
     if (!teamName.trim()) return;
     setLoading(true);
-    const { error, teamId } = await createTeam(teamName.trim());
+    const result = await createTeam(teamName.trim());
     setLoading(false);
-    if (error) {
-      toast({ title: 'Fel', description: error.message, variant: 'destructive' });
-    } else if (teamId) {
-      setNewTeamId(teamId);
+    if (result.error) {
+      toast({ title: 'Fel', description: result.error.message, variant: 'destructive' });
+    } else if (result.teamId) {
+      setNewTeamId(result.teamId);
       setMode('pick-drills');
     }
   };
