@@ -28,7 +28,7 @@ interface TeamContextValue {
   members: TeamMember[];
   loading: boolean;
   setActiveTeam: (team: Team) => void;
-  createTeam: (name: string) => Promise<{ error: Error | null }>;
+  createTeam: (name: string) => Promise<{ error: Error | null; teamId?: string }>;
   inviteCoach: (email: string, role: TeamRole) => Promise<{ error: Error | null }>;
   removeMember: (memberId: string) => Promise<{ error: Error | null }>;
   refreshTeams: () => Promise<void>;
