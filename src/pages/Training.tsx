@@ -247,10 +247,16 @@ export default function Training() {
               </div>
               <p className="text-muted-foreground mt-1">{drills.length} övningar</p>
             </div>
-            <Button className="gap-2" onClick={() => navigate('/training/drill/new')}>
-              <Plus className="h-4 w-4" />
-              Lägg till övning
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" className="gap-2" onClick={() => setShowCatalog(true)}>
+                <Download className="h-4 w-4" />
+                Övningsbanken
+              </Button>
+              <Button className="gap-2" onClick={() => navigate('/training/drill/new')}>
+                <Plus className="h-4 w-4" />
+                Lägg till övning
+              </Button>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
