@@ -100,7 +100,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('coachOS_activeTeamId', team.id);
   };
 
-  const createTeam = async (name: string) => {
+  const createTeam = async (name: string): Promise<{ error: Error | null; teamId?: string }> => {
     if (!user) return { error: new Error('Not authenticated') };
     const { data: teamId, error } = await supabase.rpc('create_team', { _name: name });
     if (error) return { error: error as unknown as Error };
@@ -108,7 +108,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     await refreshTeams();
     const { data: newTeam } = await supabase.from('teams').select('*').eq('id', teamId).single();
     if (newTeam) setActiveTeam(newTeam as Team);
-    return { error: null };
+    return { error: null, teamId: teamId as string };
   };
 
   const inviteCoach = async (email: string, role: TeamRole) => {
