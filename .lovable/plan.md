@@ -1,32 +1,41 @@
-## Plan: Egna pass som lagträningar + RPE-historik
 
-### 1. Databasmigrering
-- Lägg till kolumner i `training_sessions`:
-  - `is_personal` (boolean, default false) — markerar personliga pass
-  - `created_by_player_id` (uuid, nullable) — vilken spelare som skapade passet
-- Migrera befintlig data från `personal_trainings` till `training_sessions`
-- Uppdatera RLS: spelare kan skapa/redigera egna personliga pass
-- Behåll `personal_trainings`-tabellen tills vidare (bakåtkompatibilitet)
 
-### 2. Kod: useLocalStorage-hook
-- Uppdatera `useTrainingSessions` för att hantera personliga pass (is_personal-filter)
-- Uppdatera `usePersonalTrainings` att skriva till `training_sessions` istället
-- Spelarportalen använder samma hook med is_personal=true filter
+## Plan: Låt tränare välja övningar vid lagskapande
 
-### 3. Träningssidan — RPE på kort
-- Visa snitt-RPE badge på varje TrainingCard (beräknat från `player_rpe_ratings`)
-- Klickbar för att se individuella RPE-betyg per spelare
+### Bakgrund
+Idag anropas `seed_default_drills(_team_id)` automatiskt inuti `create_team` RPC:n, vilket lägger till alla ~98 övningar från Övningsbanken direkt. Målet är att tränaren istället ska kunna välja vilka övningar som ska importeras.
 
-### 4. Träningssidan — Historikvy
-- Ny flik "Historik" på Training-sidan
-- Tabell med alla genomförda pass (datum, tema, längd, snitt-RPE, antal spelare)
-- Filter: tidsperiod, personligt/gemensamt, tematext
-- Klick öppnar detaljer med RPE per spelare
+### Ändringar
 
-### 5. Spelarportalen
-- Uppdatera formuläret för "Logga personlig träning" att spara som training_session med is_personal=true
-- Lista personliga pass från samma källa
+#### 1. Uppdatera `create_team` DB-funktion (migration)
+Ta bort raden `PERFORM public.seed_default_drills(_team_id)` från `create_team`-funktionen så att inga övningar seedas automatiskt.
 
-### Avgränsning
-- Personliga pass får förenklat formulär (ingen sektionsuppdelning/övningar)
-- Befintlig data i personal_trainings migreras men tabellen tas inte bort ännu
+#### 2. Skapa ny DB-funktion `seed_selected_drills` (migration)
+En ny funktion som tar `_team_id uuid` och `_drill_indices int[]` (index i en fast ordning) och bara insertar de valda övningarna. Alternativt — enklare approach: behåll `seed_default_drills` som den är men gör den anropbar manuellt, och lägg till en **ny funktion** `get_default_drill_catalog()` som returnerar listan med namn/beskrivningar/kategorier utan att inserta något, så att UI:t kan visa dem.
+
+**Enklaste lösningen**: Hårdkoda övningslistan i frontend (den är redan känd), låt tränaren bocka i vilka de vill ha, och inserta de valda via vanlig `supabase.from('drills').insert([...])` efter att teamet skapats.
+
+#### 3. Ny komponent: `DrillCatalogPicker`
+- Visas som ett steg efter att lagnamnet angivits (antingen som steg 2 i TeamSetup eller som en dialog direkt efter skapande)
+- Listar alla ~98 övningar grupperade per kategori (alla har kategorin "Övningsbanken" men kan grupperas efter namn-prefix som "Passa", "Driva boll", "Målvaktsövning" etc.)
+- Sök/filter-fält
+- "Välj alla" / "Avmarkera alla" knappar
+- Varje övning har en checkbox med namn och kort beskrivning
+- Knappen "Importera valda (N st)" insertar dem till databasen
+
+#### 4. Uppdatera TeamSetup-flödet
+- Steg 1: Ange lagnamn → `createTeam(name)` (skapar lag utan övningar)
+- Steg 2: `DrillCatalogPicker` visas → tränaren väljer → bulk-insert till `drills`-tabellen
+- "Hoppa över" möjlighet för att skapa laget utan övningar
+
+#### 5. Övningslista i frontend
+Extrahera de 98 övningarna till en konstant-fil (t.ex. `src/lib/defaultDrills.ts`) med namn, beskrivning och video_url, så att pickern kan visa dem utan databasanrop.
+
+### Tekniska detaljer
+- **Migration**: Uppdatera `create_team` för att ta bort `PERFORM seed_default_drills`
+- **Ny fil**: `src/lib/defaultDrills.ts` — exportar `DEFAULT_DRILLS` array
+- **Ny komponent**: `src/components/team/DrillCatalogPicker.tsx`
+- **Ändrad fil**: `src/pages/TeamSetup.tsx` — lägg till steg 2 med picker
+- **Ändrad fil**: `src/contexts/TeamContext.tsx` — `createTeam` returnerar team_id så att drills kan insertas efteråt
+- Bulk-insert via `supabase.from('drills').insert(selectedDrills.map(d => ({ ...d, team_id })))`
+
