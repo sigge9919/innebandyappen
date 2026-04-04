@@ -8,9 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Calendar, Dumbbell, Search, Star, History, Activity, User } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Plus, Calendar, Dumbbell, Search, Star, History, Activity, User, Download } from 'lucide-react';
 import { Drill } from '@/types';
 import { format } from 'date-fns';
+import { DrillCatalogPicker } from '@/components/team/DrillCatalogPicker';
+import { useTeam } from '@/contexts/TeamContext';
 
 function getRPEColor(rating: number) {
   if (rating <= 1) return 'text-green-500';
@@ -27,10 +30,12 @@ export default function Training() {
   const { drills, updateDrill } = useDrills();
   const { ratings } = useRPERatings();
 
+  const { activeTeam } = useTeam();
   const [drillSearch, setDrillSearch] = useState('');
   const [drillFilter, setDrillFilter] = useState<string>('all');
   const [historyFilter, setHistoryFilter] = useState<'all' | 'team' | 'personal'>('all');
   const [historySearch, setHistorySearch] = useState('');
+  const [showCatalog, setShowCatalog] = useState(false);
 
   // Compute average RPE per session
   const sessionRPEMap = useMemo(() => {
@@ -242,10 +247,16 @@ export default function Training() {
               </div>
               <p className="text-muted-foreground mt-1">{drills.length} övningar</p>
             </div>
-            <Button className="gap-2" onClick={() => navigate('/training/drill/new')}>
-              <Plus className="h-4 w-4" />
-              Lägg till övning
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" className="gap-2" onClick={() => setShowCatalog(true)}>
+                <Download className="h-4 w-4" />
+                Övningsbanken
+              </Button>
+              <Button className="gap-2" onClick={() => navigate('/training/drill/new')}>
+                <Plus className="h-4 w-4" />
+                Lägg till övning
+              </Button>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -290,6 +301,20 @@ export default function Training() {
             </div>
           )}
         </div>
+
+        {activeTeam && (
+          <Dialog open={showCatalog} onOpenChange={setShowCatalog}>
+            <DialogContent className="max-w-2xl p-0 gap-0">
+              <DrillCatalogPicker
+                teamId={activeTeam.id}
+                onComplete={() => {
+                  setShowCatalog(false);
+                  window.location.reload();
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </AppLayout>
   );
