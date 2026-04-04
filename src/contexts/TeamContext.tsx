@@ -101,6 +101,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   }, [refreshMembers]);
 
   const setActiveTeam = (team: Team) => {
+    setPendingSetup(false);
     setActiveTeamState(team);
     localStorage.setItem('coachOS_activeTeamId', team.id);
   };
