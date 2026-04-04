@@ -33,6 +33,7 @@ interface TeamContextValue {
   removeMember: (memberId: string) => Promise<{ error: Error | null }>;
   refreshTeams: () => Promise<void>;
   refreshMembers: () => Promise<void>;
+  pendingSetup: boolean;
   // Season-related
   seasons: Season[];
   activeSeason: Season | null;
