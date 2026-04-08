@@ -323,6 +323,7 @@ export type Database = {
       players: {
         Row: {
           created_at: string
+          display_name: string | null
           focus_flag: boolean
           id: string
           invite_email: string | null
@@ -337,6 +338,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          display_name?: string | null
           focus_flag?: boolean
           id?: string
           invite_email?: string | null
@@ -351,6 +353,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          display_name?: string | null
           focus_flag?: boolean
           id?: string
           invite_email?: string | null
