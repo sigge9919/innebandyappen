@@ -160,7 +160,7 @@ export function GoalConfirmDialog({
                               : 'bg-muted hover:bg-muted/80'
                           )}
                         >
-                          #{player.jerseyNumber} {player.name.split(' ')[0]}
+                          #{player.jerseyNumber} {getGameDisplayName(player)}
                         </button>
                       ))}
                     </div>
@@ -182,7 +182,7 @@ export function GoalConfirmDialog({
                               : 'bg-muted/50 hover:bg-muted/80'
                           )}
                         >
-                          #{player.jerseyNumber} {player.name.split(' ')[0]}
+                          #{player.jerseyNumber} {getGameDisplayName(player)}
                         </button>
                       ))}
                     </div>
@@ -216,7 +216,7 @@ export function GoalConfirmDialog({
                               : 'bg-muted hover:bg-muted/80'
                           )}
                         >
-                          #{player.jerseyNumber} {player.name.split(' ')[0]}
+                          #{player.jerseyNumber} {getGameDisplayName(player)}
                         </button>
                       ))}
                     </div>
@@ -238,7 +238,7 @@ export function GoalConfirmDialog({
                               : 'bg-muted/50 hover:bg-muted/80'
                           )}
                         >
-                          #{player.jerseyNumber} {player.name.split(' ')[0]}
+                          #{player.jerseyNumber} {getGameDisplayName(player)}
                         </button>
                       ))}
                     </div>

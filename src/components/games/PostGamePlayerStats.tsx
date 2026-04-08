@@ -204,7 +204,7 @@ export function PostGamePlayerStats({
                           #{player.jerseyNumber}
                         </Badge>
                         <span className="font-medium truncate max-w-[80px]">
-                          {player.name.split(' ')[0]}
+                          {getGameDisplayName(player)}
                         </span>
                       </div>
                     </td>

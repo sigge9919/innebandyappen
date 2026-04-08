@@ -95,7 +95,7 @@ export function GoalDetailsEditor({
                         .filter(p => p.id !== event.playerId)
                         .map(player => (
                           <SelectItem key={player.id} value={player.id}>
-                            #{player.jerseyNumber} {player.name.split(' ')[0]}
+                            #{player.jerseyNumber} {getGameDisplayName(player)}
                           </SelectItem>
                         ))}
                     </SelectContent>

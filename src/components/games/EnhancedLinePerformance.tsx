@@ -118,7 +118,7 @@ export function EnhancedLinePerformance({ lines, events, squadPlayers }: Enhance
                       <div className="flex flex-wrap gap-1 mb-2">
                         {linePlayers.map(player => (
                           <Badge key={player.id} variant="secondary" className="text-xs">
-                            #{player.jerseyNumber} {player.name.split(' ')[0]}
+                            #{player.jerseyNumber} {getGameDisplayName(player)}
                           </Badge>
                         ))}
                       </div>

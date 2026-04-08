@@ -70,7 +70,7 @@ export function PenaltyEditor({
                       <SelectItem value={NONE_VALUE}>Ej tilldelad</SelectItem>
                       {squadPlayers.map(player => (
                         <SelectItem key={player.id} value={player.id}>
-                          #{player.jerseyNumber} {player.name.split(' ')[0]}
+                          #{player.jerseyNumber} {getGameDisplayName(player)}
                         </SelectItem>
                       ))}
                     </SelectContent>
