@@ -82,7 +82,7 @@ export default function TeamSetup() {
                     key={team.id}
                     variant="outline"
                     className="w-full justify-start text-left h-auto py-3"
-                    onClick={() => setActiveTeam(team)}
+                    onClick={() => handleSelectTeam(team)}
                   >
                     <div>
                       <div className="font-medium">{team.name}</div>
