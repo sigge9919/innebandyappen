@@ -2,7 +2,7 @@ import { Period, LineStats, GameLine, GameEvent } from '@/types/game';
 import { Player } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
+import { cn, getGameDisplayName } from '@/lib/utils';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -118,7 +118,7 @@ export function EnhancedLinePerformance({ lines, events, squadPlayers }: Enhance
                       <div className="flex flex-wrap gap-1 mb-2">
                         {linePlayers.map(player => (
                           <Badge key={player.id} variant="secondary" className="text-xs">
-                            #{player.jerseyNumber} {player.name.split(' ')[0]}
+                            #{player.jerseyNumber} {getGameDisplayName(player)}
                           </Badge>
                         ))}
                       </div>

@@ -352,6 +352,7 @@ function dbToPlayer(row: any): Player {
     status: row.status ?? 'Active',
     notes: row.notes ?? '',
     focusFlag: row.focus_flag ?? false,
+    displayName: row.display_name ?? undefined,
     userId: row.user_id ?? undefined,
     inviteEmail: row.invite_email ?? undefined,
   };
@@ -368,6 +369,7 @@ function playerToDb(p: Player, teamId: string) {
     status: p.status,
     notes: p.notes,
     focus_flag: p.focusFlag,
+    display_name: p.displayName || null,
     invite_email: p.inviteEmail || null,
   };
 }
@@ -381,6 +383,7 @@ function playerUpdatesToDb(u: Partial<Player>) {
   if (u.status !== undefined) r.status = u.status;
   if (u.notes !== undefined) r.notes = u.notes;
   if (u.focusFlag !== undefined) r.focus_flag = u.focusFlag;
+  if (u.displayName !== undefined) r.display_name = u.displayName || null;
   if (u.inviteEmail !== undefined) r.invite_email = u.inviteEmail;
   return r;
 }

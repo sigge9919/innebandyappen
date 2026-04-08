@@ -10,6 +10,7 @@ export interface Player {
   status: 'Active' | 'Injured' | 'Archived';
   notes: string;
   focusFlag: boolean;
+  displayName?: string;
   userId?: string;
   inviteEmail?: string;
 }

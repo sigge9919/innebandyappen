@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+import { cn, getGameDisplayName } from '@/lib/utils';
 import { Users, Edit2, Check, X, Shield } from 'lucide-react';
 
 interface LineSetupProps {
@@ -163,7 +163,7 @@ function LineCard({
                   : 'bg-muted hover:bg-muted/80'
               )}
             >
-              #{player.jerseyNumber} {player.name.split(' ')[0]}
+              #{player.jerseyNumber} {getGameDisplayName(player)}
             </button>
           ))}
         </div>
@@ -190,7 +190,7 @@ function LineCard({
         <div className="flex flex-wrap gap-1.5">
           {linePlayers.map(player => (
             <Badge key={player.id} variant="secondary" className="text-xs">
-              #{player.jerseyNumber} {player.name.split(' ')[0]}
+              #{player.jerseyNumber} {getGameDisplayName(player)}
             </Badge>
           ))}
         </div>

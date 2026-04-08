@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Player } from '@/types';
+import { getGameDisplayName } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -70,7 +71,7 @@ export function PenaltyConfirmDialog({
                       : 'bg-muted hover:bg-muted/80'
                   )}
                 >
-                  #{player.jerseyNumber} {player.name.split(' ')[0]}
+                  #{player.jerseyNumber} {getGameDisplayName(player)}
                 </button>
               ))}
             </div>

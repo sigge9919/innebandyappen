@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+import { cn, getGameDisplayName } from '@/lib/utils';
 import { Target, XCircle, Shield } from 'lucide-react';
 
 interface ShotPlayerDialogProps {
@@ -72,7 +72,7 @@ export function ShotPlayerDialog({
                      onClick={() => handleSelect(player.id)}
                      className="px-4 py-3 rounded text-base font-medium transition-colors bg-primary/10 border border-primary/30 hover:bg-primary hover:text-primary-foreground"
                    >
-                     #{player.jerseyNumber} {player.name.split(' ')[0]}
+                     #{player.jerseyNumber} {getGameDisplayName(player)}
                    </button>
                  ))}
                </div>
@@ -89,7 +89,7 @@ export function ShotPlayerDialog({
                      onClick={() => handleSelect(player.id)}
                      className="px-4 py-3 rounded text-base font-medium transition-colors bg-muted/50 hover:bg-primary hover:text-primary-foreground"
                    >
-                     #{player.jerseyNumber} {player.name.split(' ')[0]}
+                     #{player.jerseyNumber} {getGameDisplayName(player)}
                    </button>
                  ))}
                </div>

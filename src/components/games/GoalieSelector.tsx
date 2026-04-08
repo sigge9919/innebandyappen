@@ -2,7 +2,7 @@ import { Player } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+import { cn, getGameDisplayName } from '@/lib/utils';
 
 interface GoalieSelectorProps {
   goalies: Player[];
@@ -46,7 +46,7 @@ export function GoalieSelector({
             <SelectItem value={NONE_VALUE}>Not selected</SelectItem>
             {goalies.map(goalie => (
               <SelectItem key={goalie.id} value={goalie.id}>
-                #{goalie.jerseyNumber} {goalie.name.split(' ')[0]}
+                #{goalie.jerseyNumber} {getGameDisplayName(goalie)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -78,7 +78,7 @@ export function GoalieSelector({
             onClick={() => onSelectGoalie(goalie.id)}
           >
             <span className="font-bold mr-1">#{goalie.jerseyNumber}</span>
-            {goalie.name.split(' ')[0]}
+            {getGameDisplayName(goalie)}
           </Button>
         ))}
       </div>

@@ -1,4 +1,5 @@
 import { Player } from '@/types';
+import { getGameDisplayName } from '@/lib/utils';
 import { GameEvent, getSituationLabel } from '@/types/game';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -94,7 +95,7 @@ export function GoalDetailsEditor({
                         .filter(p => p.id !== event.playerId)
                         .map(player => (
                           <SelectItem key={player.id} value={player.id}>
-                            #{player.jerseyNumber} {player.name.split(' ')[0]}
+                            #{player.jerseyNumber} {getGameDisplayName(player)}
                           </SelectItem>
                         ))}
                     </SelectContent>
