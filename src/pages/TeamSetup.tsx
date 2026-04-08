@@ -35,11 +35,18 @@ export default function TeamSetup() {
   };
 
   const handleDrillsComplete = () => {
-    // Now activate the team after drill selection is done
     const team = teams.find(t => t.id === newTeamId);
-    if (team) setActiveTeam(team);
+    if (team) {
+      setActiveTeam(team);
+      navigate('/');
+    }
     setMode('choose');
     setNewTeamId(null);
+  };
+
+  const handleSelectTeam = (team: Team) => {
+    setActiveTeam(team);
+    navigate('/');
   };
 
   if (mode === 'pick-drills' && newTeamId) {
