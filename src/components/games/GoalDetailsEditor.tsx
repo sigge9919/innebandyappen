@@ -1,4 +1,5 @@
 import { Player } from '@/types';
+import { getGameDisplayName } from '@/lib/utils';
 import { GameEvent, getSituationLabel } from '@/types/game';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

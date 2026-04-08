@@ -2,7 +2,7 @@ import { Period, LineStats, GameLine, GameEvent } from '@/types/game';
 import { Player } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
+import { cn, getGameDisplayName } from '@/lib/utils';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useState } from 'react';
 

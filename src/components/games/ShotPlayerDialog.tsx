@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+import { cn, getGameDisplayName } from '@/lib/utils';
 import { Target, XCircle, Shield } from 'lucide-react';
 
 interface ShotPlayerDialogProps {

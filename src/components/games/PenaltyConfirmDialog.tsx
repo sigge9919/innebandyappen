@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Player } from '@/types';
+import { getGameDisplayName } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

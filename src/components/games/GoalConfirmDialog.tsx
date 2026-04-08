@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+import { cn, getGameDisplayName } from '@/lib/utils';
 import { CircleDot, Users, User } from 'lucide-react';
 
 interface GoalConfirmDialogProps {
