@@ -33,6 +33,7 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
     status: 'Active',
     notes: '',
     focusFlag: false,
+    displayName: '',
   });
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
         status: 'Active',
         notes: '',
         focusFlag: false,
+        displayName: '',
       });
     }
   }, [player, open]);
@@ -75,6 +77,7 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
       status: formData.status as Player['status'],
       notes: formData.notes || '',
       focusFlag: formData.focusFlag || false,
+      displayName: formData.displayName || undefined,
     };
     onSave(newPlayer);
     onOpenChange(false);
@@ -99,6 +102,17 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
               />
             </div>
             
+            <div className="grid gap-2">
+              <Label htmlFor="displayName">Matchnamn</Label>
+              <Input
+                id="displayName"
+                value={formData.displayName || ''}
+                onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                placeholder={formData.name ? formData.name.split(' ')[0] : 'T.ex. Kansen, A.Svensson'}
+              />
+              <p className="text-xs text-muted-foreground">Namn som visas under matcher. Lämna tomt för förnamn.</p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="jerseyNumber">Tröjnummer</Label>
