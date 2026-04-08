@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTeam, Team } from '@/contexts/TeamContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { DrillCatalogPicker } from '@/components/team/DrillCatalogPicker';
 export default function TeamSetup() {
   const { teams, createTeam, setActiveTeam } = useTeam();
   const { signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [teamName, setTeamName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,11 +35,18 @@ export default function TeamSetup() {
   };
 
   const handleDrillsComplete = () => {
-    // Now activate the team after drill selection is done
     const team = teams.find(t => t.id === newTeamId);
-    if (team) setActiveTeam(team);
+    if (team) {
+      setActiveTeam(team);
+      navigate('/');
+    }
     setMode('choose');
     setNewTeamId(null);
+  };
+
+  const handleSelectTeam = (team: Team) => {
+    setActiveTeam(team);
+    navigate('/');
   };
 
   if (mode === 'pick-drills' && newTeamId) {
@@ -73,7 +82,7 @@ export default function TeamSetup() {
                     key={team.id}
                     variant="outline"
                     className="w-full justify-start text-left h-auto py-3"
-                    onClick={() => setActiveTeam(team)}
+                    onClick={() => handleSelectTeam(team)}
                   >
                     <div>
                       <div className="font-medium">{team.name}</div>
