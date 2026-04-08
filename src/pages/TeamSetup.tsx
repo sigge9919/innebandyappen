@@ -13,6 +13,7 @@ import { DrillCatalogPicker } from '@/components/team/DrillCatalogPicker';
 export default function TeamSetup() {
   const { teams, createTeam, setActiveTeam } = useTeam();
   const { signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [teamName, setTeamName] = useState('');
   const [loading, setLoading] = useState(false);
