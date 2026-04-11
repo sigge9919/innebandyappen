@@ -125,7 +125,7 @@ export function AppSidebar() {
     <div className="flex flex-col h-full bg-sidebar">
       {/* Team name */}
       <div className="px-4 py-3 border-b border-sidebar-border">
-        <p className="text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-1">Coach OS</p>
+        <p className="text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider mb-1">Floorball Tactix</p>
         <TeamSwitcher />
       </div>
 
@@ -160,7 +160,7 @@ export function AppSidebar() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-sidebar border-b border-sidebar-border">
         <div className="flex items-center justify-between px-4 h-12">
           <span className="text-sm font-semibold text-sidebar-foreground">
-            {activeTeam?.name ?? 'Coach OS'}
+            {activeTeam?.name ?? 'Floorball Tactix'}
           </span>
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>

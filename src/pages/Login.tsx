@@ -47,10 +47,8 @@ export default function Login() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 rounded-xl bg-primary flex items-center justify-center mb-4">
-            <span className="text-primary-foreground font-bold text-xl">C</span>
-          </div>
-          <CardTitle className="text-xl">Coach OS</CardTitle>
+          <img src="/logo.png" alt="Floorball Tactix" className="mx-auto w-16 h-16 mb-4" />
+          <CardTitle className="text-xl">Floorball Tactix</CardTitle>
           <CardDescription>
             {isForgot
               ? 'Ange din e-post för att återställa lösenordet'
