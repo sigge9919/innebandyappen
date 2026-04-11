@@ -1,43 +1,38 @@
-
-
-## Plan: Valbart visningsnamn för matcher
+## Plan: Byt namn från Coach OS till Floorball Tactix
 
 ### Bakgrund
-I matchvyn visas `player.name.split(' ')[0]` (förnamnet) på ~20 ställen i 10 komponenter. Målet är att tränaren ska kunna välja ett anpassat visningsnamn per spelare i spelarprofilen.
+
+Användaren vill byta appens namn från "Coach OS" till "Floorball Tactix" och använda den uppladdade logotypen.
 
 ### Ändringar
 
-#### 1. Databas-migration
-Lägg till kolumn `display_name text` (nullable, default null) i `players`-tabellen.
+#### 1. Uppdatera index.html
 
-#### 2. Uppdatera Player-typen
-Lägg till `displayName?: string` i `src/types/index.ts`.
+- Ändra `<title>` från "Lovable App" till "Floorball Tactix"
+- Uppdatera `meta name="description"` till "Floorball Tactix - Master the Tactix, Improve your team"
+- Uppdatera `og:title` och `twitter:title` till "Floorball Tactix"
+- Uppdatera `og:description` och `twitter:description` till "Floorball Tactix - Master the Tactix, Improve your team"
 
-#### 3. Nytt fält i PlayerFormDialog
-Lägg till ett textfält "Matchnamn" i `src/components/forms/PlayerFormDialog.tsx` med placeholder som visar förnamnet automatiskt. Om fältet lämnas tomt används förnamnet som fallback.
+#### 2. Uppdatera AppSidebar.tsx
 
-#### 4. Hjälpfunktion
-Skapa `getGameDisplayName(player: Player): string` i `src/lib/utils.ts` som returnerar `player.displayName || player.name.split(' ')[0]`.
+- Ändra "Coach OS" till "Floorball Tactix" i sidomenyns header (text-xs label)
+- Ändra fallback-text från "Coach OS" till "Floorball Tactix" när inget lag är valt
 
-#### 5. Ersätt alla `name.split(' ')[0]` i matchkomponenter
-Byt ut i dessa filer (ca 20 förekomster):
-- `GoalConfirmDialog.tsx` (4 st)
-- `ShotPlayerDialog.tsx` (2 st)
-- `LineSetup.tsx` (2 st)
-- `GoalDetailsEditor.tsx` (1 st)
-- `PenaltyEditor.tsx` (1 st)
-- `PenaltyConfirmDialog.tsx` (1 st)
-- `EnhancedLinePerformance.tsx` (1 st)
-- `GoalieSelector.tsx` (2 st)
-- `PostGamePlayerStats.tsx` (1 st)
+#### 3. Uppdatera Login.tsx
 
-Alla ersätts med `getGameDisplayName(player)`.
+- Ändra "Coach OS" till "CardTitle" till "Floorball Tactix"
+- Ändra ikon-bokstav från "C" till "F"
 
-#### 6. Synkronisering med databasen
-Uppdatera `useLocalStorage.ts` (eller relevant hook) så att `display_name` mappas till/från `displayName` vid läsning/skrivning.
+#### 4. Uppdatera index.css
+
+- Ändra kommentaren från "Coach OS — Professional coaching tool" till "Floorball Tactix — Master the Tactix, Improve your team"
+
+#### 5. Lägg till logotyp
+
+- Kopiera den uppladdade bilden (user-uploads://image-3.png) till public/logo.png
+- Uppdatera Login.tsx för att använda logotyp-bilden istället för bokstavs-ikonen (valbart)
 
 ### Tekniska detaljer
-- Kolumnen är nullable — inget befintligt data behöver migreras
-- Fallback till förnamn gör att inga befintliga spelare påverkas
-- Ett enda fält, inga komplexa val — tränaren skriver t.ex. "Kansen", "A.Svensson" eller "Alex"
 
+- 4 filer ändras för text-uppdateringar
+- Logotyp kan läggas till som separat steg
