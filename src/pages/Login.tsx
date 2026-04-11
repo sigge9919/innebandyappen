@@ -48,7 +48,7 @@ export default function Login() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <img src="/logo.png" alt="Floorball Tactix" className="mx-auto w-16 h-16 mb-4" />
-          <CardTitle className="text-xl">Floorball Tactix</CardTitle>
+          
           <CardDescription>
             {isForgot
               ? 'Ange din e-post för att återställa lösenordet'
