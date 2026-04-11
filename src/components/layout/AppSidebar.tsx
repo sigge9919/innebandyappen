@@ -126,7 +126,7 @@ export function AppSidebar() {
       {/* Team name */}
       <div className="px-4 py-3 border-b border-sidebar-border">
         <div className="flex items-center gap-2 mb-1">
-          <img src="/logo.png" alt="Floorball Tactix" className="w-5 h-5" />
+          <img src="/logo.png" alt="Floorball Tactix" className="w-5 h-5 object-contain" />
           <p className="text-xs font-medium text-sidebar-foreground/50 uppercase tracking-wider">Floorball Tactix</p>
         </div>
         <TeamSwitcher />
