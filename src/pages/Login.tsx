@@ -47,7 +47,7 @@ export default function Login() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <img src="/logo.png" alt="Floorball Tactix" className="mx-auto w-16 h-16 mb-4" />
+          <img src="/logo.png" alt="Floorball Tactix" className="w-full h-auto object-contain mb-4" />
           
           <CardDescription>
             {isForgot
