@@ -111,7 +111,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <TrendSparkline label="Mål" values={sparkValues('goals')} />
             <TrendSparkline label="Assists" values={sparkValues('assists')} />
-            <TrendSparkline label="SOG" values={sparkValues('sog')} />
+            <TrendSparkline label="Skott på mål" values={sparkValues('sog')} />
             <TrendSparkline label="Off" values={sparkValues('shotsOff')} />
             <TrendSparkline label="Blockerade" values={sparkValues('shotsBlocked')} />
             <TrendSparkline label="+/-" values={sparkValues('plusMinus')} />
@@ -119,7 +119,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
           <div className="grid gap-4 md:grid-cols-2">
             <TrendChart title="Mål" data={trendData} xKey="label" series={[{ key: 'goals', label: 'Mål', color: OUR }]} />
             <TrendChart title="Assists" data={trendData} xKey="label" series={[{ key: 'assists', label: 'Assists', color: ACCENT }]} />
-            <TrendChart title="Skott på mål" data={trendData} xKey="label" series={[{ key: 'sog', label: 'SOG', color: OUR }]} />
+            <TrendChart title="Skott på mål" data={trendData} xKey="label" series={[{ key: 'sog', label: 'Skott på mål', color: OUR }]} />
             <TrendChart title="Skott utanför" data={trendData} xKey="label" series={[{ key: 'shotsOff', label: 'Off', color: OPP }]} />
             <TrendChart title="Blockerade skott" data={trendData} xKey="label" series={[{ key: 'shotsBlocked', label: 'Blk', color: ACCENT }]} />
             <TrendChart title="Plus/Minus (5v5)" data={trendData} xKey="label" series={[{ key: 'plusMinus', label: '+/-', color: OUR }]} />

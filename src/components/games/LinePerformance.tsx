@@ -56,7 +56,7 @@ export function LinePerformance({ lineStats, periodStats, className }: LinePerfo
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-xs text-center">
                   <div>
-                    <p className="text-muted-foreground">SOG</p>
+                    <p className="text-muted-foreground">Skott på mål</p>
                     <p className="font-medium">{ps.home.shotsOnGoal} - {ps.opponent.shotsOnGoal}</p>
                   </div>
                   <div>

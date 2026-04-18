@@ -83,8 +83,8 @@ export function TeamTrends({ games }: TeamTrendsProps) {
         <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Översikt</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           <TrendSparkline label="Mål" values={sparkValues('ourGoals')} />
-          <TrendSparkline label="SOG" values={sparkValues('ourSog')} />
-          <TrendSparkline label="SOG %" values={sparkValues('ourSogPct')} suffix="%" />
+          <TrendSparkline label="Skott på mål" values={sparkValues('ourSog')} />
+          <TrendSparkline label="Skott på mål %" values={sparkValues('ourSogPct')} suffix="%" />
           <TrendSparkline label="Totala skott" values={sparkValues('ourTotalShots')} />
           <TrendSparkline label="Mål emot" values={sparkValues('oppGoals')} invertTrend />
           <TrendSparkline label="Blockerade" values={sparkValues('ourBlk')} />
@@ -113,13 +113,13 @@ export function TeamTrends({ games }: TeamTrendsProps) {
               title="Skott på mål"
               data={trendData}
               xKey="label"
-              series={[ourSeries('ourSog', 'Våra SOG'), oppSeries('oppSog', 'Mot. SOG')]}
+              series={[ourSeries('ourSog', 'Våra skott på mål'), oppSeries('oppSog', 'Mot. skott på mål')]}
             />
             <TrendChart
-              title="SOG %"
+              title="Skott på mål %"
               data={trendData}
               xKey="label"
-              series={[ourSeries('ourSogPct', 'Vår SOG %'), oppSeries('oppSogPct', 'Mot. SOG %')]}
+              series={[ourSeries('ourSogPct', 'Vår skott på mål %'), oppSeries('oppSogPct', 'Mot. skott på mål %')]}
               domain={[0, 100]}
             />
             <TrendChart
@@ -184,10 +184,10 @@ export function TeamTrends({ games }: TeamTrendsProps) {
               series={[accentSeries('ppGoals', 'PP-mål')]}
             />
             <TrendChart
-              title="PP SOG"
+              title="PP Skott på mål"
               data={trendData}
               xKey="label"
-              series={[accentSeries('ppSog', 'PP SOG')]}
+              series={[accentSeries('ppSog', 'PP Skott på mål')]}
             />
             <TrendChart
               title="Box Play %"
@@ -204,10 +204,10 @@ export function TeamTrends({ games }: TeamTrendsProps) {
               invertTrend
             />
             <TrendChart
-              title="PK SOG"
+              title="PK Skott på mål"
               data={trendData}
               xKey="label"
-              series={[accentSeries('pkSog', 'PK SOG')]}
+              series={[accentSeries('pkSog', 'PK Skott på mål')]}
             />
           </div>
         </TabsContent>
