@@ -161,10 +161,10 @@ export function PlayerStatsSection({ player, games }: PlayerStatsSectionProps) {
                 <TableHead>P</TableHead>
                 <TableHead>+/-</TableHead>
                 <TableHead>PIM</TableHead>
-                <TableHead>SOG</TableHead>
+                <TableHead>Skott på mål</TableHead>
                 <TableHead>Miss</TableHead>
                 <TableHead>Blk</TableHead>
-                <TableHead>SOG%</TableHead>
+                <TableHead>Skott på mål %</TableHead>
                 <TableHead>Blk%</TableHead>
                 <TableHead>Def</TableHead>
               </TableRow>
