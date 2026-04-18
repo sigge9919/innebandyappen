@@ -178,7 +178,7 @@ export function PostGamePlayerStats({
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
-                    PIM <Lock className="h-3 w-3" />
+                    UTV <Lock className="h-3 w-3" />
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
