@@ -1,17 +1,18 @@
 import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EnhancedGame } from '@/types/game';
 import { calculateTeamStats } from '@/lib/gameStorage';
+import { TrendChart, TrendSeries } from './TrendChart';
+import { TrendSparkline } from './TrendSparkline';
 
 interface TeamTrendsProps {
   games: EnhancedGame[];
 }
 
-const GREEN = 'hsl(142, 71%, 45%)';
-const RED = 'hsl(0, 72%, 51%)';
-const BLUE = 'hsl(217, 91%, 60%)';
+const OUR = 'hsl(var(--primary))';
+const OPP = 'hsl(var(--chart-opponent))';
+const ACCENT = 'hsl(var(--success))';
+const DANGER = 'hsl(var(--destructive))';
 
 export function TeamTrends({ games }: TeamTrendsProps) {
   const trendData = useMemo(() => {
@@ -68,142 +69,149 @@ export function TeamTrends({ games }: TeamTrendsProps) {
     );
   }
 
-  const dualCharts = [
-    {
-      title: 'Mål',
-      keys: ['ourGoals', 'oppGoals'] as const,
-      config: {
-        ourGoals: { label: 'Våra mål', color: GREEN },
-        oppGoals: { label: 'Motståndarens mål', color: RED },
-      },
-    },
-    {
-      title: 'Skott på mål',
-      keys: ['ourSog', 'oppSog'] as const,
-      config: {
-        ourSog: { label: 'Våra SOG', color: GREEN },
-        oppSog: { label: 'Mot. SOG', color: RED },
-      },
-    },
-    {
-      title: 'SOG %',
-      keys: ['ourSogPct', 'oppSogPct'] as const,
-      config: {
-        ourSogPct: { label: 'Vår SOG %', color: GREEN },
-        oppSogPct: { label: 'Mot. SOG %', color: RED },
-      },
-      domain: [0, 100] as [number, number],
-    },
-    {
-      title: 'Skott utanför',
-      keys: ['ourShotsOff', 'oppShotsOff'] as const,
-      config: {
-        ourShotsOff: { label: 'Våra utanför', color: GREEN },
-        oppShotsOff: { label: 'Mot. utanför', color: RED },
-      },
-    },
-    {
-      title: 'Blockerade skott',
-      keys: ['ourBlk', 'oppBlk'] as const,
-      config: {
-        ourBlk: { label: 'Våra blockerade', color: GREEN },
-        oppBlk: { label: 'Mot. blockerade', color: RED },
-      },
-    },
-    {
-      title: 'BLK %',
-      keys: ['ourBlkPct', 'oppBlkPct'] as const,
-      config: {
-        ourBlkPct: { label: 'Vår BLK %', color: GREEN },
-        oppBlkPct: { label: 'Mot. BLK %', color: RED },
-      },
-      domain: [0, 100] as [number, number],
-    },
-    {
-      title: 'Defensiva blockeringar',
-      keys: ['ourDef', 'oppDef'] as const,
-      config: {
-        ourDef: { label: 'Våra def. blk', color: GREEN },
-        oppDef: { label: 'Mot. def. blk', color: RED },
-      },
-    },
-    {
-      title: 'Totala skott',
-      keys: ['ourTotalShots', 'oppTotalShots'] as const,
-      config: {
-        ourTotalShots: { label: 'Våra totala skott', color: GREEN },
-        oppTotalShots: { label: 'Mot. totala skott', color: RED },
-      },
-    },
-  ];
+  const ourSeries = (key: string, label: string): TrendSeries => ({ key, label, color: OUR });
+  const oppSeries = (key: string, label: string): TrendSeries => ({ key, label, color: OPP });
+  const accentSeries = (key: string, label: string): TrendSeries => ({ key, label, color: ACCENT });
+  const dangerSeries = (key: string, label: string): TrendSeries => ({ key, label, color: DANGER });
 
-  const singleCharts = [
-    {
-      title: 'Power Play Goals',
-      keys: ['ppGoals'] as const,
-      config: { ppGoals: { label: 'PP Goals', color: BLUE } },
-    },
-    {
-      title: 'Power Play SOG',
-      keys: ['ppSog'] as const,
-      config: { ppSog: { label: 'PP SOG', color: BLUE } },
-    },
-    {
-      title: 'PP %',
-      keys: ['ppPct'] as const,
-      config: { ppPct: { label: 'PP %', color: BLUE } },
-      domain: [0, 100] as [number, number],
-    },
-    {
-      title: 'Box Play Goals Against',
-      keys: ['pkGoals'] as const,
-      config: { pkGoals: { label: 'PK Goals', color: BLUE } },
-    },
-    {
-      title: 'Box Play SOG',
-      keys: ['pkSog'] as const,
-      config: { pkSog: { label: 'PK SOG', color: BLUE } },
-    },
-    {
-      title: 'PK %',
-      keys: ['pkPct'] as const,
-      config: { pkPct: { label: 'PK %', color: BLUE } },
-      domain: [0, 100] as [number, number],
-    },
-  ];
-
-  const allCharts = [...dualCharts, ...singleCharts];
+  const sparkValues = (k: keyof typeof trendData[number]) => trendData.map(d => Number(d[k]) || 0);
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      {allCharts.map(chart => (
-        <Card key={chart.title}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">{chart.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chart.config} className="h-[200px] w-full">
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                <YAxis allowDecimals={false} domain={'domain' in chart ? chart.domain : undefined} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                {chart.keys.map(key => (
-                  <Line
-                    key={key}
-                    type="monotone"
-                    dataKey={key}
-                    stroke={`var(--color-${key})`}
-                    strokeWidth={2}
-                    dot={{ r: 5, fill: `var(--color-${key})`, strokeWidth: 0 }}
-                    activeDot={{ r: 7 }}
-                  />
-                ))}
-              </LineChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="space-y-6">
+      {/* Sparkline overview */}
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Översikt</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <TrendSparkline label="Mål" values={sparkValues('ourGoals')} />
+          <TrendSparkline label="SOG" values={sparkValues('ourSog')} />
+          <TrendSparkline label="SOG %" values={sparkValues('ourSogPct')} suffix="%" />
+          <TrendSparkline label="Totala skott" values={sparkValues('ourTotalShots')} />
+          <TrendSparkline label="Mål emot" values={sparkValues('oppGoals')} invertTrend />
+          <TrendSparkline label="Blockerade" values={sparkValues('ourBlk')} />
+          <TrendSparkline label="PP %" values={sparkValues('ppPct')} suffix="%" />
+          <TrendSparkline label="PK %" values={sparkValues('pkPct')} suffix="%" />
+        </div>
+      </div>
+
+      {/* Tabs with grouped charts */}
+      <Tabs defaultValue="offensive" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsTrigger value="offensive">Offensiv</TabsTrigger>
+          <TabsTrigger value="defensive">Defensiv</TabsTrigger>
+          <TabsTrigger value="special">Special teams</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="offensive" className="mt-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <TrendChart
+              title="Mål"
+              data={trendData}
+              xKey="label"
+              series={[ourSeries('ourGoals', 'Våra mål'), oppSeries('oppGoals', 'Mot.')]}
+            />
+            <TrendChart
+              title="Skott på mål"
+              data={trendData}
+              xKey="label"
+              series={[ourSeries('ourSog', 'Våra SOG'), oppSeries('oppSog', 'Mot. SOG')]}
+            />
+            <TrendChart
+              title="SOG %"
+              data={trendData}
+              xKey="label"
+              series={[ourSeries('ourSogPct', 'Vår SOG %'), oppSeries('oppSogPct', 'Mot. SOG %')]}
+              domain={[0, 100]}
+            />
+            <TrendChart
+              title="Totala skott"
+              data={trendData}
+              xKey="label"
+              series={[ourSeries('ourTotalShots', 'Våra'), oppSeries('oppTotalShots', 'Mot.')]}
+            />
+            <TrendChart
+              title="Skott utanför"
+              data={trendData}
+              xKey="label"
+              series={[ourSeries('ourShotsOff', 'Våra'), oppSeries('oppShotsOff', 'Mot.')]}
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="defensive" className="mt-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <TrendChart
+              title="Blockerade skott"
+              data={trendData}
+              xKey="label"
+              series={[ourSeries('ourBlk', 'Våra'), oppSeries('oppBlk', 'Mot.')]}
+            />
+            <TrendChart
+              title="BLK %"
+              data={trendData}
+              xKey="label"
+              series={[ourSeries('ourBlkPct', 'Vår'), oppSeries('oppBlkPct', 'Mot.')]}
+              domain={[0, 100]}
+            />
+            <TrendChart
+              title="Defensiva blockeringar"
+              data={trendData}
+              xKey="label"
+              series={[ourSeries('ourDef', 'Våra'), oppSeries('oppDef', 'Mot.')]}
+            />
+            <TrendChart
+              title="Mål emot"
+              data={trendData}
+              xKey="label"
+              series={[oppSeries('oppGoals', 'Mål emot')]}
+              invertTrend
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="special" className="mt-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <TrendChart
+              title="Power Play %"
+              data={trendData}
+              xKey="label"
+              series={[accentSeries('ppPct', 'PP %')]}
+              domain={[0, 100]}
+            />
+            <TrendChart
+              title="PP-mål"
+              data={trendData}
+              xKey="label"
+              series={[accentSeries('ppGoals', 'PP-mål')]}
+            />
+            <TrendChart
+              title="PP SOG"
+              data={trendData}
+              xKey="label"
+              series={[accentSeries('ppSog', 'PP SOG')]}
+            />
+            <TrendChart
+              title="Box Play %"
+              data={trendData}
+              xKey="label"
+              series={[accentSeries('pkPct', 'PK %')]}
+              domain={[0, 100]}
+            />
+            <TrendChart
+              title="PK-mål emot"
+              data={trendData}
+              xKey="label"
+              series={[dangerSeries('pkGoals', 'PK-mål emot')]}
+              invertTrend
+            />
+            <TrendChart
+              title="PK SOG"
+              data={trendData}
+              xKey="label"
+              series={[accentSeries('pkSog', 'PK SOG')]}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
