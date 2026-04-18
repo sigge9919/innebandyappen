@@ -184,10 +184,10 @@ export function TeamTrends({ games }: TeamTrendsProps) {
               series={[accentSeries('ppGoals', 'PP-mål')]}
             />
             <TrendChart
-              title="PP SOG"
+              title="PP Skott på mål"
               data={trendData}
               xKey="label"
-              series={[accentSeries('ppSog', 'PP SOG')]}
+              series={[accentSeries('ppSog', 'PP Skott på mål')]}
             />
             <TrendChart
               title="Box Play %"
@@ -204,10 +204,10 @@ export function TeamTrends({ games }: TeamTrendsProps) {
               invertTrend
             />
             <TrendChart
-              title="PK SOG"
+              title="PK Skott på mål"
               data={trendData}
               xKey="label"
-              series={[accentSeries('pkSog', 'PK SOG')]}
+              series={[accentSeries('pkSog', 'PK Skott på mål')]}
             />
           </div>
         </TabsContent>
