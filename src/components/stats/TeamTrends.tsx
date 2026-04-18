@@ -83,8 +83,8 @@ export function TeamTrends({ games }: TeamTrendsProps) {
         <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Översikt</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           <TrendSparkline label="Mål" values={sparkValues('ourGoals')} />
-          <TrendSparkline label="SOG" values={sparkValues('ourSog')} />
-          <TrendSparkline label="SOG %" values={sparkValues('ourSogPct')} suffix="%" />
+          <TrendSparkline label="Skott på mål" values={sparkValues('ourSog')} />
+          <TrendSparkline label="Skott på mål %" values={sparkValues('ourSogPct')} suffix="%" />
           <TrendSparkline label="Totala skott" values={sparkValues('ourTotalShots')} />
           <TrendSparkline label="Mål emot" values={sparkValues('oppGoals')} invertTrend />
           <TrendSparkline label="Blockerade" values={sparkValues('ourBlk')} />
