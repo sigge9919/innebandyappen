@@ -1,22 +1,19 @@
 import { useMemo, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EnhancedGame } from '@/types/game';
 import { calculatePlayerStatsFromEvents } from '@/lib/gameStorage';
 import { Player } from '@/types';
+import { TrendChart, TrendSeries } from './TrendChart';
+import { TrendSparkline } from './TrendSparkline';
 
 interface PlayerTrendsProps {
   games: EnhancedGame[];
   players: Player[];
 }
 
-interface ChartDef {
-  title: string;
-  dataKey: string;
-  config: Record<string, { label: string; color: string }>;
-}
+const OUR = 'hsl(var(--primary))';
+const OPP = 'hsl(var(--chart-opponent))';
+const ACCENT = 'hsl(var(--success))';
 
 export function PlayerTrends({ games, players }: PlayerTrendsProps) {
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>(players[0]?.id || '');
@@ -58,28 +55,14 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
           plusMinus: stat?.plusMinus5v5 || 0,
         };
       })
-      .filter(Boolean);
+      .filter(Boolean) as Array<Record<string, any>>;
   }, [games, selectedPlayerId, isGoalie]);
 
   if (players.length === 0) {
     return <p className="text-center text-muted-foreground py-8">Inga spelare tillgängliga</p>;
   }
 
-  const skaterCharts: ChartDef[] = [
-    { title: 'Goals', dataKey: 'goals', config: { goals: { label: 'Goals', color: 'hsl(var(--chart-1))' } } },
-    { title: 'Assists', dataKey: 'assists', config: { assists: { label: 'Assists', color: 'hsl(var(--chart-3))' } } },
-    { title: 'Shots on Goal', dataKey: 'sog', config: { sog: { label: 'SOG', color: 'hsl(var(--chart-1))' } } },
-    { title: 'Shots Off Goal', dataKey: 'shotsOff', config: { shotsOff: { label: 'Off Goal', color: 'hsl(var(--chart-3))' } } },
-    { title: 'Shots Blocked', dataKey: 'shotsBlocked', config: { shotsBlocked: { label: 'Blocked', color: 'hsl(var(--chart-4))' } } },
-    { title: 'Plus/Minus (5v5)', dataKey: 'plusMinus', config: { plusMinus: { label: '+/-', color: 'hsl(var(--chart-1))' } } },
-  ];
-
-  const goalieCharts: ChartDef[] = [
-    { title: 'Goals Against', dataKey: 'goalsAgainst', config: { goalsAgainst: { label: 'Goals Against', color: 'hsl(var(--chart-2))' } } },
-    { title: 'Save %', dataKey: 'savePct', config: { savePct: { label: 'Save %', color: 'hsl(var(--chart-1))' } } },
-  ];
-
-  const charts = isGoalie ? goalieCharts : skaterCharts;
+  const sparkValues = (k: string) => trendData.map(d => Number(d[k]) || 0);
 
   return (
     <div className="space-y-6">
@@ -100,34 +83,48 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
         <p className="text-center text-muted-foreground py-8">
           Ingen matchdata för denna spelare
         </p>
+      ) : isGoalie ? (
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <TrendSparkline label="Mål emot" values={sparkValues('goalsAgainst')} invertTrend />
+            <TrendSparkline label="Save %" values={sparkValues('savePct')} suffix="%" />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TrendChart
+              title="Mål emot"
+              data={trendData}
+              xKey="label"
+              series={[{ key: 'goalsAgainst', label: 'Mål emot', color: OPP }]}
+              invertTrend
+            />
+            <TrendChart
+              title="Save %"
+              data={trendData}
+              xKey="label"
+              series={[{ key: 'savePct', label: 'Save %', color: OUR }]}
+              domain={[0, 100]}
+            />
+          </div>
+        </>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2">
-          {charts.map(chart => (
-            <Card key={chart.dataKey}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{chart.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={chart.config} className="h-[200px] w-full">
-                  <LineChart data={trendData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                    <YAxis allowDecimals={false} domain={chart.dataKey === 'savePct' ? [0, 100] : undefined} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line
-                      type="monotone"
-                      dataKey={chart.dataKey}
-                      stroke={`var(--color-${chart.dataKey})`}
-                      strokeWidth={2}
-                      dot={{ r: 5, fill: `var(--color-${chart.dataKey})`, strokeWidth: 0 }}
-                      activeDot={{ r: 7 }}
-                    />
-                  </LineChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <TrendSparkline label="Mål" values={sparkValues('goals')} />
+            <TrendSparkline label="Assists" values={sparkValues('assists')} />
+            <TrendSparkline label="SOG" values={sparkValues('sog')} />
+            <TrendSparkline label="Off" values={sparkValues('shotsOff')} />
+            <TrendSparkline label="Blockerade" values={sparkValues('shotsBlocked')} />
+            <TrendSparkline label="+/-" values={sparkValues('plusMinus')} />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TrendChart title="Mål" data={trendData} xKey="label" series={[{ key: 'goals', label: 'Mål', color: OUR }]} />
+            <TrendChart title="Assists" data={trendData} xKey="label" series={[{ key: 'assists', label: 'Assists', color: ACCENT }]} />
+            <TrendChart title="Skott på mål" data={trendData} xKey="label" series={[{ key: 'sog', label: 'SOG', color: OUR }]} />
+            <TrendChart title="Skott utanför" data={trendData} xKey="label" series={[{ key: 'shotsOff', label: 'Off', color: OPP }]} />
+            <TrendChart title="Blockerade skott" data={trendData} xKey="label" series={[{ key: 'shotsBlocked', label: 'Blk', color: ACCENT }]} />
+            <TrendChart title="Plus/Minus (5v5)" data={trendData} xKey="label" series={[{ key: 'plusMinus', label: '+/-', color: OUR }]} />
+          </div>
+        </>
       )}
     </div>
   );
