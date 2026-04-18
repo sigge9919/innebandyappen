@@ -163,7 +163,7 @@ export function PostGamePlayerStats({
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
-                    Blk {isEditing && blkMismatch && <MismatchWarning current={totalBlk} expected={teamStats.shotsBlocked} />}
+                    Block {isEditing && blkMismatch && <MismatchWarning current={totalBlk} expected={teamStats.shotsBlocked} />}
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
