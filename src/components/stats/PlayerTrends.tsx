@@ -111,7 +111,7 @@ export function PlayerTrends({ games, players }: PlayerTrendsProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <TrendSparkline label="Mål" values={sparkValues('goals')} />
             <TrendSparkline label="Assists" values={sparkValues('assists')} />
-            <TrendSparkline label="SOG" values={sparkValues('sog')} />
+            <TrendSparkline label="Skott på mål" values={sparkValues('sog')} />
             <TrendSparkline label="Off" values={sparkValues('shotsOff')} />
             <TrendSparkline label="Blockerade" values={sparkValues('shotsBlocked')} />
             <TrendSparkline label="+/-" values={sparkValues('plusMinus')} />
