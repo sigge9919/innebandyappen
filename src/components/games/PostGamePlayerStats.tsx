@@ -308,7 +308,7 @@ export function PostGamePlayerStats({
           </table>
         </div>
         <p className="text-xs text-muted-foreground mt-3">
-          M = Mål, A = Assist, SOG = Skott på mål, Miss = Missade skott, Blk = Blockerade skott (av motståndare), Tot = Totala skott, Def = Defensiva blockeringar, UM = Utvisningsminuter, +/− = Plus/Minus (5v5)
+          M = Mål, A = Assist, SOG = Skott på mål, Miss = Missade skott, Block = Blockerade skott (av motståndare), Tot = Totala skott, Def = Defensiva blockeringar, UTV = Utvisningsminuter, +/− = Plus/Minus (5v5)
         </p>
       </div>
 
