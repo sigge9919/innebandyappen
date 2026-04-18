@@ -113,13 +113,13 @@ export function TeamTrends({ games }: TeamTrendsProps) {
               title="Skott på mål"
               data={trendData}
               xKey="label"
-              series={[ourSeries('ourSog', 'Våra SOG'), oppSeries('oppSog', 'Mot. SOG')]}
+              series={[ourSeries('ourSog', 'Våra skott på mål'), oppSeries('oppSog', 'Mot. skott på mål')]}
             />
             <TrendChart
-              title="SOG %"
+              title="Skott på mål %"
               data={trendData}
               xKey="label"
-              series={[ourSeries('ourSogPct', 'Vår SOG %'), oppSeries('oppSogPct', 'Mot. SOG %')]}
+              series={[ourSeries('ourSogPct', 'Vår skott på mål %'), oppSeries('oppSogPct', 'Mot. skott på mål %')]}
               domain={[0, 100]}
             />
             <TrendChart
