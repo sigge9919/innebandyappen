@@ -163,7 +163,7 @@ export function PostGamePlayerStats({
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
-                    Blk {isEditing && blkMismatch && <MismatchWarning current={totalBlk} expected={teamStats.shotsBlocked} />}
+                    Block {isEditing && blkMismatch && <MismatchWarning current={totalBlk} expected={teamStats.shotsBlocked} />}
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
@@ -178,7 +178,7 @@ export function PostGamePlayerStats({
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
                   <span className="flex items-center justify-center gap-1">
-                    PIM <Lock className="h-3 w-3" />
+                    UTV <Lock className="h-3 w-3" />
                   </span>
                 </th>
                 <th className="py-2 px-2 text-center font-medium text-muted-foreground">
@@ -308,7 +308,7 @@ export function PostGamePlayerStats({
           </table>
         </div>
         <p className="text-xs text-muted-foreground mt-3">
-          M = Mål, A = Assist, SOG = Skott på mål, Miss = Missade skott, Blk = Blockerade skott (av motståndare), Tot = Totala skott, Def = Defensiva blockeringar, UM = Utvisningsminuter, +/− = Plus/Minus (5v5)
+          M = Mål, A = Assist, SOG = Skott på mål, Miss = Missade skott, Block = Blockerade skott (av motståndare), Tot = Totala skott, Def = Defensiva blockeringar, UTV = Utvisningsminuter, +/− = Plus/Minus (5v5)
         </p>
       </div>
 
