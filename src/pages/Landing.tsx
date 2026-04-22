@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Target, Play, Share2, FolderOpen, Users, BarChart3, Check } from "lucide-react";
 import { TacticsBoardRenderer } from "@/components/playbook/TacticsBoardRenderer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const features = [
   { icon: Target, title: "Taktikbräda", desc: "Placera ut spelare, rita rörelsemönster och bygg upp komplexa formationer med drag-och-släpp-enkelhet." },
