@@ -299,7 +299,7 @@ export default function Landing() {
             to="/"
             className="inline-block px-10 py-5 bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] font-black text-sm tracking-[0.25em] uppercase rounded-md shadow-[0_0_40px_hsl(190,100%,50%,0.6)] hover:shadow-[0_0_60px_hsl(190,100%,50%,0.8)] transition-shadow"
           >
-            Skapa konto gratis
+            Skapa konto
           </Link>
         </div>
       </section>
