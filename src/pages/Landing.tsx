@@ -318,6 +318,19 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      <Dialog open={showLaunchDialog} onOpenChange={setShowLaunchDialog}>
+        <DialogContent className="bg-[hsl(215,45%,11%)] border border-[hsl(190,100%,50%)]/40 text-[hsl(210,15%,92%)] shadow-[0_0_40px_hsl(190,100%,50%,0.25)]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-[hsl(190,100%,55%)] [text-shadow:0_0_20px_hsl(190,100%,55%,0.5)]">
+              Lansering 15 juni!
+            </DialogTitle>
+            <DialogDescription className="text-base text-[hsl(210,15%,75%)] pt-2">
+              Ses då 👋
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
