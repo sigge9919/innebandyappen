@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Target, Play, Share2, FolderOpen, Users, BarChart3, Check } from "lucide-react";
 import { TacticsBoardRenderer } from "@/components/playbook/TacticsBoardRenderer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const features = [
   { icon: Target, title: "Taktikbräda", desc: "Placera ut spelare, rita rörelsemönster och bygg upp komplexa formationer med drag-och-släpp-enkelhet." },
@@ -39,12 +41,13 @@ const tiers = [
 ];
 
 export default function Landing() {
+  const [showLaunchDialog, setShowLaunchDialog] = useState(false);
   return (
     <div className="min-h-screen bg-[hsl(215,40%,8%)] text-[hsl(210,15%,92%)] font-sans overflow-x-hidden">
       {/* NAV */}
       <header className="sticky top-0 z-40 backdrop-blur-md bg-[hsl(215,40%,8%)]/80 border-b border-[hsl(190,100%,50%)]/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <Link to="/landing" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Floorball Tactix" className="h-9 w-auto" />
           </Link>
           <nav className="hidden md:flex items-center gap-10 text-xs font-bold tracking-[0.2em] uppercase text-[hsl(210,15%,75%)]">
@@ -53,12 +56,13 @@ export default function Landing() {
             <a href="#prissattning" className="hover:text-[hsl(190,100%,55%)] transition-colors">Prissättning</a>
             <a href="#kontakt" className="hover:text-[hsl(190,100%,55%)] transition-colors">Om oss</a>
           </nav>
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={() => setShowLaunchDialog(true)}
             className="px-5 py-2.5 bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] font-bold text-xs tracking-[0.15em] uppercase rounded-md shadow-[0_0_20px_hsl(190,100%,50%,0.4)] hover:shadow-[0_0_30px_hsl(190,100%,50%,0.6)] transition-shadow"
           >
             Kom igång
-          </Link>
+          </button>
         </div>
       </header>
 
@@ -88,12 +92,13 @@ export default function Landing() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/"
+            <button
+              type="button"
+              onClick={() => setShowLaunchDialog(true)}
               className="w-full sm:w-auto px-8 py-4 bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] font-bold text-sm tracking-[0.2em] uppercase rounded-md shadow-[0_0_30px_hsl(190,100%,50%,0.5)] hover:shadow-[0_0_45px_hsl(190,100%,50%,0.7)] transition-shadow"
             >
               Logga in
-            </Link>
+            </button>
             <a
               href="#sa-funkar-det"
               className="w-full sm:w-auto px-8 py-4 border border-[hsl(190,100%,50%)]/30 text-[hsl(210,15%,90%)] font-bold text-sm tracking-[0.2em] uppercase rounded-md hover:border-[hsl(190,100%,50%)]/70 transition-colors flex items-center justify-center gap-2"
@@ -261,8 +266,9 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  to="/"
+                <button
+                  type="button"
+                  onClick={() => setShowLaunchDialog(true)}
                   className={`w-full py-3.5 rounded-md text-xs font-bold tracking-[0.2em] uppercase text-center transition-all ${
                     t.highlight
                       ? "bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] shadow-[0_0_20px_hsl(190,100%,50%,0.4)] hover:shadow-[0_0_30px_hsl(190,100%,50%,0.6)]"
@@ -270,7 +276,7 @@ export default function Landing() {
                   }`}
                 >
                   {t.cta}
-                </Link>
+                </button>
               </div>
             ))}
           </div>
@@ -288,12 +294,13 @@ export default function Landing() {
             <span className="block text-white">Redo att ta</span>
             <span className="block text-[hsl(190,100%,55%)] [text-shadow:0_0_30px_hsl(190,100%,55%,0.5)]">nästa steg?</span>
           </h2>
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={() => setShowLaunchDialog(true)}
             className="inline-block px-10 py-5 bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] font-black text-sm tracking-[0.25em] uppercase rounded-md shadow-[0_0_40px_hsl(190,100%,50%,0.6)] hover:shadow-[0_0_60px_hsl(190,100%,50%,0.8)] transition-shadow"
           >
             Skapa konto
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -311,6 +318,19 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      <Dialog open={showLaunchDialog} onOpenChange={setShowLaunchDialog}>
+        <DialogContent className="bg-[hsl(215,45%,11%)] border border-[hsl(190,100%,50%)]/40 text-[hsl(210,15%,92%)] shadow-[0_0_40px_hsl(190,100%,50%,0.25)]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-[hsl(190,100%,55%)] [text-shadow:0_0_20px_hsl(190,100%,55%,0.5)]">
+              Lansering 15 juni!
+            </DialogTitle>
+            <DialogDescription className="text-base text-[hsl(210,15%,75%)] pt-2">
+              Ses då 👋
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
