@@ -20,7 +20,7 @@ const tiers = [
   {
     name: "Pro",
     tagline: "För seriösa lag",
-    price: "149",
+    price: "---",
     suffix: "kr / mån",
     features: ["Obegränsade taktiker", "Animationer", "Lagets delning", "Prioriterad support"],
     cta: "Köp Pro",
