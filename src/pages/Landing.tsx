@@ -29,7 +29,7 @@ const tiers = [
   {
     name: "Klubb",
     tagline: "För hela klubben",
-    price: "499",
+    price: "---",
     suffix: "kr / mån",
     features: ["Allt i Pro", "Obegränsade lag", "Admin-panel", "Matchanalys"],
     cta: "Kontakta oss",
