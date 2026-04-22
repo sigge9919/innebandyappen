@@ -47,7 +47,7 @@ export default function Landing() {
       {/* NAV */}
       <header className="sticky top-0 z-40 backdrop-blur-md bg-[hsl(215,40%,8%)]/80 border-b border-[hsl(190,100%,50%)]/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <Link to="/landing" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Floorball Tactix" className="h-9 w-auto" />
           </Link>
           <nav className="hidden md:flex items-center gap-10 text-xs font-bold tracking-[0.2em] uppercase text-[hsl(210,15%,75%)]">
