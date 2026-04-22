@@ -18,15 +18,6 @@ const steps = [
 
 const tiers = [
   {
-    name: "Gratis",
-    tagline: "För den nyfikna tränaren",
-    price: "0",
-    suffix: "/ mån",
-    features: ["5 taktiker", "Grundläggande bräda", "Export som bild"],
-    cta: "Kom igång",
-    highlight: false,
-  },
-  {
     name: "Pro",
     tagline: "För seriösa lag",
     price: "149",
@@ -248,7 +239,7 @@ export default function Landing() {
             <p className="text-[hsl(210,15%,65%)]">Börja gratis, uppgradera när du är redo.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {tiers.map((t) => (
               <div
                 key={t.name}
