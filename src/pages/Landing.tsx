@@ -190,29 +190,29 @@ export default function Landing() {
           </div>
 
           <div className="rounded-2xl border border-[hsl(190,100%,50%)]/20 bg-[hsl(215,45%,9%)] p-6 shadow-[0_0_50px_hsl(190,100%,50%,0.1)]">
-            <div className="aspect-[16/10] rounded-lg bg-[hsl(215,45%,5%)] border border-[hsl(190,100%,50%)]/15 relative overflow-hidden mb-5 p-3">
-              <div className="absolute inset-3 rounded-[32px] border-2 border-[hsl(190,100%,50%)]/40 bg-[hsl(215,45%,8%)]">
-                <div className="absolute inset-y-0 left-1/2 w-px bg-[hsl(190,100%,55%)]/70" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full border border-[hsl(190,100%,55%)]/70" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[hsl(190,100%,55%)]" />
-                <div className="absolute top-1/2 left-[6%] -translate-y-1/2 w-[10%] h-[55%] border border-[hsl(190,100%,55%)]/70" />
-                <div className="absolute top-1/2 right-[6%] -translate-y-1/2 w-[10%] h-[55%] border border-[hsl(190,100%,55%)]/70" />
-              </div>
-              {[
-                { n: 1, top: "30%", left: "44%" },
-                { n: 3, top: "42%", left: "50%" },
-                { n: 5, top: "55%", left: "54%" },
-                { n: 4, top: "62%", left: "48%" },
-                { n: 2, top: "72%", left: "42%" },
-              ].map((p) => (
-                <div
-                  key={p.n}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[hsl(190,100%,55%)] text-[hsl(215,40%,8%)] text-[10px] font-bold flex items-center justify-center shadow-[0_0_10px_hsl(190,100%,55%,0.6)]"
-                  style={{ top: p.top, left: p.left }}
-                >
-                  {p.n}
-                </div>
-              ))}
+            <div
+              className="rounded-lg overflow-hidden mb-5"
+              style={{
+                ['--background' as any]: '215 45% 8%',
+                ['--muted' as any]: '215 45% 5%',
+                ['--border' as any]: '190 100% 50% / 0.4',
+                ['--primary' as any]: '190 100% 55%',
+                ['--primary-foreground' as any]: '215 40% 8%',
+                ['--destructive' as any]: '355 80% 60%',
+              } as React.CSSProperties}
+            >
+              <TacticsBoardRenderer
+                width={800}
+                height={500}
+                players={[
+                  { id: 'p1', x: 352, y: 150, team: 'home', number: '1' },
+                  { id: 'p2', x: 400, y: 210, team: 'home', number: '3' },
+                  { id: 'p3', x: 432, y: 275, team: 'home', number: '5' },
+                  { id: 'p4', x: 384, y: 310, team: 'home', number: '4' },
+                  { id: 'p5', x: 336, y: 360, team: 'home', number: '2' },
+                ]}
+                displayPositions={{}}
+              />
             </div>
             <div className="flex gap-2">
               <span className="px-3 py-1.5 text-xs font-semibold rounded-md bg-[hsl(190,100%,50%)]/15 text-[hsl(190,100%,60%)] border border-[hsl(190,100%,50%)]/40">Powerplay</span>
