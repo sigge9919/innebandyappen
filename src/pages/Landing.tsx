@@ -219,9 +219,14 @@ export default function Landing() {
           </div>
 
           <div className="rounded-2xl border border-[hsl(190,100%,50%)]/20 bg-[hsl(215,45%,9%)] p-6 shadow-[0_0_50px_hsl(190,100%,50%,0.1)]">
-            <div className="aspect-[16/10] rounded-lg bg-gradient-to-br from-[hsl(150,40%,18%)] to-[hsl(160,45%,12%)] border border-[hsl(190,100%,50%)]/15 relative overflow-hidden mb-5">
-              <div className="absolute inset-y-3 left-1/2 w-px bg-white/20" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-white/20" />
+            <div className="aspect-[16/10] rounded-lg bg-[hsl(215,45%,5%)] border border-[hsl(190,100%,50%)]/15 relative overflow-hidden mb-5 p-3">
+              <div className="absolute inset-3 rounded-[32px] border-2 border-[hsl(190,100%,50%)]/40 bg-[hsl(215,45%,8%)]">
+                <div className="absolute inset-y-0 left-1/2 w-px bg-[hsl(190,100%,55%)]/70" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full border border-[hsl(190,100%,55%)]/70" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[hsl(190,100%,55%)]" />
+                <div className="absolute top-1/2 left-[6%] -translate-y-1/2 w-[10%] h-[55%] border border-[hsl(190,100%,55%)]/70" />
+                <div className="absolute top-1/2 right-[6%] -translate-y-1/2 w-[10%] h-[55%] border border-[hsl(190,100%,55%)]/70" />
+              </div>
               {[
                 { n: 1, top: "30%", left: "44%" },
                 { n: 3, top: "42%", left: "50%" },
