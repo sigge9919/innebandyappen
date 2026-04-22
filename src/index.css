@@ -168,3 +168,18 @@
     @apply p-4 lg:p-6 max-w-7xl mx-auto;
   }
 }
+
+@layer utilities {
+  .bg-grid-cyan {
+    background-image:
+      linear-gradient(hsl(190 100% 50% / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(190 100% 50% / 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .glow-cyan {
+    box-shadow: 0 0 24px hsl(190 100% 50% / 0.45), 0 0 64px hsl(190 100% 50% / 0.2);
+  }
+  .text-glow-cyan {
+    text-shadow: 0 0 18px hsl(190 100% 50% / 0.6), 0 0 36px hsl(190 100% 50% / 0.35);
+  }
+}
