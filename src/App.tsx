@@ -25,6 +25,7 @@ import PlayerPortal from "./pages/PlayerPortal";
 import NotFound from "./pages/NotFound";
 import RPETrends from "./pages/RPETrends";
 import ResetPassword from "./pages/ResetPassword";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/landing" element={<Landing />} />
             <Route path="*" element={
               <TeamProvider>
                 <AppGuard>

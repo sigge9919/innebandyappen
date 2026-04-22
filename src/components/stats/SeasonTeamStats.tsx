@@ -116,12 +116,12 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
                 <TableHead>Lag</TableHead>
                 <TableHead className="text-center">GP</TableHead>
                 <TableHead className="text-center">G</TableHead>
-                <TableHead className="text-center">SOG</TableHead>
+                <TableHead className="text-center">Skott på mål</TableHead>
                 <TableHead className="text-center">Miss</TableHead>
-                <TableHead className="text-center">Blk</TableHead>
+                <TableHead className="text-center">Block</TableHead>
                 <TableHead className="text-center">Total</TableHead>
-                <TableHead className="text-center">SOG%</TableHead>
-                <TableHead className="text-center">Blk%</TableHead>
+                <TableHead className="text-center">Skott på mål %</TableHead>
+                <TableHead className="text-center">Block%</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -157,11 +157,11 @@ export function SeasonTeamStats({ games }: SeasonTeamStatsProps) {
                     <TableRow>
                       <TableHead>Lag</TableHead>
                       <TableHead className="text-center">G</TableHead>
-                      <TableHead className="text-center">SOG</TableHead>
+                      <TableHead className="text-center">Skott på mål</TableHead>
                       <TableHead className="text-center">Miss</TableHead>
-                      <TableHead className="text-center">Blk</TableHead>
+                      <TableHead className="text-center">Block</TableHead>
                       <TableHead className="text-center">Total</TableHead>
-                      <TableHead className="text-center">SOG%</TableHead>
+                      <TableHead className="text-center">Skott på mål %</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

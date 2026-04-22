@@ -54,12 +54,12 @@ export function SeasonPlayerStats({ games, players }: SeasonPlayerStatsProps) {
                 <TableHead className="text-center">A</TableHead>
                 <TableHead className="text-center">P</TableHead>
                 <TableHead className="text-center">+/-</TableHead>
-                <TableHead className="text-center">PIM</TableHead>
-                <TableHead className="text-center">SOG</TableHead>
+                <TableHead className="text-center">UTV</TableHead>
+                <TableHead className="text-center">Skott på mål</TableHead>
                 <TableHead className="text-center">Miss</TableHead>
-                <TableHead className="text-center">Blk</TableHead>
-                <TableHead className="text-center">SOG%</TableHead>
-                <TableHead className="text-center">Blk%</TableHead>
+                <TableHead className="text-center">Block</TableHead>
+                <TableHead className="text-center">Skott på mål %</TableHead>
+                <TableHead className="text-center">Block%</TableHead>
                 <TableHead className="text-center">Def</TableHead>
               </TableRow>
             </TableHeader>

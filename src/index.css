@@ -50,6 +50,8 @@
     --sidebar-accent-foreground: 210 10% 80%;
     --sidebar-border: 215 30% 16%;
     --sidebar-ring: 190 100% 50%;
+
+    --chart-opponent: 12 80% 60%;
   }
 
   .dark {
@@ -95,6 +97,8 @@
     --sidebar-accent-foreground: 210 10% 80%;
     --sidebar-border: 215 30% 14%;
     --sidebar-ring: 190 100% 55%;
+
+    --chart-opponent: 12 85% 65%;
   }
 }
 
