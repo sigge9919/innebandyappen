@@ -38,12 +38,12 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Landing />} />
             <Route path="*" element={
               <TeamProvider>
                 <AppGuard>
                   <Routes>
-                    <Route path="/" element={<Index />} />
+                    <Route path="/login" element={<Index />} />
                     <Route path="/team" element={<Team />} />
                     <Route path="/team/:playerId" element={<PlayerDetail />} />
                     <Route path="/games" element={<Games />} />
