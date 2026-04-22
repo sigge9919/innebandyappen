@@ -23,7 +23,7 @@ const tiers = [
     price: "149",
     suffix: "kr / mån",
     features: ["Obegränsade taktiker", "Animationer", "Lagets delning", "Prioriterad support"],
-    cta: "Testa 14 dagar gratis",
+    cta: "Köp Pro",
     highlight: true,
   },
   {
