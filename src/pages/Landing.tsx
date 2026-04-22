@@ -18,15 +18,6 @@ const steps = [
 
 const tiers = [
   {
-    name: "Gratis",
-    tagline: "För den nyfikna tränaren",
-    price: "0",
-    suffix: "/ mån",
-    features: ["5 taktiker", "Grundläggande bräda", "Export som bild"],
-    cta: "Kom igång",
-    highlight: false,
-  },
-  {
     name: "Pro",
     tagline: "För seriösa lag",
     price: "149",
