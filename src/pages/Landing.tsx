@@ -92,12 +92,13 @@ export default function Landing() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/"
+            <button
+              type="button"
+              onClick={() => setShowLaunchDialog(true)}
               className="w-full sm:w-auto px-8 py-4 bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] font-bold text-sm tracking-[0.2em] uppercase rounded-md shadow-[0_0_30px_hsl(190,100%,50%,0.5)] hover:shadow-[0_0_45px_hsl(190,100%,50%,0.7)] transition-shadow"
             >
               Logga in
-            </Link>
+            </button>
             <a
               href="#sa-funkar-det"
               className="w-full sm:w-auto px-8 py-4 border border-[hsl(190,100%,50%)]/30 text-[hsl(210,15%,90%)] font-bold text-sm tracking-[0.2em] uppercase rounded-md hover:border-[hsl(190,100%,50%)]/70 transition-colors flex items-center justify-center gap-2"
