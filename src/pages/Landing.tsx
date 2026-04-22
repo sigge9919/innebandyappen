@@ -266,8 +266,9 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  to="/"
+                <button
+                  type="button"
+                  onClick={() => setShowLaunchDialog(true)}
                   className={`w-full py-3.5 rounded-md text-xs font-bold tracking-[0.2em] uppercase text-center transition-all ${
                     t.highlight
                       ? "bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] shadow-[0_0_20px_hsl(190,100%,50%,0.4)] hover:shadow-[0_0_30px_hsl(190,100%,50%,0.6)]"
@@ -275,7 +276,7 @@ export default function Landing() {
                   }`}
                 >
                   {t.cta}
-                </Link>
+                </button>
               </div>
             ))}
           </div>
