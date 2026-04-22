@@ -41,6 +41,7 @@ const tiers = [
 ];
 
 export default function Landing() {
+  const [showLaunchDialog, setShowLaunchDialog] = useState(false);
   return (
     <div className="min-h-screen bg-[hsl(215,40%,8%)] text-[hsl(210,15%,92%)] font-sans overflow-x-hidden">
       {/* NAV */}
