@@ -23,7 +23,7 @@ const steps = [
 const tiers = [
   {
     name: "Pro",
-    tagline: "För seriösa lag",
+    tagline: "För enskilda lag",
     price: "---",
     suffix: "kr / mån",
     features: ["Obegränsade taktiker", "Animationer", "Lagets delning", "Prioriterad support"],
