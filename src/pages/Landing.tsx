@@ -75,6 +75,11 @@ export default function Landing() {
         }}
       >
         <div className="max-w-5xl mx-auto text-center">
+          <div className="mb-6">
+            <span className="inline-block text-3xl md:text-5xl font-black tracking-tight text-[hsl(190,100%,55%)] [text-shadow:0_0_40px_hsl(190,100%,55%,0.5)]">
+              LANSERING 15 JUNI
+            </span>
+          </div>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[hsl(190,100%,50%)]/40 text-[hsl(190,100%,55%)] text-[11px] font-bold tracking-[0.2em] uppercase mb-10">
             <span className="w-1.5 h-1.5 rounded-full bg-[hsl(190,100%,55%)] shadow-[0_0_8px_hsl(190,100%,55%)]" />
             Digital taktikplattform för innebandy
