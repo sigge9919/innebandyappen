@@ -1,43 +1,53 @@
 
 
-## Plan: Minimalistisk landningssida med logotyp
+## Plan: Snyggare och mer informativa trenddiagram
 
-Ersätter den nuvarande långa scroll-landningssidan med en enkel, centrerad sida som matchar den uppladdade HTML-filen exakt.
+### Problem med nuvarande lösning
+- **Visuell överbelastning**: 8 dubbla diagram + 6 enkla = 14 separata kort att skanna
+- **Standard recharts-look**: Tunna linjer, hårda gridlinjer, ingen visuell hierarki
+- **Svårt att se trend i ett ögonkast**: Linjer utan area, ingen riktningsindikator, ingen jämförelse mot snitt
+- **Ingen sammanhang**: Saknas snitt-linjer, max/min, trendpilar eller "form"-indikatorer
 
-### Designspråk (från uppladdad fil)
-- **Bakgrund**: Solid mörk navy `#0b1829` (samma som filen, full skärm)
-- **Logotyp**: Inline SVG av korsade innebandyklubbor (X-form i `#1a3a6b` mörkblå + `#00d9f5` cyan-glow) med boll i mitten (cyan ring runt mörk kärna)
-- **Text**: "FLOORBALL TACTIX" i bold sans-serif, vit (`#f0f6ff`), letter-spacing 4px, under logotypen
-- **Layout**: Allt centrerat vertikalt och horisontellt på skärmen, inga sektioner, ingen scroll
+### Föreslagen lösning — tre förbättringar i kombination
 
-### Sidstruktur (en skärm, ingen scroll)
+#### 1. Estetisk uppgradering av befintliga diagram
+- **Area + linje** istället för bara linje (gradient fill med låg opacitet) — ger volym och gör trender tydligare
+- **Mjukare grid** (dashed, lägre opacitet) och borttagna axlar utan värde
+- **Avrundade tooltips** med tema-färger (cyan/navy från logotypen)
+- **Snittlinje** (streckad referenslinje) per metric — visar direkt om senaste matchen är över/under snitt
+- **Färgharmonisering**: Använd cyan (logotypens primärfärg) för "vårt lag" istället för grönt, och en varm korall för motståndare istället för hård röd. Behåll grön/röd bara för PP/PK där det signalerar bra/dåligt
+- **Y-axel borttagen** på de flesta diagram — värdet visas i tooltip + senaste värdet som stor siffra i kortets header
 
-1. **Centrerad SVG-logotyp** — exakt SVG från uppladdad fil (korsade klubbor + boll), ca 280×280px
-2. **Wordmark** — "FLOORBALL TACTIX" under logotypen
-3. **Tagline** (ny, kort) — "Digital taktikplattform för innebandy" i ljusgrå under wordmarket
-4. **Två CTA-knappar** sida vid sida:
-   - Cyan **"Kom igång"** (primary) → `/login`
-   - Outline **"Logga in"** → `/login`
-5. **Diskret footer** längst ner — `© 2026 Floorball Tactix`
+#### 2. Ny "Sparkline-översikt" överst
+Ett kompakt rutnät (3-4 kolumner) där varje metric visas som:
+```text
+┌────────────────────────────┐
+│ SOG               ↑ +12%   │
+│ 28  ─╲╱─╱╲╱──             │  ← mini sparkline
+│ snitt 24  │  senaste 28    │
+└────────────────────────────┘
+```
+- Ger en helhetsbild på en skärm innan man dyker ner i detaljer
+- Trendpil (↑↓→) baserat på senaste 3 vs föregående 3 matcher
+- Färgad enligt riktning (cyan = bättre, korall = sämre)
+
+#### 3. Gruppering med tabs
+Istället för 14 kort i en lång lista, gruppera i tabs:
+- **Offensiv** (Mål, SOG, SOG%, Totala skott, Skott utanför)
+- **Defensiv** (Blockerade, BLK%, Defensiva blockeringar)
+- **Special teams** (PP-mål, PP SOG, PP%, PK-mål, PK SOG, PK%)
 
 ### Filer som ändras
-
-- **`src/pages/Landing.tsx`** — skrivs om från grunden till minimalistisk version
-- **Tas bort** (oanvända efter omskrivning):
-  - `src/components/landing/LandingNav.tsx`
-  - `src/components/landing/HeroBoard.tsx`
-  - `src/components/landing/FeatureCard.tsx`
-  - `src/components/landing/PricingCard.tsx`
-
-### Oförändrat
-- `src/components/guards/AppGuard.tsx` — routing-logik fungerar redan (utloggad på `/` → `<Landing />`)
-- `src/App.tsx` — `/login`-route finns redan
-- `src/index.css` — befintliga `.glow-cyan` / `.text-glow-cyan`-utilities återanvänds på CTA-knappen
+- `src/components/stats/TeamTrends.tsx` — refaktorering med sparkline-översikt, tabs, area-charts, snittlinjer
+- `src/components/stats/PlayerTrends.tsx` — samma estetiska uppgradering (area + snittlinje + nya färger)
+- Nya hjälpkomponenter:
+  - `src/components/stats/TrendSparkline.tsx` — kompakt sparkline-kort
+  - `src/components/stats/TrendChart.tsx` — återanvändbar area+linje-chart med snittlinje
 
 ### Tekniska detaljer
-- SVG inlinas direkt i komponenten (ingen extern fil) för perfekt skalning
-- `min-h-screen flex items-center justify-center` för centrering
-- Färgvärden hårdkodade till exakt match med filen (`#0b1829`, `#1a3a6b`, `#00d9f5`, `#f0f6ff`) snarare än CSS-variabler, för pixelperfekt visuell likhet med ursprungsdesignen
-- Responsiv: logotyp skalar ner på mobil, knappar staplas vertikalt under `sm`-breakpoint
-- Inga nya dependencies
+- Använder `recharts` `AreaChart` + `linearGradient` för gradient-fill
+- `ReferenceLine` för snittvärde (streckad)
+- Tab-gruppering via befintlig `Tabs`-komponent
+- Trendberäkning: snitt(senaste 3) vs snitt(föregående 3) → procent + riktning
+- Färger från CSS-variabler (`--primary` cyan) + en ny `--chart-opponent` ton
 

@@ -1,7 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useTeam } from '@/contexts/TeamContext';
 import Login from '@/pages/Login';
-import Landing from '@/pages/Landing';
 import TeamSetup from '@/pages/TeamSetup';
 import PlayerPortal from '@/pages/PlayerPortal';
 import { useLocation, Navigate } from 'react-router-dom';
@@ -23,11 +22,7 @@ export function AppGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user) {
-    // Show landing page on root for unauthenticated visitors; Login on all other paths
-    if (location.pathname === '/') return <Landing />;
-    return <Login />;
-  }
+  if (!user) return <Login />;
   if (!activeTeam && location.pathname !== '/team-setup') return <TeamSetup />;
 
   // Players get their own portal — they can't access coach pages
