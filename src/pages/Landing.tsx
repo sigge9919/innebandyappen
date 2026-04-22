@@ -106,16 +106,33 @@ export default function Landing() {
             <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-[hsl(190,100%,55%)] mb-3 text-left">
               Innebandyplan · Dra spelare för att flytta
             </div>
-            <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gradient-to-br from-[hsl(150,40%,18%)] to-[hsl(160,45%,12%)] border border-[hsl(190,100%,50%)]/15">
-              {/* center line + circle */}
-              <div className="absolute inset-y-4 left-1/2 w-px bg-white/20" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border border-white/20" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white" />
-              {/* goals */}
-              <div className="absolute top-1/2 left-6 -translate-y-1/2 w-12 h-20 border border-white/25 rounded-sm flex items-center justify-center">
-                <div className="w-4 h-10 rounded bg-[hsl(190,100%,55%)] flex items-center justify-center text-[10px] font-bold text-[hsl(215,40%,8%)] shadow-[0_0_15px_hsl(190,100%,55%,0.7)]">G</div>
+            <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-[hsl(215,45%,5%)] border border-[hsl(190,100%,50%)]/15 p-3">
+              {/* Rink playing surface with rounded corners */}
+              <div className="absolute inset-3 rounded-[40px] border-[3px] border-[hsl(190,100%,50%)]/40 bg-[hsl(215,45%,8%)]">
+                {/* center line */}
+                <div className="absolute inset-y-0 left-1/2 w-[2px] bg-[hsl(190,100%,55%)]/70" />
+                {/* center circle */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-2 border-[hsl(190,100%,55%)]/70" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[hsl(190,100%,55%)]" />
+                {/* Left crease + goal */}
+                <div className="absolute top-1/2 left-[6%] -translate-y-1/2 w-[10%] h-[55%] border-2 border-[hsl(190,100%,55%)]/70" />
+                <div className="absolute top-1/2 left-[9%] -translate-y-1/2 w-[4%] h-[28%] border-2 border-[hsl(190,100%,55%)]/70" />
+                {/* Right crease + goal */}
+                <div className="absolute top-1/2 right-[6%] -translate-y-1/2 w-[10%] h-[55%] border-2 border-[hsl(190,100%,55%)]/70" />
+                <div className="absolute top-1/2 right-[9%] -translate-y-1/2 w-[4%] h-[28%] border-2 border-[hsl(190,100%,55%)]/70" />
+                {/* Corner markers */}
+                {[
+                  { top: "8%", left: "5%" },
+                  { top: "8%", right: "5%" },
+                  { bottom: "8%", left: "5%" },
+                  { bottom: "8%", right: "5%" },
+                ].map((pos, i) => (
+                  <div key={i} className="absolute w-3 h-3" style={pos as React.CSSProperties}>
+                    <div className="absolute top-1/2 left-0 right-0 h-px bg-[hsl(190,100%,55%)]/70" />
+                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[hsl(190,100%,55%)]/70" />
+                  </div>
+                ))}
               </div>
-              <div className="absolute top-1/2 right-6 -translate-y-1/2 w-12 h-20 border border-white/25 rounded-sm" />
               {/* our players (cyan) */}
               {[
                 { n: 2, top: "20%", left: "38%" },
