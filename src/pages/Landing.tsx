@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { ArrowRight, Target, Play, Share2, FolderOpen, Users, BarChart3, Check } from "lucide-react";
 import { TacticsBoardRenderer } from "@/components/playbook/TacticsBoardRenderer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -42,6 +43,20 @@ const tiers = [
 
 export default function Landing() {
   const [showLaunchDialog, setShowLaunchDialog] = useState(false);
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[hsl(215,40%,8%)] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-[hsl(190,100%,50%)] animate-pulse" />
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <div className="min-h-screen bg-[hsl(215,40%,8%)] text-[hsl(210,15%,92%)] font-sans overflow-x-hidden">
       {/* NAV */}
