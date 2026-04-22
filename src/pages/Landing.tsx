@@ -100,7 +100,7 @@ export default function Landing() {
               to="/"
               className="w-full sm:w-auto px-8 py-4 bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] font-bold text-sm tracking-[0.2em] uppercase rounded-md shadow-[0_0_30px_hsl(190,100%,50%,0.5)] hover:shadow-[0_0_45px_hsl(190,100%,50%,0.7)] transition-shadow"
             >
-              Prova gratis
+              Logga in
             </Link>
             <a
               href="#sa-funkar-det"
