@@ -1,53 +1,63 @@
 
 
-## Plan: Snyggare och mer informativa trenddiagram
+## Plan: Landningssida för Floorball Tactix
 
-### Problem med nuvarande lösning
-- **Visuell överbelastning**: 8 dubbla diagram + 6 enkla = 14 separata kort att skanna
-- **Standard recharts-look**: Tunna linjer, hårda gridlinjer, ingen visuell hierarki
-- **Svårt att se trend i ett ögonkast**: Linjer utan area, ingen riktningsindikator, ingen jämförelse mot snitt
-- **Ingen sammanhang**: Saknas snitt-linjer, max/min, trendpilar eller "form"-indikatorer
+Bygger en publik landningssida på `/` baserat på din PDF-design. Utloggade besökare ser landningssidan; inloggade skickas direkt till dashboarden.
 
-### Föreslagen lösning — tre förbättringar i kombination
+### Designspråk (matchar PDF)
+- **Bakgrund**: Mörk navy (`#0b1829` / befintlig `--sidebar-background`) med subtilt grid-mönster (CSS bakgrundsraster)
+- **Accent**: Cyan (`--primary` 190 100% 50%) med glow-effekter på CTA-knappar och rubriker
+- **Typografi**: Stora bold rubriker (befintlig `tracking-tight`), all-caps eyebrow-labels i cyan
+- **Komponenter**: shadcn/ui Button + Card, inte ny stylekonvertering — applicerar dock landningssidans stilar via Tailwind-klasser
 
-#### 1. Estetisk uppgradering av befintliga diagram
-- **Area + linje** istället för bara linje (gradient fill med låg opacitet) — ger volym och gör trender tydligare
-- **Mjukare grid** (dashed, lägre opacitet) och borttagna axlar utan värde
-- **Avrundade tooltips** med tema-färger (cyan/navy från logotypen)
-- **Snittlinje** (streckad referenslinje) per metric — visar direkt om senaste matchen är över/under snitt
-- **Färgharmonisering**: Använd cyan (logotypens primärfärg) för "vårt lag" istället för grönt, och en varm korall för motståndare istället för hård röd. Behåll grön/röd bara för PP/PK där det signalerar bra/dåligt
-- **Y-axel borttagen** på de flesta diagram — värdet visas i tooltip + senaste värdet som stor siffra i kortets header
+### Sidstruktur (en lång scroll-sida)
 
-#### 2. Ny "Sparkline-översikt" överst
-Ett kompakt rutnät (3-4 kolumner) där varje metric visas som:
-```text
-┌────────────────────────────┐
-│ SOG               ↑ +12%   │
-│ 28  ─╲╱─╱╲╱──             │  ← mini sparkline
-│ snitt 24  │  senaste 28    │
-└────────────────────────────┘
-```
-- Ger en helhetsbild på en skärm innan man dyker ner i detaljer
-- Trendpil (↑↓→) baserat på senaste 3 vs föregående 3 matcher
-- Färgad enligt riktning (cyan = bättre, korall = sämre)
+1. **Topbar** — Logo (`/logo.png`) vänster, navlinks (Funktioner, Så funkar det, Prissättning), "Logga in"-knapp + cyan "Kom igång"-CTA höger. Mobilmeny via Sheet.
 
-#### 3. Gruppering med tabs
-Istället för 14 kort i en lång lista, gruppera i tabs:
-- **Offensiv** (Mål, SOG, SOG%, Totala skott, Skott utanför)
-- **Defensiv** (Blockerade, BLK%, Defensiva blockeringar)
-- **Special teams** (PP-mål, PP SOG, PP%, PK-mål, PK SOG, PK%)
+2. **Hero** — Eyebrow-pill "DIGITAL TAKTIKPLATTFORM FÖR INNEBANDY", H1 "Träna smartare / VINN MER" (andra raden i cyan med glow), undertext, två CTA-knappar ("Prova gratis" → /login, "Se demo" → scrollar till funktioner). Under: en stor mock-up av innebandyplanen med spelarprickar (ren SVG, ingen interaktion — bara visuellt).
 
-### Filer som ändras
-- `src/components/stats/TeamTrends.tsx` — refaktorering med sparkline-översikt, tabs, area-charts, snittlinjer
-- `src/components/stats/PlayerTrends.tsx` — samma estetiska uppgradering (area + snittlinje + nya färger)
-- Nya hjälpkomponenter:
-  - `src/components/stats/TrendSparkline.tsx` — kompakt sparkline-kort
-  - `src/components/stats/TrendChart.tsx` — återanvändbar area+linje-chart med snittlinje
+3. **Funktioner** — Eyebrow "PLATTFORMEN", H2 "Allt du behöver som tränare", 6 feature-kort i 2×3 grid (Taktikbräda, Animerade spelrörelser, Dela med laget, Taktikbibliotek, Samarbete, Matchanalys) med lucide-ikoner istället för emoji.
+
+4. **Så funkar det** — 3-stegs lista (numrerade cyan-cirklar) till vänster, mock-up av taktikbrädan till höger.
+
+5. **Prissättning** — 3 kort (Gratis 0kr, Pro 149kr/mån "POPULÄRAST" med cyan border + glow, Klubb 499kr/mån). Alla CTAs leder till /login.
+
+6. **Slutgiltig CTA** — "Redo att ta nästa steg?" + stor cyan "Skapa konto gratis"-knapp.
+
+7. **Footer** — Logo, copyright, länkar (Integritetspolicy, Villkor, Kontakt — placeholder-ankare).
+
+### Routing (krav: landningssida bara för utloggade)
+
+I `App.tsx`:
+- Ny publik route `/` → `<Landing />` (utan TeamProvider/AppGuard)
+- Om inloggad användare hamnar på `/`, redirect till `/app`
+- Flytta hela appen bakom `/app/*` eller behåll nuvarande paths men lägg landningssidan som villkorlig render
+
+**Vald approach** (minst risk för befintliga länkar): Behåll alla appens routes som idag (`/team`, `/games`, etc.). Endast `/` ändras:
+- Utloggad på `/` → Landningssida
+- Inloggad på `/` → Dashboard (som idag)
+- Allt annat (`/team`, `/games`, …) → AppGuard kräver inloggning som idag
+
+`AppGuard` ändras: om `!user && location.pathname === '/'` → render `<Landing />` istället för `<Login />`. `<Login />` flyttas till egen route `/login` som landningssidans CTA-knappar pekar på.
+
+### Filer som skapas/ändras
+
+**Nya:**
+- `src/pages/Landing.tsx` — hela landningssidan
+- `src/components/landing/LandingNav.tsx` — top-nav med mobilmeny
+- `src/components/landing/HeroBoard.tsx` — SVG-mockup av innebandyplanen
+- `src/components/landing/FeatureCard.tsx`
+- `src/components/landing/PricingCard.tsx`
+
+**Ändras:**
+- `src/App.tsx` — lägg till `/login`-route, montera Landing
+- `src/components/guards/AppGuard.tsx` — render Landing istället för Login när utloggad på `/`
+- `src/index.css` — lägg till grid-bakgrundsklass + cyan glow-utility
 
 ### Tekniska detaljer
-- Använder `recharts` `AreaChart` + `linearGradient` för gradient-fill
-- `ReferenceLine` för snittvärde (streckad)
-- Tab-gruppering via befintlig `Tabs`-komponent
-- Trendberäkning: snitt(senaste 3) vs snitt(föregående 3) → procent + riktning
-- Färger från CSS-variabler (`--primary` cyan) + en ny `--chart-opponent` ton
+- Landningssidan använder samma `BrowserRouter` + `AuthProvider` så vi kan kolla `user`-status
+- Inga databasändringar
+- Inga nya dependencies — använder befintliga shadcn/ui + lucide-react ikoner
+- SVG-illustrationer av planen byggs inline (inte bilder från PDF) så de skalar perfekt
+- Responsiv: 2-kolumnsgrid blir 1 kolumn under `md`, mobilmeny via `Sheet` under `lg`
 
