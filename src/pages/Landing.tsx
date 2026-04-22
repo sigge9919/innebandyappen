@@ -107,63 +107,33 @@ export default function Landing() {
             <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-[hsl(190,100%,55%)] mb-3 text-left">
               Innebandyplan · Dra spelare för att flytta
             </div>
-            <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-[hsl(215,45%,5%)] border border-[hsl(190,100%,50%)]/15 p-3">
-              {/* Rink playing surface with rounded corners */}
-              <div className="absolute inset-3 rounded-[40px] border-[3px] border-[hsl(190,100%,50%)]/40 bg-[hsl(215,45%,8%)]">
-                {/* center line */}
-                <div className="absolute inset-y-0 left-1/2 w-[2px] bg-[hsl(190,100%,55%)]/70" />
-                {/* center circle */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-2 border-[hsl(190,100%,55%)]/70" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[hsl(190,100%,55%)]" />
-                {/* Left crease + goal */}
-                <div className="absolute top-1/2 left-[6%] -translate-y-1/2 w-[10%] h-[55%] border-2 border-[hsl(190,100%,55%)]/70" />
-                <div className="absolute top-1/2 left-[9%] -translate-y-1/2 w-[4%] h-[28%] border-2 border-[hsl(190,100%,55%)]/70" />
-                {/* Right crease + goal */}
-                <div className="absolute top-1/2 right-[6%] -translate-y-1/2 w-[10%] h-[55%] border-2 border-[hsl(190,100%,55%)]/70" />
-                <div className="absolute top-1/2 right-[9%] -translate-y-1/2 w-[4%] h-[28%] border-2 border-[hsl(190,100%,55%)]/70" />
-                {/* Corner markers */}
-                {[
-                  { top: "8%", left: "5%" },
-                  { top: "8%", right: "5%" },
-                  { bottom: "8%", left: "5%" },
-                  { bottom: "8%", right: "5%" },
-                ].map((pos, i) => (
-                  <div key={i} className="absolute w-3 h-3" style={pos as React.CSSProperties}>
-                    <div className="absolute top-1/2 left-0 right-0 h-px bg-[hsl(190,100%,55%)]/70" />
-                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[hsl(190,100%,55%)]/70" />
-                  </div>
-                ))}
-              </div>
-              {/* our players (cyan) */}
-              {[
-                { n: 2, top: "20%", left: "38%" },
-                { n: 4, top: "38%", left: "44%" },
-                { n: 6, top: "50%", left: "48%" },
-                { n: 5, top: "62%", left: "44%" },
-                { n: 3, top: "78%", left: "38%" },
-              ].map((p) => (
-                <div
-                  key={p.n}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 md:w-9 md:h-9 rounded-full bg-[hsl(190,100%,55%)] text-[hsl(215,40%,8%)] text-xs font-bold flex items-center justify-center shadow-[0_0_15px_hsl(190,100%,55%,0.7)]"
-                  style={{ top: p.top, left: p.left }}
-                >
-                  {p.n}
-                </div>
-              ))}
-              {/* opponents (red) */}
-              {[
-                { n: 8, top: "28%", left: "62%" },
-                { n: 7, top: "50%", left: "58%" },
-                { n: 9, top: "70%", left: "62%" },
-              ].map((p) => (
-                <div
-                  key={p.n}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 md:w-9 md:h-9 rounded-full bg-[hsl(355,80%,60%)] text-white text-xs font-bold flex items-center justify-center shadow-[0_0_12px_hsl(355,80%,60%,0.6)]"
-                  style={{ top: p.top, left: p.left }}
-                >
-                  {p.n}
-                </div>
-              ))}
+            <div
+              className="rounded-xl overflow-hidden"
+              style={{
+                ['--background' as any]: '215 45% 8%',
+                ['--muted' as any]: '215 45% 5%',
+                ['--border' as any]: '190 100% 50% / 0.4',
+                ['--primary' as any]: '190 100% 55%',
+                ['--primary-foreground' as any]: '215 40% 8%',
+                ['--destructive' as any]: '355 80% 60%',
+              } as React.CSSProperties}
+            >
+              <TacticsBoardRenderer
+                width={800}
+                height={500}
+                players={[
+                  { id: 'h1', x: 304, y: 100, team: 'home', number: '2' },
+                  { id: 'h2', x: 352, y: 190, team: 'home', number: '4' },
+                  { id: 'h3', x: 384, y: 250, team: 'home', number: '6' },
+                  { id: 'h4', x: 352, y: 310, team: 'home', number: '5' },
+                  { id: 'h5', x: 304, y: 390, team: 'home', number: '3' },
+                  { id: 'a1', x: 496, y: 140, team: 'away', number: '8' },
+                  { id: 'a2', x: 464, y: 250, team: 'away', number: '7' },
+                  { id: 'a3', x: 496, y: 350, team: 'away', number: '9' },
+                  { id: 'b', x: 400, y: 250, team: 'ball' },
+                ]}
+                displayPositions={{}}
+              />
             </div>
           </div>
         </div>
