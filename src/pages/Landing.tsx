@@ -239,7 +239,7 @@ export default function Landing() {
             <p className="text-[hsl(210,15%,65%)]">Börja gratis, uppgradera när du är redo.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {tiers.map((t) => (
               <div
                 key={t.name}
