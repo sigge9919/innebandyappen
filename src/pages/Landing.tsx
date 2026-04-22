@@ -56,12 +56,13 @@ export default function Landing() {
             <a href="#prissattning" className="hover:text-[hsl(190,100%,55%)] transition-colors">Prissättning</a>
             <a href="#kontakt" className="hover:text-[hsl(190,100%,55%)] transition-colors">Om oss</a>
           </nav>
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={() => setShowLaunchDialog(true)}
             className="px-5 py-2.5 bg-[hsl(190,100%,50%)] text-[hsl(215,40%,8%)] font-bold text-xs tracking-[0.15em] uppercase rounded-md shadow-[0_0_20px_hsl(190,100%,50%,0.4)] hover:shadow-[0_0_30px_hsl(190,100%,50%,0.6)] transition-shadow"
           >
             Kom igång
-          </Link>
+          </button>
         </div>
       </header>
 
