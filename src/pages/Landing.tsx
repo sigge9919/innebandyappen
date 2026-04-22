@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { ArrowRight, Target, Play, Share2, FolderOpen, Users, BarChart3, Check } from "lucide-react";
 import { TacticsBoardRenderer } from "@/components/playbook/TacticsBoardRenderer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -22,7 +23,7 @@ const steps = [
 const tiers = [
   {
     name: "Pro",
-    tagline: "För seriösa lag",
+    tagline: "För enskilda lag",
     price: "---",
     suffix: "kr / mån",
     features: ["Obegränsade taktiker", "Animationer", "Lagets delning", "Prioriterad support"],
@@ -42,12 +43,26 @@ const tiers = [
 
 export default function Landing() {
   const [showLaunchDialog, setShowLaunchDialog] = useState(false);
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[hsl(215,40%,8%)] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-[hsl(190,100%,50%)] animate-pulse" />
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <div className="min-h-screen bg-[hsl(215,40%,8%)] text-[hsl(210,15%,92%)] font-sans overflow-x-hidden">
       {/* NAV */}
       <header className="sticky top-0 z-40 backdrop-blur-md bg-[hsl(215,40%,8%)]/80 border-b border-[hsl(190,100%,50%)]/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/login" className="flex items-center gap-2">
             <img src="/logo.png" alt="Floorball Tactix" className="h-9 w-auto" />
           </Link>
           <nav className="hidden md:flex items-center gap-10 text-xs font-bold tracking-[0.2em] uppercase text-[hsl(210,15%,75%)]">
