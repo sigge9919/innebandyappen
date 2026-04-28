@@ -1,44 +1,71 @@
-## Fix half-rink visuals and force 3-up layout for 5v5
+## Mål
 
-### Problems
-1. The half-rink in `LineFormationBoard.tsx` has rounded corners on all four sides — the center line side should be **straight** (it's a cut, not a rink end).
-2. The goal/crease shape doesn't match `TacticsBoardRenderer.tsx` proportions — needs to use the same crease/goal style.
-3. On the current 1000px viewport the 3 lines stack into 2 columns (`sm:grid-cols-2 lg:grid-cols-3`, lg = 1024px). User wants all 3 side-by-side always.
+Anpassa det visuella uttrycket på sidan **Översikt** (`/`) och dess **sidomeny** så att det matchar den bifogade referensbilden. Inga texter, etiketter, namn, navigation eller logik ändras — endast färger, ytor, kortstil, typografi och layout.
 
-### Changes — `src/components/lines/LineFormationBoard.tsx`
+## Visuella förändringar (referens → app)
 
-**Layout grid**
-- Replace responsive grid with always-3-columns when `lineCount === 3`: `grid-cols-3` (no responsive breakpoints). Reduce gap to `gap-2` so they fit on narrower screens. Each board scales down via `w-full`.
+Referensen visar:
+- Mörk djupblå bakgrund (nästan svart-navy) över hela appen, även huvudytan (inte bara sidebar).
+- Subtil cyan/turkos linjekonst-grafik som dekorativ bakgrund i hörn (logotypens X-mönster).
+- Sidebar utan synlig kant — flyter ihop med bakgrunden, aktiv post markerad med cyan-text + cyan vänsterstreck istället för ljusare ruta.
+- Stora rubriker i vit, fet, generös typografi ("Dashboard"-stil).
+- Korten är mörka paneler (något ljusare än bakgrunden), **rundade hörn** (~12 px), mjuk inre cyan glow/border, ingen hård linje.
+- Metriker visas stort i cyan, etiketter i ljusgrå/dimmad vit.
+- Små cyan ikoner i kortets övre högra hörn.
+- Tunna cyan-streck och bars i sparklines/diagram (redan i appens chart-färg).
 
-**SVG half-rink redraw**
-- Replace the single `<rect rx={cornerRadius}>` with a `<path>` that has rounded corners only at the **top** (goal end) and **straight square corners** at the **bottom** (center-line cut). Path outline:
-  ```
-  M padding,(H-padding)                 // bottom-left, square
-  L padding,(padding+R)                 // up left side
-  Q padding,padding  (padding+R),padding   // top-left rounded
-  L (W-padding-R),padding               // top edge
-  Q (W-padding),padding (W-padding),(padding+R)  // top-right rounded
-  L (W-padding),(H-padding)             // down right side
-  Z                                     // close along bottom (straight)
-  ```
-- Background `<rect>` for muted area stays full-size; the rink fill uses the path above.
+## Förändringsplan (filvis)
 
-**Goal & crease — match TacticsBoardRenderer style**
-The tactics board uses (for a horizontal end): crease 70×120, goal 25×60, goalInset 40, plus the goal sits **inside** the crease offset by 15. Translate to a rotated top-end on a `220×320` board with proportional scaling (~factor 0.35):
-- Crease: width 90, height 36, positioned `x = W/2 - 45`, `y = padding + 14` (inset from top edge, matching tactics board's goalInset proportion)
-- Goal: width 32, height 12, positioned `x = W/2 - 16`, `y = padding + 14 + 8` (offset inside crease, like tactics board)
-- Both stroked with `hsl(var(--primary))`, no fill — matching tactics board.
+### 1. `src/index.css` — färgtema (light mode)
+Ändra `:root`-blocket så att light mode efterliknar dark mode-nivåerna i referensen (dvs hela appen blir mörk för inloggade användare — referensen är genomgående mörk):
+- `--background`: djup navy, t.ex. `215 45% 7%`
+- `--foreground`: nära vit `210 20% 95%`
+- `--card`: något ljusare panel `215 35% 12%`
+- `--card-foreground`: `210 20% 95%`
+- `--border`: subtilt cyan-tonad `190 40% 20% / låg opacitet via separat klass`
+- `--muted-foreground`: `215 15% 60%`
+- `--primary`: behålls (cyan `190 100% 50%`)
+- `--radius`: höjs från `0.25rem` till `0.75rem` för rundade kort
 
-**Center line & half center circle (bottom)**
-- Keep red center line at `y = H - padding`.
-- Half center circle radius 50 scaled to ~22, opens upward into the half (already correct, just adjust radius for new proportions).
+Lägg till nya utility-klasser i `@layer components`:
+- `.glow-card` — `bg-card rounded-xl border border-primary/15 shadow-[0_0_0_1px_hsl(var(--primary)/0.08),0_8px_32px_-12px_hsl(var(--primary)/0.25)] p-4`
+- `.dashboard-bg` — bakgrundslagret med två dekorativa SVG/gradient-pseudoelement i hörnen (cyan X-mönster, väldigt låg opacitet)
+- Uppdatera `.stat-card` så den ärver `glow-card`-utseendet (rundad, mjuk cyan-kant, ingen hård linje).
+- Uppdatera `.metric-value` — större (`text-3xl`), tabular, primary-färg på hero-värden.
+- Uppdatera `.nav-item-active` — transparent bg, cyan textfärg, behåll cyan vänsterstreck.
 
-**Slot button sizing**
-- Since boards are now narrower (3 across in 1000px ≈ ~310px each minus gaps), reduce slot button to `h-8 w-8 text-[10px]` and player name label to `max-w-[60px]` to avoid overlap.
+### 2. `src/components/layout/AppSidebar.tsx`
+- Ta bort höger-bordern på `<aside>` (eller gör den helt transparent) så sidebar smälter in.
+- Behåll logotyp + team-switcher + nav exakt som idag (texter oförändrade).
+- Lite mer luft i `nav-item` (py-2.5, gap-3).
+- Gör aktiv ikon cyan (ärvs via `nav-item-active`).
 
-### Files
-- Modified: `src/components/lines/LineFormationBoard.tsx`
+### 3. `src/components/layout/AppLayout.tsx`
+- Lägg `dashboard-bg` på `<main>`-elementet så de dekorativa hörnmönstren visas.
 
-### Out of scope
-- No DB / type changes.
-- No changes to slot coordinates (`src/types/lineLayout.ts`) — current x/y percentages still work on the redrawn board.
+### 4. `src/pages/Dashboard.tsx`
+- Byt rubrikstil: `<h1>` blir `text-3xl font-bold` (kvar: "Översikt", säsongstext oförändrad).
+- Stats-raden: ta bort `gap-px bg-border` och hård border. Ersätt med `grid gap-3` där varje `StatCard` är ett rundat glow-kort.
+- Behåll alla 4 stat-kort, "Priority row" (4 kort) och "Secondary row" (3 kort) — samma komponenter, samma data, oförändrad ordning och oförändrade texter.
+
+### 5. `src/components/dashboard/StatCard.tsx`
+- Lägg till valfri ikon uppe till höger (cyan, opacitet 70 %) — använder den redan deklarerade men oanvända `icon`-propen. Dashboard skickar redan in ikon-namn implicit; om inte sätts, skippas den. Inga API-ändringar utåt.
+- Värdet i `text-3xl text-primary font-bold`.
+- Etikett i `text-[11px] uppercase tracking-wider text-muted-foreground`.
+
+### 6. Övriga dashboard-kort
+`NextGameCard`, `LastGameCard`, `NextTrainingCard`, `WeeklyFocusCard`, `TeamRPECard`, `RPEAlertsCard`, `PlayerAlerts`:
+- Byt yttersta `<div className="stat-card">` så de får det nya rundade glow-utseendet automatiskt via uppdaterad `.stat-card`-stil. Inga props eller texter ändras.
+- `RPEAlertsCard` & `TeamRPECard` använder `<Card>` från `ui/card` — `Card`-komponenten ärver `--radius` och får automatiskt rundade hörn när radie höjs.
+- Mindre justering: säkerställ att rubriker (`metric-label`) och knappar fortsatt är läsbara mot mörkare bakgrund (tester via befintliga tokens).
+
+## Vad som INTE ändras
+
+- Inga sidnamn, menyetiketter, knapptexter, kortrubriker eller datavärden.
+- Ingen routing, hooks, state, datakällor, RLS, edge-funktioner.
+- Inga andra sidor än Översikt + delad sidebar/layout (övriga sidor använder samma tokens och får automatiskt det nya temat — det är önskat då temat är globalt, men ingen layout på andra sidor justeras strukturellt).
+- Ingen ny databas, inga nya tabeller eller kolumner.
+
+## Resultat
+
+Användaren loggar in och möts av en mörk dashboard med rundade glow-kort, cyan accentfärg, stor rubrik och dekorativ X-mönsterbakgrund i hörnen — visuellt likt referensbilden, men med samma innehåll, samma struktur och samma logik som idag.
