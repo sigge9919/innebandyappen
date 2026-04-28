@@ -160,10 +160,7 @@ export function AppSidebar() {
 
       {/* Mobile Header & Sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-sidebar border-b border-sidebar-border">
-        <div className="flex items-center justify-between px-4 h-12">
-          <span className="text-sm font-semibold text-sidebar-foreground">
-            {activeTeam?.name ?? 'Floorball Tactix'}
-          </span>
+        <div className="flex items-center gap-2 px-4 h-12">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-sidebar-foreground h-8 w-8">
@@ -174,6 +171,9 @@ export function AppSidebar() {
               <SidebarContent onItemClick={() => setMobileOpen(false)} />
             </SheetContent>
           </Sheet>
+          <span className="text-sm font-semibold text-sidebar-foreground truncate">
+            {activeTeam?.name ?? 'Floorball Tactix'}
+          </span>
         </div>
       </div>
     </>
