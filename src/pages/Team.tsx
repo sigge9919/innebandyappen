@@ -6,16 +6,25 @@ import { PlayerFormDialog } from '@/components/forms/PlayerFormDialog';
 import { usePlayers } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Search, Users, AlertTriangle, Target, Archive } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Player } from '@/types';
 
 type FilterType = 'all' | 'active' | 'injured' | 'focus' | 'archived';
+type SortType = 'number' | 'name' | 'position';
+
+const POSITION_RANK: Record<string, number> = {
+  Goalkeeper: 0,
+  Defender: 1,
+  Forward: 2,
+};
 
 export default function Team() {
   const navigate = useNavigate();
   const { players, addPlayer, updatePlayer, deletePlayer } = usePlayers();
   const [filter, setFilter] = useState<FilterType>('all');
+  const [sort, setSort] = useState<SortType>('number');
   const [search, setSearch] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -36,6 +45,19 @@ export default function Team() {
       default:
         return matchesSearch && player.status !== 'Archived';
     }
+  });
+
+  const sortedPlayers = [...filteredPlayers].sort((a, b) => {
+    if (sort === 'name') {
+      return a.name.localeCompare(b.name, 'sv');
+    }
+    if (sort === 'position') {
+      const ra = POSITION_RANK[a.positions?.[0] ?? (a as any).position ?? 'Forward'] ?? 99;
+      const rb = POSITION_RANK[b.positions?.[0] ?? (b as any).position ?? 'Forward'] ?? 99;
+      if (ra !== rb) return ra - rb;
+      return (a.jerseyNumber ?? 0) - (b.jerseyNumber ?? 0);
+    }
+    return (a.jerseyNumber ?? 0) - (b.jerseyNumber ?? 0);
   });
 
   const archivedCount = players.filter(p => p.status === 'Archived').length;
@@ -113,11 +135,21 @@ export default function Team() {
               </Button>
             ))}
           </div>
+          <Select value={sort} onValueChange={(v) => setSort(v as SortType)}>
+            <SelectTrigger className="h-9 w-[160px]">
+              <SelectValue placeholder="Sortera" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="number">Nummer</SelectItem>
+              <SelectItem value="name">Namn (A–Ö)</SelectItem>
+              <SelectItem value="position">Position</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Player List */}
         <div className="grid gap-4 md:grid-cols-2">
-          {filteredPlayers.map(player => (
+          {sortedPlayers.map(player => (
             <PlayerCard 
               key={player.id} 
               player={player} 
@@ -126,7 +158,7 @@ export default function Team() {
           ))}
         </div>
 
-        {filteredPlayers.length === 0 && (
+        {sortedPlayers.length === 0 && (
           <div className="text-center py-12">
             <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground">Inga spelare hittades</p>
