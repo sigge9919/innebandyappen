@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Player } from '@/types';
-import { LineSlot, LineLayoutType } from '@/types/lineLayout';
+import { LineSlot, LineLayoutType, getLineCount } from '@/types/lineLayout';
 import {
   Popover,
   PopoverContent,
@@ -14,7 +14,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Button } from '@/components/ui/button';
 import { cn, getGameDisplayName } from '@/lib/utils';
 import { X } from 'lucide-react';
 
@@ -23,16 +22,13 @@ interface LineFormationBoardProps {
   slots: LineSlot[];
   players: Player[];
   onChange?: (slots: LineSlot[]) => void;
-  /** Read-only mode for previews. */
   readOnly?: boolean;
-  /** Aspect ratio adjustments — 5v5 board is taller (vertical rink). */
-  height?: number;
-  width?: number;
 }
 
 /**
- * Vertical floorball rink (rotated 90deg from tactics board).
- * Goals are at top and bottom. Slots are positioned by percent (x,y in 0-100).
+ * Renders one half-rink mini-board per line. For 5v5 this means three
+ * boards displayed side-by-side. Each board shows fixed positional slots
+ * that can be assigned a player by clicking.
  */
 export function LineFormationBoard({
   type,
@@ -40,185 +36,178 @@ export function LineFormationBoard({
   players,
   onChange,
   readOnly = false,
-  height,
-  width = 360,
 }: LineFormationBoardProps) {
-  // Vertical rink: width < height
-  const W = width;
-  const H = height ?? Math.round(W * 1.6);
-  const padding = 14;
-  const cornerRadius = 28;
-  const rinkW = W - padding * 2;
-  const rinkH = H - padding * 2;
+  const lineCount = getLineCount(type);
 
-  // Goal/crease (top + bottom)
-  const creaseW = 80;
-  const creaseH = 46;
-  const goalW = 36;
-  const goalH = 12;
-  const goalInset = 24;
+  const slotsByLine = useMemo(() => {
+    const map: Record<number, LineSlot[]> = {};
+    for (let i = 0; i < lineCount; i++) map[i] = [];
+    slots.forEach(s => {
+      const li = s.lineIndex ?? 0;
+      if (!map[li]) map[li] = [];
+      map[li].push(s);
+    });
+    return map;
+  }, [slots, lineCount]);
 
-  // For 5v5 we draw three line bands as soft horizontal stripes
-  const bands =
-    type === '5v5'
-      ? [
-          { y: 8, h: 28, label: 'Kedja 1' },
-          { y: 38, h: 24, label: 'Kedja 2' },
-          { y: 68, h: 24, label: 'Kedja 3' },
-        ]
-      : [];
-
-  const slotXY = (s: LineSlot) => ({
-    cx: padding + (s.x / 100) * rinkW,
-    cy: padding + (s.y / 100) * rinkH,
-  });
-
-  const playerById = (id?: string | null) =>
-    id ? players.find(p => p.id === id) : undefined;
-
-  const assignedIds = new Set(slots.map(s => s.playerId).filter(Boolean) as string[]);
+  const assignedIds = useMemo(
+    () => new Set(slots.map(s => s.playerId).filter(Boolean) as string[]),
+    [slots]
+  );
 
   const handleAssign = (slotId: string, playerId: string | null) => {
     if (!onChange || readOnly) return;
     const next = slots.map(s => {
       if (s.slotId === slotId) return { ...s, playerId };
-      // Prevent same player in two slots
       if (playerId && s.playerId === playerId) return { ...s, playerId: null };
       return s;
     });
     onChange(next);
   };
 
+  // Grid columns: side-by-side on wider screens, stacked on small
+  const gridCols =
+    lineCount === 1
+      ? 'grid-cols-1 max-w-xs mx-auto'
+      : lineCount === 2
+      ? 'grid-cols-1 sm:grid-cols-2'
+      : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+
   return (
-    <div className="relative w-full flex justify-center">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="w-full h-auto max-w-[420px]"
-        style={{ touchAction: 'manipulation' }}
-      >
-        {/* Outer area */}
-        <rect x={0} y={0} width={W} height={H} fill="hsl(var(--muted))" />
-        {/* Rink playing surface */}
-        <rect
-          x={padding}
-          y={padding}
-          width={rinkW}
-          height={rinkH}
-          rx={cornerRadius}
-          fill="hsl(var(--background))"
-          stroke="hsl(var(--border))"
-          strokeWidth={2}
+    <div className={cn('grid gap-4', gridCols)}>
+      {Array.from({ length: lineCount }).map((_, li) => (
+        <HalfRinkBoard
+          key={li}
+          title={lineCount > 1 ? `Kedja ${li + 1}` : ''}
+          slots={slotsByLine[li] ?? []}
+          players={players}
+          assignedIds={assignedIds}
+          readOnly={readOnly}
+          onAssign={handleAssign}
         />
-        {/* Center line (horizontal) */}
-        <line
-          x1={padding}
-          x2={padding + rinkW}
-          y1={H / 2}
-          y2={H / 2}
-          stroke="hsl(var(--primary))"
-          strokeWidth={1.5}
-          opacity={0.5}
-        />
-        {/* Center circle */}
-        <circle
-          cx={W / 2}
-          cy={H / 2}
-          r={36}
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth={1.5}
-          opacity={0.5}
-        />
-        <circle cx={W / 2} cy={H / 2} r={3} fill="hsl(var(--primary))" />
+      ))}
+    </div>
+  );
+}
 
-        {/* Top crease + goal */}
-        <rect
-          x={W / 2 - creaseW / 2}
-          y={padding + goalInset}
-          width={creaseW}
-          height={creaseH}
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth={1.5}
-        />
-        <rect
-          x={W / 2 - goalW / 2}
-          y={padding + goalInset - goalH}
-          width={goalW}
-          height={goalH}
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth={1.5}
-        />
-        {/* Bottom crease + goal */}
-        <rect
-          x={W / 2 - creaseW / 2}
-          y={H - padding - goalInset - creaseH}
-          width={creaseW}
-          height={creaseH}
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth={1.5}
-        />
-        <rect
-          x={W / 2 - goalW / 2}
-          y={H - padding - goalInset}
-          width={goalW}
-          height={goalH}
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth={1.5}
-        />
+function HalfRinkBoard({
+  title,
+  slots,
+  players,
+  assignedIds,
+  readOnly,
+  onAssign,
+}: {
+  title: string;
+  slots: LineSlot[];
+  players: Player[];
+  assignedIds: Set<string>;
+  readOnly: boolean;
+  onAssign: (slotId: string, playerId: string | null) => void;
+}) {
+  // Half-rink: vertical, narrower than tall. Goal at top, center line at bottom.
+  const W = 220;
+  const H = 320;
+  const padding = 10;
+  const cornerRadius = 28;
+  const rinkW = W - padding * 2;
+  const rinkH = H - padding * 2;
 
-        {/* 5v5 line bands */}
-        {bands.map((b, i) => (
-          <g key={i}>
-            <rect
-              x={padding + 4}
-              y={padding + (b.y / 100) * rinkH}
-              width={rinkW - 8}
-              height={(b.h / 100) * rinkH}
-              fill="hsl(var(--primary))"
-              fillOpacity={0.05}
-              rx={6}
-            />
-            <text
-              x={padding + 10}
-              y={padding + (b.y / 100) * rinkH + 12}
-              fill="hsl(var(--muted-foreground))"
-              fontSize={9}
-              fontWeight={600}
-            >
-              {b.label}
-            </text>
-          </g>
-        ))}
-      </svg>
+  // Goal area at top
+  const creaseW = 90;
+  const creaseH = 40;
+  const goalW = 40;
+  const goalH = 10;
+  const goalInset = 18;
 
-      {/* Slots overlay (HTML for accessible popovers) */}
-      <div className="absolute inset-0 pointer-events-none">
-        {slots.map(s => {
-          const { cx, cy } = slotXY(s);
-          const player = playerById(s.playerId);
-          const leftPct = (cx / W) * 100;
-          const topPct = (cy / H) * 100;
-          return (
-            <div
-              key={s.slotId}
-              className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto"
-              style={{ left: `${leftPct}%`, top: `${topPct}%` }}
-            >
-              <SlotButton
-                slot={s}
-                player={player}
-                players={players}
-                assignedIds={assignedIds}
-                readOnly={readOnly}
-                onAssign={pid => handleAssign(s.slotId, pid)}
-              />
-            </div>
-          );
-        })}
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {title && (
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          {title}
+        </div>
+      )}
+      <div className="relative w-full max-w-[260px]">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
+          {/* Outer */}
+          <rect x={0} y={0} width={W} height={H} fill="hsl(var(--muted))" />
+          {/* Rink surface */}
+          <rect
+            x={padding}
+            y={padding}
+            width={rinkW}
+            height={rinkH}
+            rx={cornerRadius}
+            fill="hsl(var(--background))"
+            stroke="hsl(var(--border))"
+            strokeWidth={2}
+          />
+          {/* Goal at top */}
+          <rect
+            x={W / 2 - goalW / 2}
+            y={padding + goalInset - goalH}
+            width={goalW}
+            height={goalH}
+            fill="none"
+            stroke="hsl(var(--primary))"
+            strokeWidth={1.5}
+          />
+          {/* Crease at top */}
+          <rect
+            x={W / 2 - creaseW / 2}
+            y={padding + goalInset}
+            width={creaseW}
+            height={creaseH}
+            fill="none"
+            stroke="hsl(var(--primary))"
+            strokeWidth={1.5}
+          />
+          {/* Center line at bottom (red) */}
+          <line
+            x1={padding}
+            x2={padding + rinkW}
+            y1={H - padding}
+            y2={H - padding}
+            stroke="hsl(var(--primary))"
+            strokeWidth={2}
+            opacity={0.7}
+          />
+          {/* Half center circle (top of bottom line, opens upward) */}
+          <path
+            d={`M ${W / 2 - 28} ${H - padding} A 28 28 0 0 1 ${W / 2 + 28} ${H - padding}`}
+            fill="none"
+            stroke="hsl(var(--primary))"
+            strokeWidth={1.5}
+            opacity={0.6}
+          />
+        </svg>
+
+        {/* Slot overlay */}
+        <div className="absolute inset-0">
+          {slots.map(s => {
+            const leftPct = ((padding + (s.x / 100) * rinkW) / W) * 100;
+            const topPct = ((padding + (s.y / 100) * rinkH) / H) * 100;
+            const player = s.playerId
+              ? players.find(p => p.id === s.playerId)
+              : undefined;
+            return (
+              <div
+                key={s.slotId}
+                className="absolute -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${leftPct}%`, top: `${topPct}%` }}
+              >
+                <SlotButton
+                  slot={s}
+                  player={player}
+                  players={players}
+                  assignedIds={assignedIds}
+                  readOnly={readOnly}
+                  onAssign={pid => onAssign(s.slotId, pid)}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -246,7 +235,6 @@ function SlotButton({
     ? 'bg-primary text-primary-foreground border-primary shadow-md'
     : 'bg-card text-muted-foreground border-dashed border-muted-foreground/50';
 
-  // Suggest players matching slot role first, but allow all
   const suggested = players
     .slice()
     .sort((a, b) => {
@@ -262,9 +250,9 @@ function SlotButton({
       disabled={readOnly}
       className={cn(
         'flex flex-col items-center justify-center rounded-full border-2 transition-all',
-        'h-10 w-10 text-[11px] font-bold',
+        'h-9 w-9 text-[11px] font-bold',
         filledClasses,
-        !readOnly && 'hover:scale-105 cursor-pointer',
+        !readOnly && 'hover:scale-110 cursor-pointer'
       )}
     >
       {filled ? `#${player.jerseyNumber}` : slot.label ?? slot.role}
@@ -329,7 +317,7 @@ function SlotButton({
         </Popover>
       )}
       {filled && (
-        <span className="text-[10px] mt-0.5 px-1 rounded bg-background/80 text-foreground max-w-[72px] truncate">
+        <span className="text-[9px] mt-0.5 px-1 rounded bg-background/90 text-foreground max-w-[70px] truncate leading-tight">
           {getGameDisplayName(player!)}
         </span>
       )}

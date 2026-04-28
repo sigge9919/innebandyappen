@@ -42,6 +42,8 @@ const LINE_TYPE_TO_LAYOUT_TYPE: Partial<Record<LineType, LineLayoutType>> = {
   '5v5': '5v5',
   PP: 'PP',
   PK: 'PK',
+  '6v5': '6v5',
+  '5v6': '5v6',
 };
 
 export function LineSetup({
