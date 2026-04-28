@@ -1,23 +1,24 @@
+## Sortera spelare i Lag-vyn
 
-## Byt rotrutt till landing och flytta appen till /login
+Lägg till möjlighet att sortera spellistan på sidan **Lag** (`src/pages/Team.tsx`) utifrån:
 
-Just nu är `/` = appen (Dashboard via `Index`) och `/landing` = landingsidan. Det vänds:
+- **Nummer** (tröjnummer, stigande) — standardval
+- **Namn** (A–Ö)
+- **Position** (gruppvis: Målvakt → Back → Forward, sen efter nummer)
 
-- `/` → Landing (publik startsida)
-- `/login` → appens ingång (Dashboard/AppGuard som hanterar inloggning)
-- `/landing` → tas bort (eller redirect till `/`)
+### Ändringar i `src/pages/Team.tsx`
 
-### Ändringar i `src/App.tsx`
-- Lägg `<Route path="/" element={<Landing />} />` som publik route (utanför `TeamProvider`/`AppGuard`), tillsammans med `/reset-password`.
-- Ta bort den nuvarande `<Route path="/landing" …>`.
-- Inuti catch-all `<Route path="*">` (som wrappas av `TeamProvider` + `AppGuard`):
-  - Ändra `<Route path="/" element={<Index />} />` till `<Route path="/login" element={<Index />} />`.
-  - Övriga app-routes (`/team`, `/games`, …) behålls oförändrade.
+1. Ny state-variabel `sort` med typen `'number' | 'name' | 'position'`, default `'number'`.
+2. Lägg till en `Select` (shadcn) bredvid filterknapparna med etiketten "Sortera" och de tre valen.
+3. Sortera `filteredPlayers` innan rendering enligt valt sorteringsläge:
+   - `number`: stigande på `jerseyNumber` (numeriskt).
+   - `name`: `localeCompare` med svensk locale (`sv`).
+   - `position`: först ordning Målvakt/Back/Forward via en rank-map på `positions[0]`, därefter tröjnummer som tiebreaker.
 
-### Ändringar i `src/pages/Landing.tsx`
-- Headerns logotyp `<Link to="/">` → `<Link to="/login">` så att klick på logotypen leder till appens inlogg, enligt tidigare regel ("endast logotypen leder till login").
-- Inga andra knappar ändras — popup "Lansering 15 juni" är kvar.
+### UI-placering
 
-### Att tänka på
-- `AppGuard` triggar nu på `/login` istället för `/` och hanterar omdirigering till inloggning/dashboard som tidigare.
-- Eventuella interna länkar i appen som pekar på `/` (om sådana finns) bör fortsätta fungera eftersom `/` nu är publik landing — men användare som redan är inloggade och navigerar till `/` kommer att se landingsidan. Om du vill att inloggade användare istället auto-omdirigeras från `/` till `/login` kan vi lägga till det i ett senare steg (säg till om du vill ha det).
+Sorteringskontrollen läggs i samma rad som sök/filter, kompakt (h-9), så att layouten förblir click-sparse och fungerar även på mobil (wrap).
+
+### Inget annat påverkas
+
+Inga ändringar i datamodell, lagring eller andra komponenter behövs.
