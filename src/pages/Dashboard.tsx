@@ -10,6 +10,7 @@ import { WeeklyFocusCard } from '@/components/dashboard/WeeklyFocusCard';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RPEAlertsCard } from '@/components/dashboard/RPEAlertsCard';
 import { TeamRPECard } from '@/components/dashboard/TeamRPECard';
+import { Users, Trophy, Target, Calendar } from 'lucide-react';
 import { usePlayers, useTrainingSessions, useWeeklyFocus, useCoachNotes, useRPERatings } from '@/hooks/useLocalStorage';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 
@@ -46,12 +47,12 @@ export default function Dashboard() {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border mb-6 border border-border">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           <div onClick={() => navigate('/team')} className="cursor-pointer">
-            <StatCard title="Aktiva spelare" value={activePlayers} subtitle={`av ${players.length}`} />
+            <StatCard title="Aktiva spelare" value={activePlayers} subtitle={`av ${players.length}`} icon={Users} />
           </div>
           <div onClick={() => navigate('/games')} className="cursor-pointer">
-            <StatCard title="Spelade matcher" value={gamesPlayed} subtitle="denna säsong" />
+            <StatCard title="Spelade matcher" value={gamesPlayed} subtitle="denna säsong" icon={Trophy} />
           </div>
           <div onClick={() => navigate('/games')} className="cursor-pointer">
             <StatCard
@@ -59,10 +60,11 @@ export default function Dashboard() {
               value={gamesPlayed > 0 ? `${Math.round((gamesWon / gamesPlayed) * 100)}%` : 'N/A'}
               subtitle={`${gamesWon}V ${gamesPlayed - gamesWon}F`}
               variant="success"
+              icon={Target}
             />
           </div>
           <div onClick={() => navigate('/training')} className="cursor-pointer">
-            <StatCard title="Träningar" value={sessions.length} subtitle="planerade" />
+            <StatCard title="Träningar" value={sessions.length} subtitle="planerade" icon={Calendar} />
           </div>
         </div>
 
