@@ -136,34 +136,27 @@ export function AppSidebar() {
         {visibleNavItems.map((item) => (
           <NavItem key={item.to} {...item} onClick={onItemClick} />
         ))}
-      </nav>
-
-      {/* Sign out */}
-      <div className="border-t border-sidebar-border py-2">
         <button
           onClick={signOut}
-          className="nav-item w-full text-sidebar-foreground/50 hover:text-sidebar-foreground"
+          className="nav-item w-full text-sidebar-foreground/70 hover:text-sidebar-foreground"
         >
           <LogOut className="h-4 w-4" />
           <span className="text-sm">Logga ut</span>
         </button>
-      </div>
+      </nav>
     </div>
   );
 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-56 flex-col border-r border-sidebar-border bg-sidebar shrink-0">
+      <aside className="hidden lg:flex w-56 flex-col bg-sidebar shrink-0">
         <SidebarContent />
       </aside>
 
       {/* Mobile Header & Sidebar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-sidebar border-b border-sidebar-border">
-        <div className="flex items-center justify-between px-4 h-12">
-          <span className="text-sm font-semibold text-sidebar-foreground">
-            {activeTeam?.name ?? 'Floorball Tactix'}
-          </span>
+        <div className="flex items-center gap-2 px-4 h-12">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-sidebar-foreground h-8 w-8">
@@ -174,6 +167,9 @@ export function AppSidebar() {
               <SidebarContent onItemClick={() => setMobileOpen(false)} />
             </SheetContent>
           </Sheet>
+          <span className="text-sm font-semibold text-sidebar-foreground truncate">
+            {activeTeam?.name ?? 'Floorball Tactix'}
+          </span>
         </div>
       </div>
     </>

@@ -1,44 +1,76 @@
-## Fix half-rink visuals and force 3-up layout for 5v5
+## Mål
 
-### Problems
-1. The half-rink in `LineFormationBoard.tsx` has rounded corners on all four sides — the center line side should be **straight** (it's a cut, not a rink end).
-2. The goal/crease shape doesn't match `TacticsBoardRenderer.tsx` proportions — needs to use the same crease/goal style.
-3. On the current 1000px viewport the 3 lines stack into 2 columns (`sm:grid-cols-2 lg:grid-cols-3`, lg = 1024px). User wants all 3 side-by-side always.
+Låt varje användare anpassa sin Översikt: vilka kort som visas, i vilken ordning. Inställningen sparas per användare och lag, och nya användare får en smart standard baserat på deras roll.
 
-### Changes — `src/components/lines/LineFormationBoard.tsx`
+## Översikt
 
-**Layout grid**
-- Replace responsive grid with always-3-columns when `lineCount === 3`: `grid-cols-3` (no responsive breakpoints). Reduce gap to `gap-2` so they fit on narrower screens. Each board scales down via `w-full`.
+På Översikt läggs en liten "Anpassa"-knapp i sidhuvudet. När den klickas öppnas ett läge där användaren kan:
+- Slå av/på varje kort (checkbox).
+- Ändra ordning med upp/ned-pilar (enkelt och fungerar lika bra på mobil som desktop).
+- Spara eller återställa till rollens standard.
 
-**SVG half-rink redraw**
-- Replace the single `<rect rx={cornerRadius}>` with a `<path>` that has rounded corners only at the **top** (goal end) and **straight square corners** at the **bottom** (center-line cut). Path outline:
-  ```
-  M padding,(H-padding)                 // bottom-left, square
-  L padding,(padding+R)                 // up left side
-  Q padding,padding  (padding+R),padding   // top-left rounded
-  L (W-padding-R),padding               // top edge
-  Q (W-padding),padding (W-padding),(padding+R)  // top-right rounded
-  L (W-padding),(H-padding)             // down right side
-  Z                                     // close along bottom (straight)
-  ```
-- Background `<rect>` for muted area stays full-size; the rink fill uses the path above.
+Korten som kan anpassas:
+- Statistikraden (4 stat-kort) — som ett block, kan döljas helt
+- Nästa träning
+- Nästa match
+- Veckans fokus
+- Lagets RPE
+- Senaste matchen
+- RPE-varningar (Hög trötthet)
+- Spelarnotiser
 
-**Goal & crease — match TacticsBoardRenderer style**
-The tactics board uses (for a horizontal end): crease 70×120, goal 25×60, goalInset 40, plus the goal sits **inside** the crease offset by 15. Translate to a rotated top-end on a `220×320` board with proportional scaling (~factor 0.35):
-- Crease: width 90, height 36, positioned `x = W/2 - 45`, `y = padding + 14` (inset from top edge, matching tactics board's goalInset proportion)
-- Goal: width 32, height 12, positioned `x = W/2 - 16`, `y = padding + 14 + 8` (offset inside crease, like tactics board)
-- Both stroked with `hsl(var(--primary))`, no fill — matching tactics board.
+## Datalagring
 
-**Center line & half center circle (bottom)**
-- Keep red center line at `y = H - padding`.
-- Half center circle radius 50 scaled to ~22, opens upward into the half (already correct, just adjust radius for new proportions).
+Ny tabell **`user_dashboard_preferences`** i Lovable Cloud:
 
-**Slot button sizing**
-- Since boards are now narrower (3 across in 1000px ≈ ~310px each minus gaps), reduce slot button to `h-8 w-8 text-[10px]` and player name label to `max-w-[60px]` to avoid overlap.
+```text
+id              uuid (pk)
+user_id         uuid  -> auth.uid()
+team_id         uuid  -> teams.id
+layout          jsonb  -- [{ id: "next-game", visible: true }, ...]
+updated_at      timestamptz
+unique (user_id, team_id)
+```
 
-### Files
-- Modified: `src/components/lines/LineFormationBoard.tsx`
+**RLS:**
+- SELECT/INSERT/UPDATE/DELETE: endast egna rader (`user_id = auth.uid()`) och endast om man är medlem i laget (`is_team_member(team_id)`).
 
-### Out of scope
-- No DB / type changes.
-- No changes to slot coordinates (`src/types/lineLayout.ts`) — current x/y percentages still work on the redrawn board.
+Inga ändringar i andra tabeller.
+
+## Roll-baserade standardinställningar
+
+Vid första besöket på Översikt (ingen rad finns) genereras layouten från användarens roll i aktivt lag (`get_user_team_role`):
+
+- **head_coach / assistant_coach**: stats → nästa match → nästa träning → veckans fokus → lagets RPE → senaste match → RPE-varningar → spelarnotiser
+- **player**: lagets RPE → nästa träning → nästa match → veckans fokus → senaste match → stats → (RPE-varningar och spelarnotiser dolda)
+- **viewer / övrigt**: nästa match → senaste match → stats → nästa träning → veckans fokus → (RPE-kort dolda)
+
+Standarden sparas inte automatiskt — först när användaren öppnar "Anpassa" och trycker Spara skapas raden. Det gör att framtida ändringar i defaults når befintliga användare som inte aktivt anpassat.
+
+## Tekniska detaljer
+
+### Ny hook `useDashboardLayout(teamId, role)`
+- Läser raden för (user, team) från tabellen.
+- Om saknas: returnerar rollens default in-memory.
+- Exponerar `layout`, `setLayout`, `save`, `resetToRoleDefault`.
+
+### `src/pages/Dashboard.tsx`
+- Itererar över layout-arrayen istället för hårdkodad ordning.
+- Renderar bara kort där `visible: true` och där underliggande data finns (samma villkor som idag, t.ex. `lastPlayedGame` måste finnas).
+- Lägger till knappen "Anpassa" i sidhuvudet bredvid säsongsväljaren.
+
+### Ny komponent `src/components/dashboard/DashboardCustomizer.tsx`
+- Sheet/dialog med en lista över alla kort.
+- Per rad: kortets namn, switch för visa/dölj, upp/ned-pilar för ordning.
+- Knappar: "Återställ standard", "Avbryt", "Spara".
+- Sparar via hooken till databasen.
+
+### Inga andra sidor påverkas
+Övriga sidor, rutter, RLS, edge-funktioner och befintliga komponenter förblir oförändrade.
+
+## Vad användaren märker
+
+1. Öppnar Översikt → ser sin senaste sparade layout (eller rollens default om inget sparats).
+2. Klickar "Anpassa" → kan dra på/av kort och ändra ordning.
+3. Sparar → nästa gång hen loggar in på samma lag (även från annan enhet) ser hen samma layout.
+4. Byter till annat lag → varje lag har sin egen sparade layout.
