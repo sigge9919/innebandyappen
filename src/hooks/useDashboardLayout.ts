@@ -130,7 +130,7 @@ export function useDashboardLayout(teamId: string | null, role: TeamRole | null)
     const { error } = await supabase
       .from('user_dashboard_preferences')
       .upsert(
-        { user_id: user.id, team_id: teamId, layout: next as unknown as object },
+        [{ user_id: user.id, team_id: teamId, layout: next as unknown as object }],
         { onConflict: 'user_id,team_id' }
       );
     if (!error) {
