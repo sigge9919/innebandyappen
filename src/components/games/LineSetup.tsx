@@ -169,22 +169,37 @@ export function LineSetup({
 function LoadLayoutButton({
   layouts,
   onSelect,
+  compact = false,
+  title = 'Ladda sparad',
 }: {
   layouts: { id: string; name: string; slots: { playerId?: string | null }[] }[];
   onSelect: (id: string) => void;
+  compact?: boolean;
+  title?: string;
 }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <FolderOpen className="h-4 w-4" />
-          Ladda sparad
-        </Button>
+        {compact ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            title={title}
+          >
+            <FolderOpen className="h-3.5 w-3.5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="sm" className="gap-2">
+            <FolderOpen className="h-4 w-4" />
+            {title}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Välj sparad uppställning</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
           {layouts.map(l => {
