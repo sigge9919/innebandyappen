@@ -92,3 +92,12 @@ export function createDefaultSlots(type: LineLayoutType): LineSlot[] {
     { slotId: '5v6-RD', role: 'D', label: 'HB', x: 65, y: 78, lineIndex: 0 },
   ];
 }
+
+/**
+ * Returns slots for a single line (lineIndex=0) of the given formation.
+ * Used in match prep where each GameLine is its own board.
+ */
+export function createSingleLineSlots(type: LineLayoutType): LineSlot[] {
+  if (type === '5v5') return build5v5Line(0);
+  return createDefaultSlots(type);
+}
