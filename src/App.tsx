@@ -46,8 +46,8 @@ const App = () => (
                   <Routes>
                     <Route path="/login" element={<Index />} />
                     <Route path="/team" element={<Team />} />
-                    <Route path="/team/:playerId" element={<PlayerDetail />} />
                     <Route path="/team/lines" element={<TeamLines />} />
+                    <Route path="/team/:playerId" element={<PlayerDetail />} />
                     <Route path="/games" element={<Games />} />
                     <Route path="/games/:gameId" element={<GameDetail />} />
                     <Route path="/stats" element={<Stats />} />
