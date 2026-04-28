@@ -334,6 +334,8 @@ function LineCard({
         players={squadPlayers}
         onChange={handleSlotsChange}
         readOnly={disabled}
+        lineCountOverride={1}
+        hideLineTitles
       />
     </div>
   );
