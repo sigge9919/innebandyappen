@@ -21,6 +21,8 @@ const TYPE_LABELS: Record<LineLayoutType, string> = {
   '5v5': '5 mot 5',
   PP: 'Powerplay (5v4)',
   PK: 'Boxplay (4v5)',
+  '6v5': '6 mot 5 (Tom kasse)',
+  '5v6': '5 mot 6 (Försvar tom kasse)',
 };
 
 export default function TeamLines() {
