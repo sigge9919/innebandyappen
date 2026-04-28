@@ -1,71 +1,76 @@
 ## Mål
 
-Anpassa det visuella uttrycket på sidan **Översikt** (`/`) och dess **sidomeny** så att det matchar den bifogade referensbilden. Inga texter, etiketter, namn, navigation eller logik ändras — endast färger, ytor, kortstil, typografi och layout.
+Låt varje användare anpassa sin Översikt: vilka kort som visas, i vilken ordning. Inställningen sparas per användare och lag, och nya användare får en smart standard baserat på deras roll.
 
-## Visuella förändringar (referens → app)
+## Översikt
 
-Referensen visar:
-- Mörk djupblå bakgrund (nästan svart-navy) över hela appen, även huvudytan (inte bara sidebar).
-- Subtil cyan/turkos linjekonst-grafik som dekorativ bakgrund i hörn (logotypens X-mönster).
-- Sidebar utan synlig kant — flyter ihop med bakgrunden, aktiv post markerad med cyan-text + cyan vänsterstreck istället för ljusare ruta.
-- Stora rubriker i vit, fet, generös typografi ("Dashboard"-stil).
-- Korten är mörka paneler (något ljusare än bakgrunden), **rundade hörn** (~12 px), mjuk inre cyan glow/border, ingen hård linje.
-- Metriker visas stort i cyan, etiketter i ljusgrå/dimmad vit.
-- Små cyan ikoner i kortets övre högra hörn.
-- Tunna cyan-streck och bars i sparklines/diagram (redan i appens chart-färg).
+På Översikt läggs en liten "Anpassa"-knapp i sidhuvudet. När den klickas öppnas ett läge där användaren kan:
+- Slå av/på varje kort (checkbox).
+- Ändra ordning med upp/ned-pilar (enkelt och fungerar lika bra på mobil som desktop).
+- Spara eller återställa till rollens standard.
 
-## Förändringsplan (filvis)
+Korten som kan anpassas:
+- Statistikraden (4 stat-kort) — som ett block, kan döljas helt
+- Nästa träning
+- Nästa match
+- Veckans fokus
+- Lagets RPE
+- Senaste matchen
+- RPE-varningar (Hög trötthet)
+- Spelarnotiser
 
-### 1. `src/index.css` — färgtema (light mode)
-Ändra `:root`-blocket så att light mode efterliknar dark mode-nivåerna i referensen (dvs hela appen blir mörk för inloggade användare — referensen är genomgående mörk):
-- `--background`: djup navy, t.ex. `215 45% 7%`
-- `--foreground`: nära vit `210 20% 95%`
-- `--card`: något ljusare panel `215 35% 12%`
-- `--card-foreground`: `210 20% 95%`
-- `--border`: subtilt cyan-tonad `190 40% 20% / låg opacitet via separat klass`
-- `--muted-foreground`: `215 15% 60%`
-- `--primary`: behålls (cyan `190 100% 50%`)
-- `--radius`: höjs från `0.25rem` till `0.75rem` för rundade kort
+## Datalagring
 
-Lägg till nya utility-klasser i `@layer components`:
-- `.glow-card` — `bg-card rounded-xl border border-primary/15 shadow-[0_0_0_1px_hsl(var(--primary)/0.08),0_8px_32px_-12px_hsl(var(--primary)/0.25)] p-4`
-- `.dashboard-bg` — bakgrundslagret med två dekorativa SVG/gradient-pseudoelement i hörnen (cyan X-mönster, väldigt låg opacitet)
-- Uppdatera `.stat-card` så den ärver `glow-card`-utseendet (rundad, mjuk cyan-kant, ingen hård linje).
-- Uppdatera `.metric-value` — större (`text-3xl`), tabular, primary-färg på hero-värden.
-- Uppdatera `.nav-item-active` — transparent bg, cyan textfärg, behåll cyan vänsterstreck.
+Ny tabell **`user_dashboard_preferences`** i Lovable Cloud:
 
-### 2. `src/components/layout/AppSidebar.tsx`
-- Ta bort höger-bordern på `<aside>` (eller gör den helt transparent) så sidebar smälter in.
-- Behåll logotyp + team-switcher + nav exakt som idag (texter oförändrade).
-- Lite mer luft i `nav-item` (py-2.5, gap-3).
-- Gör aktiv ikon cyan (ärvs via `nav-item-active`).
+```text
+id              uuid (pk)
+user_id         uuid  -> auth.uid()
+team_id         uuid  -> teams.id
+layout          jsonb  -- [{ id: "next-game", visible: true }, ...]
+updated_at      timestamptz
+unique (user_id, team_id)
+```
 
-### 3. `src/components/layout/AppLayout.tsx`
-- Lägg `dashboard-bg` på `<main>`-elementet så de dekorativa hörnmönstren visas.
+**RLS:**
+- SELECT/INSERT/UPDATE/DELETE: endast egna rader (`user_id = auth.uid()`) och endast om man är medlem i laget (`is_team_member(team_id)`).
 
-### 4. `src/pages/Dashboard.tsx`
-- Byt rubrikstil: `<h1>` blir `text-3xl font-bold` (kvar: "Översikt", säsongstext oförändrad).
-- Stats-raden: ta bort `gap-px bg-border` och hård border. Ersätt med `grid gap-3` där varje `StatCard` är ett rundat glow-kort.
-- Behåll alla 4 stat-kort, "Priority row" (4 kort) och "Secondary row" (3 kort) — samma komponenter, samma data, oförändrad ordning och oförändrade texter.
+Inga ändringar i andra tabeller.
 
-### 5. `src/components/dashboard/StatCard.tsx`
-- Lägg till valfri ikon uppe till höger (cyan, opacitet 70 %) — använder den redan deklarerade men oanvända `icon`-propen. Dashboard skickar redan in ikon-namn implicit; om inte sätts, skippas den. Inga API-ändringar utåt.
-- Värdet i `text-3xl text-primary font-bold`.
-- Etikett i `text-[11px] uppercase tracking-wider text-muted-foreground`.
+## Roll-baserade standardinställningar
 
-### 6. Övriga dashboard-kort
-`NextGameCard`, `LastGameCard`, `NextTrainingCard`, `WeeklyFocusCard`, `TeamRPECard`, `RPEAlertsCard`, `PlayerAlerts`:
-- Byt yttersta `<div className="stat-card">` så de får det nya rundade glow-utseendet automatiskt via uppdaterad `.stat-card`-stil. Inga props eller texter ändras.
-- `RPEAlertsCard` & `TeamRPECard` använder `<Card>` från `ui/card` — `Card`-komponenten ärver `--radius` och får automatiskt rundade hörn när radie höjs.
-- Mindre justering: säkerställ att rubriker (`metric-label`) och knappar fortsatt är läsbara mot mörkare bakgrund (tester via befintliga tokens).
+Vid första besöket på Översikt (ingen rad finns) genereras layouten från användarens roll i aktivt lag (`get_user_team_role`):
 
-## Vad som INTE ändras
+- **head_coach / assistant_coach**: stats → nästa match → nästa träning → veckans fokus → lagets RPE → senaste match → RPE-varningar → spelarnotiser
+- **player**: lagets RPE → nästa träning → nästa match → veckans fokus → senaste match → stats → (RPE-varningar och spelarnotiser dolda)
+- **viewer / övrigt**: nästa match → senaste match → stats → nästa träning → veckans fokus → (RPE-kort dolda)
 
-- Inga sidnamn, menyetiketter, knapptexter, kortrubriker eller datavärden.
-- Ingen routing, hooks, state, datakällor, RLS, edge-funktioner.
-- Inga andra sidor än Översikt + delad sidebar/layout (övriga sidor använder samma tokens och får automatiskt det nya temat — det är önskat då temat är globalt, men ingen layout på andra sidor justeras strukturellt).
-- Ingen ny databas, inga nya tabeller eller kolumner.
+Standarden sparas inte automatiskt — först när användaren öppnar "Anpassa" och trycker Spara skapas raden. Det gör att framtida ändringar i defaults når befintliga användare som inte aktivt anpassat.
 
-## Resultat
+## Tekniska detaljer
 
-Användaren loggar in och möts av en mörk dashboard med rundade glow-kort, cyan accentfärg, stor rubrik och dekorativ X-mönsterbakgrund i hörnen — visuellt likt referensbilden, men med samma innehåll, samma struktur och samma logik som idag.
+### Ny hook `useDashboardLayout(teamId, role)`
+- Läser raden för (user, team) från tabellen.
+- Om saknas: returnerar rollens default in-memory.
+- Exponerar `layout`, `setLayout`, `save`, `resetToRoleDefault`.
+
+### `src/pages/Dashboard.tsx`
+- Itererar över layout-arrayen istället för hårdkodad ordning.
+- Renderar bara kort där `visible: true` och där underliggande data finns (samma villkor som idag, t.ex. `lastPlayedGame` måste finnas).
+- Lägger till knappen "Anpassa" i sidhuvudet bredvid säsongsväljaren.
+
+### Ny komponent `src/components/dashboard/DashboardCustomizer.tsx`
+- Sheet/dialog med en lista över alla kort.
+- Per rad: kortets namn, switch för visa/dölj, upp/ned-pilar för ordning.
+- Knappar: "Återställ standard", "Avbryt", "Spara".
+- Sparar via hooken till databasen.
+
+### Inga andra sidor påverkas
+Övriga sidor, rutter, RLS, edge-funktioner och befintliga komponenter förblir oförändrade.
+
+## Vad användaren märker
+
+1. Öppnar Översikt → ser sin senaste sparade layout (eller rollens default om inget sparats).
+2. Klickar "Anpassa" → kan dra på/av kort och ändra ordning.
+3. Sparar → nästa gång hen loggar in på samma lag (även från annan enhet) ser hen samma layout.
+4. Byter till annat lag → varje lag har sin egen sparade layout.
