@@ -23,6 +23,10 @@ interface LineFormationBoardProps {
   players: Player[];
   onChange?: (slots: LineSlot[]) => void;
   readOnly?: boolean;
+  /** Force a specific number of boards (overrides default per type). */
+  lineCountOverride?: number;
+  /** Hide the "Kedja N" title above each board. */
+  hideLineTitles?: boolean;
 }
 
 /**
@@ -36,8 +40,10 @@ export function LineFormationBoard({
   players,
   onChange,
   readOnly = false,
+  lineCountOverride,
+  hideLineTitles = false,
 }: LineFormationBoardProps) {
-  const lineCount = getLineCount(type);
+  const lineCount = lineCountOverride ?? getLineCount(type);
 
   const slotsByLine = useMemo(() => {
     const map: Record<number, LineSlot[]> = {};
@@ -78,7 +84,7 @@ export function LineFormationBoard({
       {Array.from({ length: lineCount }).map((_, li) => (
         <HalfRinkBoard
           key={li}
-          title={lineCount > 1 ? `Kedja ${li + 1}` : ''}
+          title={!hideLineTitles && lineCount > 1 ? `Kedja ${li + 1}` : ''}
           slots={slotsByLine[li] ?? []}
           players={players}
           assignedIds={assignedIds}
