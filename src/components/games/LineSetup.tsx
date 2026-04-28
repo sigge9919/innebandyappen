@@ -5,10 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn, getGameDisplayName } from '@/lib/utils';
-import { Users, Edit2, Check, X, Shield, FolderOpen } from 'lucide-react';
+import { Edit2, Check, X, Shield, FolderOpen } from 'lucide-react';
 import { useLineLayouts } from '@/hooks/useLineLayouts';
-import { LineLayoutType } from '@/types/lineLayout';
+import {
+  LineLayoutType,
+  LineSlot,
+  createSingleLineSlots,
+} from '@/types/lineLayout';
+import { LineFormationBoard } from '@/components/lines/LineFormationBoard';
 import {
   Dialog,
   DialogContent,
@@ -142,7 +146,7 @@ export function LineSetup({
                 />
               )}
             </div>
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {typeLines.map(line => (
                 <LineCard
                   key={line.id}
@@ -150,9 +154,8 @@ export function LineSetup({
                   squadPlayers={squadPlayers}
                   onUpdateLine={onUpdateLine}
                   disabled={disabled}
-                  availableLayouts={
-                    type !== '5v5' && !disabled ? availableLayouts : []
-                  }
+                  layoutType={layoutType ?? '5v5'}
+                  availableLayouts={!disabled ? availableLayouts : []}
                   onLoadLayout={(layoutId) =>
                     handleLoadLayoutToLine(type, layoutId, line.id)
                   }
@@ -231,6 +234,7 @@ function LineCard({
   squadPlayers,
   onUpdateLine,
   disabled,
+  layoutType,
   availableLayouts = [],
   onLoadLayout,
 }: {
@@ -238,20 +242,12 @@ function LineCard({
   squadPlayers: Player[];
   onUpdateLine: (lineId: string, updates: Partial<GameLine>) => void;
   disabled?: boolean;
+  layoutType: LineLayoutType;
   availableLayouts?: { id: string; name: string; slots: { playerId?: string | null }[] }[];
   onLoadLayout?: (layoutId: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(line.name);
-
-  // Toggle player and immediately save
-  const togglePlayer = (playerId: string) => {
-    const newPlayerIds = line.playerIds.includes(playerId)
-      ? line.playerIds.filter(id => id !== playerId)
-      : [...line.playerIds, playerId];
-    
-    onUpdateLine(line.id, { playerIds: newPlayerIds });
-  };
 
   const handleSaveName = () => {
     if (editName.trim() && editName !== line.name) {
@@ -265,86 +261,80 @@ function LineCard({
     setIsEditing(false);
   };
 
-  const linePlayers = squadPlayers.filter(p => line.playerIds.includes(p.id));
+  // Build positional slots for this single line, populate from playerIds in order
+  const template = createSingleLineSlots(layoutType);
+  const hydratedSlots: LineSlot[] = template.map((s, i) => ({
+    ...s,
+    playerId: line.playerIds[i] ?? null,
+  }));
 
-  if (isEditing) {
-    return (
-      <div className="stat-card space-y-3">
-        <div className="flex items-center gap-2">
-          <Input
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            className="flex-1"
-            placeholder="Kedjenamn"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSaveName();
-              if (e.key === 'Escape') handleCancelName();
-            }}
-            autoFocus
-          />
-          <Button size="icon" variant="ghost" onClick={handleSaveName}>
-            <Check className="h-4 w-4 text-success" />
-          </Button>
-          <Button size="icon" variant="ghost" onClick={handleCancelName}>
-            <X className="h-4 w-4 text-destructive" />
-          </Button>
-        </div>
-        <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto">
-          {squadPlayers.map(player => (
-            <button
-              key={player.id}
-              onClick={() => togglePlayer(player.id)}
-              className={cn(
-                'text-left px-2 py-1.5 rounded text-sm transition-colors',
-                line.playerIds.includes(player.id)
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted hover:bg-muted/80'
-              )}
-            >
-              #{player.jerseyNumber} {getGameDisplayName(player)}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const handleSlotsChange = (next: LineSlot[]) => {
+    const ids = next.map(s => s.playerId).filter(Boolean) as string[];
+    onUpdateLine(line.id, { playerIds: ids });
+  };
+
+  const filledCount = line.playerIds.length;
+  const totalSlots = template.length;
 
   return (
     <div className="stat-card">
-      <div className="flex items-center justify-between mb-2">
-        <h5 className="font-semibold text-foreground">{line.name}</h5>
-        {!disabled && (
-          <div className="flex items-center gap-1">
-            {availableLayouts.length > 0 && onLoadLayout && (
-              <LoadLayoutButton
-                layouts={availableLayouts}
-                onSelect={onLoadLayout}
-                compact
-                title={`Ladda till ${line.name}`}
-              />
-            )}
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-7 w-7"
-              onClick={() => setIsEditing(true)}
-            >
-              <Edit2 className="h-3.5 w-3.5" />
+      <div className="flex items-center justify-between mb-2 gap-2">
+        {isEditing ? (
+          <div className="flex items-center gap-1 flex-1">
+            <Input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              className="flex-1 h-8"
+              placeholder="Kedjenamn"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveName();
+                if (e.key === 'Escape') handleCancelName();
+              }}
+              autoFocus
+            />
+            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleSaveName}>
+              <Check className="h-4 w-4 text-success" />
+            </Button>
+            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleCancelName}>
+              <X className="h-4 w-4 text-destructive" />
             </Button>
           </div>
+        ) : (
+          <>
+            <h5 className="font-semibold text-foreground truncate">{line.name}</h5>
+            <div className="flex items-center gap-1 shrink-0">
+              <Badge variant="secondary" className="text-[10px]">
+                {filledCount}/{totalSlots}
+              </Badge>
+              {!disabled && availableLayouts.length > 0 && onLoadLayout && (
+                <LoadLayoutButton
+                  layouts={availableLayouts}
+                  onSelect={onLoadLayout}
+                  compact
+                  title={`Ladda till ${line.name}`}
+                />
+              )}
+              {!disabled && (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <Edit2 className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
+          </>
         )}
       </div>
-      {linePlayers.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5">
-          {linePlayers.map(player => (
-            <Badge key={player.id} variant="secondary" className="text-xs">
-              #{player.jerseyNumber} {getGameDisplayName(player)}
-            </Badge>
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground italic">Inga spelare tilldelade</p>
-      )}
+      <LineFormationBoard
+        type={layoutType}
+        slots={hydratedSlots}
+        players={squadPlayers}
+        onChange={handleSlotsChange}
+        readOnly={disabled}
+      />
     </div>
   );
 }
