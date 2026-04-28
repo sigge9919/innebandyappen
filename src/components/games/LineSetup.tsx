@@ -79,6 +79,22 @@ export function LineSetup({
     toast.success(`"${layout.name}" laddad`);
   };
 
+  const handleLoadLayoutToLine = (
+    lineType: LineType,
+    layoutId: string,
+    targetLineId: string
+  ) => {
+    const layout = layouts.find(l => l.id === layoutId);
+    if (!layout) return;
+    const squadIds = new Set(squadPlayers.map(p => p.id));
+    const ids = layout.slots
+      .filter(s => (s.lineIndex ?? 0) === 0 && s.playerId && squadIds.has(s.playerId))
+      .map(s => s.playerId as string);
+    onUpdateLine(targetLineId, { playerIds: ids });
+    const target = lines.find(l => l.id === targetLineId);
+    toast.success(`"${layout.name}" laddad till ${target?.name ?? lineType}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Goalie Selection */}
@@ -119,7 +135,7 @@ export function LineSetup({
               <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                 {LINE_TYPE_LABELS[type]}
               </h4>
-              {!disabled && availableLayouts.length > 0 && (
+              {!disabled && availableLayouts.length > 0 && type === '5v5' && (
                 <LoadLayoutButton
                   layouts={availableLayouts}
                   onSelect={(id) => handleLoadLayout(type, id)}
@@ -134,6 +150,12 @@ export function LineSetup({
                   squadPlayers={squadPlayers}
                   onUpdateLine={onUpdateLine}
                   disabled={disabled}
+                  availableLayouts={
+                    type !== '5v5' && !disabled ? availableLayouts : []
+                  }
+                  onLoadLayout={(layoutId) =>
+                    handleLoadLayoutToLine(type, layoutId, line.id)
+                  }
                 />
               ))}
             </div>
@@ -194,11 +216,15 @@ function LineCard({
   squadPlayers,
   onUpdateLine,
   disabled,
+  availableLayouts = [],
+  onLoadLayout,
 }: {
   line: GameLine;
   squadPlayers: Player[];
   onUpdateLine: (lineId: string, updates: Partial<GameLine>) => void;
   disabled?: boolean;
+  availableLayouts?: { id: string; name: string; slots: { playerId?: string | null }[] }[];
+  onLoadLayout?: (layoutId: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(line.name);
@@ -273,14 +299,24 @@ function LineCard({
       <div className="flex items-center justify-between mb-2">
         <h5 className="font-semibold text-foreground">{line.name}</h5>
         {!disabled && (
-          <Button 
-            size="icon" 
-            variant="ghost" 
-            className="h-7 w-7"
-            onClick={() => setIsEditing(true)}
-          >
-            <Edit2 className="h-3.5 w-3.5" />
-          </Button>
+          <div className="flex items-center gap-1">
+            {availableLayouts.length > 0 && onLoadLayout && (
+              <LoadLayoutButton
+                layouts={availableLayouts}
+                onSelect={onLoadLayout}
+                compact
+                title={`Ladda till ${line.name}`}
+              />
+            )}
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7"
+              onClick={() => setIsEditing(true)}
+            >
+              <Edit2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         )}
       </div>
       {linePlayers.length > 0 ? (
