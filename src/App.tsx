@@ -9,6 +9,7 @@ import { AppGuard } from "@/components/guards/AppGuard";
 import Index from "./pages/Index";
 import Team from "./pages/Team";
 import PlayerDetail from "./pages/PlayerDetail";
+import TeamLines from "./pages/TeamLines";
 import Games from "./pages/Games";
 import GameDetail from "./pages/GameDetail";
 import Stats from "./pages/Stats";
@@ -46,6 +47,7 @@ const App = () => (
                     <Route path="/login" element={<Index />} />
                     <Route path="/team" element={<Team />} />
                     <Route path="/team/:playerId" element={<PlayerDetail />} />
+                    <Route path="/team/lines" element={<TeamLines />} />
                     <Route path="/games" element={<Games />} />
                     <Route path="/games/:gameId" element={<GameDetail />} />
                     <Route path="/stats" element={<Stats />} />
