@@ -38,7 +38,7 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <div className="page-container">
-        <div className="section-header">
+        <div className="flex flex-col items-start gap-3 mb-4">
           <div>
             <h1 className="section-title">Översikt</h1>
             {selectedSeason && <p className="text-muted-foreground text-sm mt-0.5">{selectedSeason.name}</p>}
