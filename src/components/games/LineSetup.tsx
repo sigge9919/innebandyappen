@@ -6,7 +6,17 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn, getGameDisplayName } from '@/lib/utils';
-import { Users, Edit2, Check, X, Shield } from 'lucide-react';
+import { Users, Edit2, Check, X, Shield, FolderOpen } from 'lucide-react';
+import { useLineLayouts } from '@/hooks/useLineLayouts';
+import { LineLayoutType } from '@/types/lineLayout';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 interface LineSetupProps {
   lines: GameLine[];
@@ -28,6 +38,12 @@ const LINE_TYPE_LABELS: Record<LineType, string> = {
 
 const NONE_VALUE = '_none';
 
+const LINE_TYPE_TO_LAYOUT_TYPE: Partial<Record<LineType, LineLayoutType>> = {
+  '5v5': '5v5',
+  PP: 'PP',
+  PK: 'PK',
+};
+
 export function LineSetup({
   lines,
   squadPlayers,
@@ -38,6 +54,28 @@ export function LineSetup({
   onSelectGoalie,
 }: LineSetupProps) {
   const lineTypes: LineType[] = ['5v5', 'PP', 'PK', '6v5', '5v6'];
+  const { layouts } = useLineLayouts();
+
+  const handleLoadLayout = (lineType: LineType, layoutId: string) => {
+    const layout = layouts.find(l => l.id === layoutId);
+    if (!layout) return;
+    const squadIds = new Set(squadPlayers.map(p => p.id));
+    // Group slots by lineIndex (0,1,2 for 5v5; 0 for PP/PK)
+    const byLineIndex: Record<number, string[]> = {};
+    layout.slots.forEach(s => {
+      const li = s.lineIndex ?? 0;
+      if (!byLineIndex[li]) byLineIndex[li] = [];
+      if (s.playerId && squadIds.has(s.playerId)) byLineIndex[li].push(s.playerId);
+    });
+    // Find target lines for this type, in order
+    const targetLines = lines.filter(l => l.type === lineType);
+    Object.entries(byLineIndex).forEach(([liStr, ids]) => {
+      const li = parseInt(liStr, 10);
+      const target = targetLines[li];
+      if (target) onUpdateLine(target.id, { playerIds: ids });
+    });
+    toast.success(`"${layout.name}" laddad`);
+  };
 
   return (
     <div className="space-y-6">
@@ -68,12 +106,24 @@ export function LineSetup({
       {lineTypes.map(type => {
         const typeLines = lines.filter(l => l.type === type);
         if (typeLines.length === 0) return null;
+        const layoutType = LINE_TYPE_TO_LAYOUT_TYPE[type];
+        const availableLayouts = layoutType
+          ? layouts.filter(l => l.type === layoutType)
+          : [];
         
         return (
           <div key={type} className="space-y-3">
-            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              {LINE_TYPE_LABELS[type]}
-            </h4>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                {LINE_TYPE_LABELS[type]}
+              </h4>
+              {!disabled && availableLayouts.length > 0 && (
+                <LoadLayoutButton
+                  layouts={availableLayouts}
+                  onSelect={(id) => handleLoadLayout(type, id)}
+                />
+              )}
+            </div>
             <div className="grid gap-3 md:grid-cols-2">
               {typeLines.map(line => (
                 <LineCard
@@ -89,6 +139,51 @@ export function LineSetup({
         );
       })}
     </div>
+  );
+}
+
+function LoadLayoutButton({
+  layouts,
+  onSelect,
+}: {
+  layouts: { id: string; name: string; slots: { playerId?: string | null }[] }[];
+  onSelect: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <FolderOpen className="h-4 w-4" />
+          Ladda sparad
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Välj sparad uppställning</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+          {layouts.map(l => {
+            const filled = l.slots.filter(s => s.playerId).length;
+            return (
+              <button
+                key={l.id}
+                onClick={() => {
+                  onSelect(l.id);
+                  setOpen(false);
+                }}
+                className="w-full text-left p-3 rounded-md border border-border hover:border-primary hover:bg-primary/5 transition-colors flex items-center justify-between"
+              >
+                <span className="font-medium">{l.name}</span>
+                <Badge variant="secondary" className="text-xs">
+                  {filled}/{l.slots.length} positioner
+                </Badge>
+              </button>
+            );
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -7,7 +7,7 @@ import { usePlayers } from '@/hooks/useLocalStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, Users, AlertTriangle, Target, Archive } from 'lucide-react';
+import { Plus, Search, Users, AlertTriangle, Target, Archive, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Player } from '@/types';
 
@@ -99,6 +99,10 @@ export default function Team() {
           <Button className="gap-2" onClick={handleAddPlayer}>
             <Plus className="h-4 w-4" />
             Lägg till spelare
+          </Button>
+          <Button variant="outline" className="gap-2" onClick={() => navigate('/team/lines')}>
+            <LayoutGrid className="h-4 w-4" />
+            Lines
           </Button>
         </div>
 
