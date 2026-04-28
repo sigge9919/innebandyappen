@@ -136,18 +136,14 @@ export function AppSidebar() {
         {visibleNavItems.map((item) => (
           <NavItem key={item.to} {...item} onClick={onItemClick} />
         ))}
-      </nav>
-
-      {/* Sign out */}
-      <div className="border-t border-sidebar-border py-2">
         <button
           onClick={signOut}
-          className="nav-item w-full text-sidebar-foreground/50 hover:text-sidebar-foreground"
+          className="nav-item w-full text-sidebar-foreground/70 hover:text-sidebar-foreground"
         >
           <LogOut className="h-4 w-4" />
           <span className="text-sm">Logga ut</span>
         </button>
-      </div>
+      </nav>
     </div>
   );
 
