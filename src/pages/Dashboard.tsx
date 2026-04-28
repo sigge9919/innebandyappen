@@ -105,17 +105,19 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <div className="page-container">
-        <div className="flex flex-col items-start gap-3 mb-4">
-          <div>
-            <h1 className="section-title">Översikt</h1>
-            {selectedSeason && <p className="text-muted-foreground text-sm mt-0.5">{selectedSeason.name}</p>}
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
+        <div className="mb-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="section-title">Översikt</h1>
+              {selectedSeason && <p className="text-muted-foreground text-sm mt-0.5">{selectedSeason.name}</p>}
+            </div>
             <Button variant="outline" size="sm" onClick={() => setCustomizerOpen(true)}>
               <Settings2 className="h-3.5 w-3.5 mr-1.5" />
               Anpassa
             </Button>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap mt-3">
+            <SeasonSelector seasons={seasons} selectedSeasonId={selectedSeasonId} onSeasonChange={setSelectedSeasonId} />
           </div>
         </div>
 
