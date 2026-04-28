@@ -1,88 +1,44 @@
-## Line-byggare i Lag — visuella formationer som kan laddas i match
+## Fix half-rink visuals and force 3-up layout for 5v5
 
-Skapa en ny modul i Lag-vyn för att laborera med kedjor (5v5, PP, PK) på en visuell, formationsbaserad plan. Sparade kedjor ska kunna laddas in vid matchförberedelser och behålla sin formation.
+### Problems
+1. The half-rink in `LineFormationBoard.tsx` has rounded corners on all four sides — the center line side should be **straight** (it's a cut, not a rink end).
+2. The goal/crease shape doesn't match `TacticsBoardRenderer.tsx` proportions — needs to use the same crease/goal style.
+3. On the current 1000px viewport the 3 lines stack into 2 columns (`sm:grid-cols-2 lg:grid-cols-3`, lg = 1024px). User wants all 3 side-by-side always.
 
-### 1. Ny vy: "Lines" i Lag
+### Changes — `src/components/lines/LineFormationBoard.tsx`
 
-I `src/pages/Team.tsx` läggs en flikväxlare i sidhuvudet:
+**Layout grid**
+- Replace responsive grid with always-3-columns when `lineCount === 3`: `grid-cols-3` (no responsive breakpoints). Reduce gap to `gap-2` so they fit on narrower screens. Each board scales down via `w-full`.
 
-- **Spelare** (nuvarande lista)
-- **Lines** (ny vy)
+**SVG half-rink redraw**
+- Replace the single `<rect rx={cornerRadius}>` with a `<path>` that has rounded corners only at the **top** (goal end) and **straight square corners** at the **bottom** (center-line cut). Path outline:
+  ```
+  M padding,(H-padding)                 // bottom-left, square
+  L padding,(padding+R)                 // up left side
+  Q padding,padding  (padding+R),padding   // top-left rounded
+  L (W-padding-R),padding               // top edge
+  Q (W-padding),padding (W-padding),(padding+R)  // top-right rounded
+  L (W-padding),(H-padding)             // down right side
+  Z                                     // close along bottom (straight)
+  ```
+- Background `<rect>` for muted area stays full-size; the rink fill uses the path above.
 
-Default-vyn fortsätter vara Spelare så inget förändras för befintliga flöden.
+**Goal & crease — match TacticsBoardRenderer style**
+The tactics board uses (for a horizontal end): crease 70×120, goal 25×60, goalInset 40, plus the goal sits **inside** the crease offset by 15. Translate to a rotated top-end on a `220×320` board with proportional scaling (~factor 0.35):
+- Crease: width 90, height 36, positioned `x = W/2 - 45`, `y = padding + 14` (inset from top edge, matching tactics board's goalInset proportion)
+- Goal: width 32, height 12, positioned `x = W/2 - 16`, `y = padding + 14 + 8` (offset inside crease, like tactics board)
+- Both stroked with `hsl(var(--primary))`, no fill — matching tactics board.
 
-### 2. Formationskomponent — `LineFormationBoard`
+**Center line & half center circle (bottom)**
+- Keep red center line at `y = H - padding`.
+- Half center circle radius 50 scaled to ~22, opens upward into the half (already correct, just adjust radius for new proportions).
 
-Ny fil: `src/components/lines/LineFormationBoard.tsx`
+**Slot button sizing**
+- Since boards are now narrower (3 across in 1000px ≈ ~310px each minus gaps), reduce slot button to `h-8 w-8 text-[10px]` and player name label to `max-w-[60px]` to avoid overlap.
 
-En SVG-baserad rink (återanvänd ritlogiken från `TacticsBoardRenderer` men **roterad 90°** så att mål är upp/ned istället för vänster/höger). Komponenten renderar **förinställda positioner** för en kedjetyp:
+### Files
+- Modified: `src/components/lines/LineFormationBoard.tsx`
 
-- **5v5** (3 parallella kedjor staplade vertikalt på planen):
-  - Per kedja: 2 backar (nedre raden), 1 center (mitten), 2 forwards (övre raden)
-  - Totalt 15 positioner uppdelade i tre färgkodade band
-- **PP (5v4)**: 1 kedja med 5 spelare i PP-formation (1 back upptill, 2 halvbackar, 2 forwards nere vid mål)
-- **PK (4v5)**: 1 kedja med 4 spelare i box-formation (2 backar, 2 forwards i ruta)
-
-Varje "slot" är en cirkel på planen med rolletikett (B/C/F). Klick på en slot öppnar en spelarväljare (popover) som listar truppens spelare filtrerade efter passande positioner men tillåter alla. Vald spelare visas som smeknamn under cirkeln.
-
-Slots är **fasta positioner** — användaren flyttar inte cirklarna, bara tilldelar spelare. Detta håller UI:t enkelt och formationen återanvändbar i match.
-
-### 3. Sida: `/team/lines`
-
-Ny fil: `src/pages/TeamLines.tsx` (route registreras i `src/App.tsx` under skyddade routes).
-
-Layout:
-
-- Topprad: knappar för formationstyp `5v5 | PP | PK` + namn-input + Spara/Ladda/Ny
-- Centralt: `LineFormationBoard` med vald formation
-- Sidopanel höger: lista över sparade line-uppställningar (kan filtreras efter typ), med knappar Ladda / Byt namn / Duplicera / Radera
-
-### 4. Datamodell & lagring
-
-Ny tabell `line_layouts`:
-
-```text
-line_layouts
-- id uuid pk
-- team_id uuid (RLS: is_team_member)
-- name text
-- type text  -- '5v5' | 'PP' | 'PK'
-- slots jsonb  -- [{ slotId, role: 'D'|'C'|'F', x, y, lineIndex, playerId? }]
-- created_at timestamptz
-- updated_at timestamptz
-```
-
-RLS-policys identiska med `drills`/`plays` (team members CRUD). Migration via supabase-tool.
-
-Hook `src/hooks/useLineLayouts.ts` för CRUD mot tabellen, scopad till aktuellt team via `TeamContext`.
-
-### 5. Integration i matchförberedelser
-
-I `src/components/games/LineSetup.tsx`:
-
-- Lägg till en knapp **"Ladda från sparade kedjor"** överst i varje sektion (5v5, PP, PK)
-- Klick öppnar dialog med listan av sparade layouts av matchande typ
-- Vid val: mappa slots → existerande `GameLine.playerIds` arrayer (5v5-layouten fyller `line-1`, `line-2`, `line-3`; PP fyller `pp-1`; PK fyller `pk-1`)
-
-Dessutom: i `LineCard` kompletteras nuvarande badge-listan med en kompakt formationsvy (mini-`LineFormationBoard` i read-only-läge med tröjnummer i sloten) så att samma formation syns i matchvyn.
-
-### 6. Visuella detaljer
-
-- Återanvänd färgtokens (`--primary` cyan för hemmaspelare, `--muted` rink-bakgrund, 0.25rem radius)
-- Tre 5v5-kedjor särskiljs med subtila banderoller bakom varje kedja (svag tonad bakgrund) och etikett "Kedja 1/2/3"
-- Tom slot = streckad cirkel med rolletikett; tilldelad slot = fylld cirkel med tröjnummer
-- Touch-vänliga slot-storlekar (≥ 36px) för bänkanvändning
-
-### Tekniska anteckningar
-
-- Roterad rink: byt höjd/bredd-förhållande och rita långsidor vertikalt; mål placeras vid `y=padding` och `y=height-padding`
-- Slot-koordinater definieras som procent av rink-storleken så att layouten är responsiv
-- Spelarväljare via `Popover` + sökbar lista (Command-komponenten finns redan)
-- `usePlayers`-hooken används för att hämta truppen i builder-vyn; i matchvyn kommer spelarna från `squadPlayers`-prop som tidigare
-- Inga ändringar i `EnhancedGame`-typen behövs — line-layouts mappas in i befintliga `GameLine.playerIds`
-
-### Vad som **inte** ingår
-
-- Ingen drag-and-drop av positioner (slots är fasta)
-- Inga animationer (det är taktiktavlans uppgift)
-- 6v5 / 5v6 lägger vi inte till i builder nu, men kan addas senare med samma mönster
+### Out of scope
+- No DB / type changes.
+- No changes to slot coordinates (`src/types/lineLayout.ts`) — current x/y percentages still work on the redrawn board.

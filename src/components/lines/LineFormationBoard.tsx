@@ -70,11 +70,11 @@ export function LineFormationBoard({
     lineCount === 1
       ? 'grid-cols-1 max-w-xs mx-auto'
       : lineCount === 2
-      ? 'grid-cols-1 sm:grid-cols-2'
-      : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+      ? 'grid-cols-2'
+      : 'grid-cols-3';
 
   return (
-    <div className={cn('grid gap-4', gridCols)}>
+    <div className={cn('grid gap-2', gridCols)}>
       {Array.from({ length: lineCount }).map((_, li) => (
         <HalfRinkBoard
           key={li}
@@ -105,20 +105,37 @@ function HalfRinkBoard({
   readOnly: boolean;
   onAssign: (slotId: string, playerId: string | null) => void;
 }) {
-  // Half-rink: vertical, narrower than tall. Goal at top, center line at bottom.
+  // Half-rink: vertical. Goal end (rounded) at top, center-line cut (square) at bottom.
   const W = 220;
   const H = 320;
   const padding = 10;
-  const cornerRadius = 28;
+  const R = 28; // corner radius (top only)
   const rinkW = W - padding * 2;
   const rinkH = H - padding * 2;
 
-  // Goal area at top
+  const left = padding;
+  const right = W - padding;
+  const top = padding;
+  const bottom = H - padding;
+
+  // Path: square bottom corners, rounded top corners.
+  const rinkPath = [
+    `M ${left} ${bottom}`,
+    `L ${left} ${top + R}`,
+    `Q ${left} ${top} ${left + R} ${top}`,
+    `L ${right - R} ${top}`,
+    `Q ${right} ${top} ${right} ${top + R}`,
+    `L ${right} ${bottom}`,
+    'Z',
+  ].join(' ');
+
+  // Crease + goal at top — proportions mirror TacticsBoardRenderer
+  // (crease 70x120, goal 25x60, goalInset 40 on a 800x500 board → ~factor 0.45)
   const creaseW = 90;
-  const creaseH = 40;
-  const goalW = 40;
+  const creaseH = 32;
+  const goalW = 32;
   const goalH = 10;
-  const goalInset = 18;
+  const creaseInset = 14; // distance from rink top edge to crease
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -127,59 +144,55 @@ function HalfRinkBoard({
           {title}
         </div>
       )}
-      <div className="relative w-full max-w-[260px]">
+      <div className="relative w-full">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
           {/* Outer */}
           <rect x={0} y={0} width={W} height={H} fill="hsl(var(--muted))" />
-          {/* Rink surface */}
-          <rect
-            x={padding}
-            y={padding}
-            width={rinkW}
-            height={rinkH}
-            rx={cornerRadius}
+          {/* Rink surface — rounded top, square bottom (cut at center line) */}
+          <path
+            d={rinkPath}
             fill="hsl(var(--background))"
             stroke="hsl(var(--border))"
             strokeWidth={2}
           />
-          {/* Goal at top */}
-          <rect
-            x={W / 2 - goalW / 2}
-            y={padding + goalInset - goalH}
-            width={goalW}
-            height={goalH}
-            fill="none"
-            stroke="hsl(var(--primary))"
-            strokeWidth={1.5}
-          />
-          {/* Crease at top */}
+          {/* Crease at top — outline only, matches tactics board */}
           <rect
             x={W / 2 - creaseW / 2}
-            y={padding + goalInset}
+            y={top + creaseInset}
             width={creaseW}
             height={creaseH}
             fill="none"
             stroke="hsl(var(--primary))"
-            strokeWidth={1.5}
-          />
-          {/* Center line at bottom (red) */}
-          <line
-            x1={padding}
-            x2={padding + rinkW}
-            y1={H - padding}
-            y2={H - padding}
-            stroke="hsl(var(--primary))"
             strokeWidth={2}
-            opacity={0.7}
           />
-          {/* Half center circle (top of bottom line, opens upward) */}
-          <path
-            d={`M ${W / 2 - 28} ${H - padding} A 28 28 0 0 1 ${W / 2 + 28} ${H - padding}`}
+          {/* Goal — sits inside the crease, like tactics board */}
+          <rect
+            x={W / 2 - goalW / 2}
+            y={top + creaseInset + 8}
+            width={goalW}
+            height={goalH}
             fill="none"
             stroke="hsl(var(--primary))"
-            strokeWidth={1.5}
-            opacity={0.6}
+            strokeWidth={2}
           />
+          {/* Center line at bottom (the cut) */}
+          <line
+            x1={left}
+            x2={right}
+            y1={bottom}
+            y2={bottom}
+            stroke="hsl(var(--primary))"
+            strokeWidth={2}
+          />
+          {/* Half center circle opening upward into the half */}
+          <path
+            d={`M ${W / 2 - 26} ${bottom} A 26 26 0 0 1 ${W / 2 + 26} ${bottom}`}
+            fill="none"
+            stroke="hsl(var(--primary))"
+            strokeWidth={2}
+          />
+          {/* Center dot */}
+          <circle cx={W / 2} cy={bottom} r={3} fill="hsl(var(--primary))" />
         </svg>
 
         {/* Slot overlay */}
@@ -250,7 +263,7 @@ function SlotButton({
       disabled={readOnly}
       className={cn(
         'flex flex-col items-center justify-center rounded-full border-2 transition-all',
-        'h-9 w-9 text-[11px] font-bold',
+        'h-8 w-8 text-[10px] font-bold',
         filledClasses,
         !readOnly && 'hover:scale-110 cursor-pointer'
       )}
@@ -317,7 +330,7 @@ function SlotButton({
         </Popover>
       )}
       {filled && (
-        <span className="text-[9px] mt-0.5 px-1 rounded bg-background/90 text-foreground max-w-[70px] truncate leading-tight">
+        <span className="text-[9px] mt-0.5 px-1 rounded bg-background/90 text-foreground max-w-[60px] truncate leading-tight">
           {getGameDisplayName(player!)}
         </span>
       )}
