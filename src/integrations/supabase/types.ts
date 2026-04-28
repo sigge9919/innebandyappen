@@ -217,6 +217,36 @@ export type Database = {
           },
         ]
       }
+      line_layouts: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slots: Json
+          team_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slots?: Json
+          team_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slots?: Json
+          team_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       personal_trainings: {
         Row: {
           created_at: string
