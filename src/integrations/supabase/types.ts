@@ -494,6 +494,60 @@ export type Database = {
           },
         ]
       }
+      tactics_layouts: {
+        Row: {
+          canvas_height: number | null
+          canvas_width: number | null
+          created_at: string
+          created_by: string | null
+          drawing_data: string
+          home_player_count: number
+          id: string
+          is_animation: boolean
+          keyframes: Json
+          name: string
+          opponent_player_count: number
+          players: Json
+          team_id: string
+          updated_at: string
+          zones: Json
+        }
+        Insert: {
+          canvas_height?: number | null
+          canvas_width?: number | null
+          created_at?: string
+          created_by?: string | null
+          drawing_data?: string
+          home_player_count?: number
+          id?: string
+          is_animation?: boolean
+          keyframes?: Json
+          name: string
+          opponent_player_count?: number
+          players?: Json
+          team_id: string
+          updated_at?: string
+          zones?: Json
+        }
+        Update: {
+          canvas_height?: number | null
+          canvas_width?: number | null
+          created_at?: string
+          created_by?: string | null
+          drawing_data?: string
+          home_player_count?: number
+          id?: string
+          is_animation?: boolean
+          keyframes?: Json
+          name?: string
+          opponent_player_count?: number
+          players?: Json
+          team_id?: string
+          updated_at?: string
+          zones?: Json
+        }
+        Relationships: []
+      }
       team_members: {
         Row: {
           created_at: string

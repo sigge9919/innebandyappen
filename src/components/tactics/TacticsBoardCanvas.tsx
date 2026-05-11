@@ -18,6 +18,8 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useTeam } from '@/contexts/TeamContext';
+import { useTacticsLayouts } from '@/hooks/useTacticsLayouts';
 
 interface PlayerMarker {
   id: string;
@@ -64,26 +66,10 @@ interface TacticsLayout {
 type Tool = 'select' | 'addHome' | 'addOpponent' | 'addBall' | 'draw' | 'erase' | 'addZone' | 'delete';
 type Mode = 'edit' | 'animate';
 
-const STORAGE_KEY = 'tactics-layouts';
-
 // Helper to get computed CSS color from CSS variable
 const getCssColor = (varName: string): string => {
   const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
   return value ? `hsl(${value})` : '#000';
-};
-
-// Storage helpers
-const getSavedLayouts = (): TacticsLayout[] => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveLayoutToStorage = (layouts: TacticsLayout[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(layouts));
 };
 
 // Linear interpolation helper
@@ -100,6 +86,12 @@ interface TacticsBoardCanvasProps {
 }
 
 export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps) {
+  const { activeTeam } = useTeam();
+  const {
+    layouts: savedLayouts,
+    create: createLayout,
+    remove: deleteLayout,
+  } = useTacticsLayouts(activeTeam?.id ?? null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -132,25 +124,21 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   const [draggedControlPoint, setDraggedControlPoint] = useState<string | null>(null);
   
   // Save/Load state
-  const [savedLayouts, setSavedLayouts] = useState<TacticsLayout[]>([]);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [layoutName, setLayoutName] = useState('');
 
   // Load saved layouts on mount
   useEffect(() => {
-    const layouts = getSavedLayouts();
-    setSavedLayouts(layouts);
-    
     // Auto-load layout if initialLayoutId is provided
-    if (initialLayoutId) {
-      const found = layouts.find(l => l.id === initialLayoutId);
+    if (initialLayoutId && savedLayouts.length > 0) {
+      const found = savedLayouts.find(l => l.id === initialLayoutId);
       if (found) {
         // Defer to after canvas is ready
-        setTimeout(() => handleLoadLayout(found), 100);
+        setTimeout(() => handleLoadLayout(found as TacticsLayout), 100);
       }
     }
-  }, [initialLayoutId]);
+  }, [initialLayoutId, savedLayouts]);
 
   // Draw the floorball rink
   const drawRink = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
@@ -896,7 +884,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   };
 
   // Save current layout
-  const handleSaveLayout = () => {
+  const handleSaveLayout = async () => {
     if (!layoutName.trim()) {
       toast.error('Ange ett namn för uppställningen');
       return;
@@ -905,27 +893,26 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     const drawingCanvas = drawingCanvasRef.current;
     const drawingData = drawingCanvas ? drawingCanvas.toDataURL() : '';
 
-    const newLayout: TacticsLayout = {
-      id: `layout-${Date.now()}`,
-      name: layoutName.trim(),
-      players,
+    const name = layoutName.trim();
+    const { data, error } = await createLayout({
+      name,
+      players: players as any,
       drawingData,
       homePlayerCount,
       opponentPlayerCount,
-      createdAt: new Date().toISOString(),
-      keyframes: keyframes.length > 0 ? keyframes : undefined,
+      keyframes: keyframes.length > 0 ? (keyframes as any) : undefined,
       isAnimation: keyframes.length > 1,
       zones: zones.length > 0 ? zones : undefined,
       canvasWidth: canvasSize.width,
       canvasHeight: canvasSize.height,
-    };
-
-    const updatedLayouts = [...savedLayouts, newLayout];
-    saveLayoutToStorage(updatedLayouts);
-    setSavedLayouts(updatedLayouts);
+    });
+    if (error || !data) {
+      toast.error('Kunde inte spara', { description: error?.message });
+      return;
+    }
     setLayoutName('');
     setSaveDialogOpen(false);
-    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Uppställning'} "${newLayout.name}" sparad`);
+    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Uppställning'} "${data.name}" sparad`);
   };
 
   // Load a saved layout
@@ -998,11 +985,13 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   };
 
   // Delete a saved layout
-  const handleDeleteLayout = (layoutId: string, e: React.MouseEvent) => {
+  const handleDeleteLayout = async (layoutId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updatedLayouts = savedLayouts.filter((l) => l.id !== layoutId);
-    saveLayoutToStorage(updatedLayouts);
-    setSavedLayouts(updatedLayouts);
+    const { error } = await deleteLayout(layoutId);
+    if (error) {
+      toast.error('Kunde inte ta bort', { description: error.message });
+      return;
+    }
     toast.success('Uppställning borttagen');
   };
 
@@ -1090,7 +1079,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                   savedLayouts.map((layout) => (
                     <div
                       key={layout.id}
-                      onClick={() => handleLoadLayout(layout)}
+                      onClick={() => handleLoadLayout(layout as unknown as TacticsLayout)}
                       className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
