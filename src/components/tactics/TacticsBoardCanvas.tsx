@@ -64,26 +64,10 @@ interface TacticsLayout {
 type Tool = 'select' | 'addHome' | 'addOpponent' | 'addBall' | 'draw' | 'erase' | 'addZone' | 'delete';
 type Mode = 'edit' | 'animate';
 
-const STORAGE_KEY = 'tactics-layouts';
-
 // Helper to get computed CSS color from CSS variable
 const getCssColor = (varName: string): string => {
   const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
   return value ? `hsl(${value})` : '#000';
-};
-
-// Storage helpers
-const getSavedLayouts = (): TacticsLayout[] => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveLayoutToStorage = (layouts: TacticsLayout[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(layouts));
 };
 
 // Linear interpolation helper
