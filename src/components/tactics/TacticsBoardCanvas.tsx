@@ -18,6 +18,8 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useTeam } from '@/contexts/TeamContext';
+import { useTacticsLayouts } from '@/hooks/useTacticsLayouts';
 
 interface PlayerMarker {
   id: string;
@@ -84,6 +86,12 @@ interface TacticsBoardCanvasProps {
 }
 
 export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps) {
+  const { activeTeam } = useTeam();
+  const {
+    layouts: savedLayouts,
+    create: createLayout,
+    remove: deleteLayout,
+  } = useTacticsLayouts(activeTeam?.id ?? null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -116,25 +124,21 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   const [draggedControlPoint, setDraggedControlPoint] = useState<string | null>(null);
   
   // Save/Load state
-  const [savedLayouts, setSavedLayouts] = useState<TacticsLayout[]>([]);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [layoutName, setLayoutName] = useState('');
 
   // Load saved layouts on mount
   useEffect(() => {
-    const layouts = getSavedLayouts();
-    setSavedLayouts(layouts);
-    
     // Auto-load layout if initialLayoutId is provided
-    if (initialLayoutId) {
-      const found = layouts.find(l => l.id === initialLayoutId);
+    if (initialLayoutId && savedLayouts.length > 0) {
+      const found = savedLayouts.find(l => l.id === initialLayoutId);
       if (found) {
         // Defer to after canvas is ready
-        setTimeout(() => handleLoadLayout(found), 100);
+        setTimeout(() => handleLoadLayout(found as TacticsLayout), 100);
       }
     }
-  }, [initialLayoutId]);
+  }, [initialLayoutId, savedLayouts]);
 
   // Draw the floorball rink
   const drawRink = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
