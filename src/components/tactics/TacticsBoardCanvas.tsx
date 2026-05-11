@@ -884,7 +884,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   };
 
   // Save current layout
-  const handleSaveLayout = () => {
+  const handleSaveLayout = async () => {
     if (!layoutName.trim()) {
       toast.error('Ange ett namn för uppställningen');
       return;
@@ -893,27 +893,26 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
     const drawingCanvas = drawingCanvasRef.current;
     const drawingData = drawingCanvas ? drawingCanvas.toDataURL() : '';
 
-    const newLayout: TacticsLayout = {
-      id: `layout-${Date.now()}`,
-      name: layoutName.trim(),
-      players,
+    const name = layoutName.trim();
+    const { data, error } = await createLayout({
+      name,
+      players: players as any,
       drawingData,
       homePlayerCount,
       opponentPlayerCount,
-      createdAt: new Date().toISOString(),
-      keyframes: keyframes.length > 0 ? keyframes : undefined,
+      keyframes: keyframes.length > 0 ? (keyframes as any) : undefined,
       isAnimation: keyframes.length > 1,
       zones: zones.length > 0 ? zones : undefined,
       canvasWidth: canvasSize.width,
       canvasHeight: canvasSize.height,
-    };
-
-    const updatedLayouts = [...savedLayouts, newLayout];
-    saveLayoutToStorage(updatedLayouts);
-    setSavedLayouts(updatedLayouts);
+    });
+    if (error || !data) {
+      toast.error('Kunde inte spara', { description: error?.message });
+      return;
+    }
     setLayoutName('');
     setSaveDialogOpen(false);
-    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Uppställning'} "${newLayout.name}" sparad`);
+    toast.success(`${keyframes.length > 1 ? 'Animation' : 'Uppställning'} "${data.name}" sparad`);
   };
 
   // Load a saved layout
@@ -986,11 +985,13 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   };
 
   // Delete a saved layout
-  const handleDeleteLayout = (layoutId: string, e: React.MouseEvent) => {
+  const handleDeleteLayout = async (layoutId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updatedLayouts = savedLayouts.filter((l) => l.id !== layoutId);
-    saveLayoutToStorage(updatedLayouts);
-    setSavedLayouts(updatedLayouts);
+    const { error } = await deleteLayout(layoutId);
+    if (error) {
+      toast.error('Kunde inte ta bort', { description: error.message });
+      return;
+    }
     toast.success('Uppställning borttagen');
   };
 
