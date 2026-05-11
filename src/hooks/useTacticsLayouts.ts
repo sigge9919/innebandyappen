@@ -2,22 +2,26 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-export interface TacticsPlayerMarker {
+// Player markers come in two shapes across the app (canvas uses 'opponent',
+// renderer uses 'away'). Keep this open and let consumers narrow.
+export type TacticsPlayerMarker = {
   id: string;
   x: number;
   y: number;
-  type?: 'home' | 'away' | 'ball';
-  team?: 'home' | 'away' | 'ball';
   number?: number | string;
-}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [k: string]: any;
+};
 
-export interface TacticsKeyframe {
+export type TacticsKeyframe = {
   id: string;
   timestamp: number;
   players: TacticsPlayerMarker[];
   drawingData?: string;
   curveControlPoints?: { [playerId: string]: { x: number; y: number } };
-}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [k: string]: any;
+};
 
 export interface TacticsZone {
   id: string;
