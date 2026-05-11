@@ -1,76 +1,34 @@
-## Mål
+## Problem
 
-Låt varje användare anpassa sin Översikt: vilka kort som visas, i vilken ordning. Inställningen sparas per användare och lag, och nya användare får en smart standard baserat på deras roll.
+Spelarpositioner, bollar, skuggzoner och kurvkontrollpunkter sparas i taktiktavlan som **absoluta pixelkoordinater** kopplade till canvasens aktuella storlek. När tabletten roteras (eller fönsterbredden ändras) räknas canvasens bredd/höjd om i `updateSize` (`src/components/tactics/TacticsBoardCanvas.tsx`, rad ~335–348), men de sparade koordinaterna gör det inte. Resultat: rinken ritas om i ny storlek, men spelarna sitter kvar på sina gamla pixelvärden och hamnar därmed på fel ställen relativt planen — precis det du ser i porträtt vs landskap.
 
-## Översikt
+Samma problem uppstår vid Spara/Ladda mellan enheter med olika skärmstorlek.
 
-På Översikt läggs en liten "Anpassa"-knapp i sidhuvudet. När den klickas öppnas ett läge där användaren kan:
-- Slå av/på varje kort (checkbox).
-- Ändra ordning med upp/ned-pilar (enkelt och fungerar lika bra på mobil som desktop).
-- Spara eller återställa till rollens standard.
+## Lösning (översikt)
 
-Korten som kan anpassas:
-- Statistikraden (4 stat-kort) — som ett block, kan döljas helt
-- Nästa träning
-- Nästa match
-- Veckans fokus
-- Lagets RPE
-- Senaste matchen
-- RPE-varningar (Hög trötthet)
-- Spelarnotiser
+Gör alla positionsdata **proportionella** mot canvasstorleken i stället för absoluta pixlar. Två steg:
 
-## Datalagring
+1. **Skalning vid storleksändring** — när `canvasSize` ändras, multiplicera alla existerande `x`/`y` med `newWidth/oldWidth` respektive `newHeight/oldHeight`. Gäller `players`, `zones`, `keyframes[].players`, `keyframes[].curveControlPoints`.
+2. **Skalning vid Ladda** — spara `canvasWidth`/`canvasHeight` tillsammans med en layout. Vid laddning, skala om alla koordinater från sparad storlek till aktuell canvasstorlek.
 
-Ny tabell **`user_dashboard_preferences`** i Lovable Cloud:
-
-```text
-id              uuid (pk)
-user_id         uuid  -> auth.uid()
-team_id         uuid  -> teams.id
-layout          jsonb  -- [{ id: "next-game", visible: true }, ...]
-updated_at      timestamptz
-unique (user_id, team_id)
-```
-
-**RLS:**
-- SELECT/INSERT/UPDATE/DELETE: endast egna rader (`user_id = auth.uid()`) och endast om man är medlem i laget (`is_team_member(team_id)`).
-
-Inga ändringar i andra tabeller.
-
-## Roll-baserade standardinställningar
-
-Vid första besöket på Översikt (ingen rad finns) genereras layouten från användarens roll i aktivt lag (`get_user_team_role`):
-
-- **head_coach / assistant_coach**: stats → nästa match → nästa träning → veckans fokus → lagets RPE → senaste match → RPE-varningar → spelarnotiser
-- **player**: lagets RPE → nästa träning → nästa match → veckans fokus → senaste match → stats → (RPE-varningar och spelarnotiser dolda)
-- **viewer / övrigt**: nästa match → senaste match → stats → nästa träning → veckans fokus → (RPE-kort dolda)
-
-Standarden sparas inte automatiskt — först när användaren öppnar "Anpassa" och trycker Spara skapas raden. Det gör att framtida ändringar i defaults når befintliga användare som inte aktivt anpassat.
+Detta gör att samma spelmönster ser identiskt ut i porträtt, landskap, telefon, surfplatta och desktop.
 
 ## Tekniska detaljer
 
-### Ny hook `useDashboardLayout(teamId, role)`
-- Läser raden för (user, team) från tabellen.
-- Om saknas: returnerar rollens default in-memory.
-- Exponerar `layout`, `setLayout`, `save`, `resetToRoleDefault`.
+Fil: `src/components/tactics/TacticsBoardCanvas.tsx`
 
-### `src/pages/Dashboard.tsx`
-- Itererar över layout-arrayen istället för hårdkodad ordning.
-- Renderar bara kort där `visible: true` och där underliggande data finns (samma villkor som idag, t.ex. `lastPlayedGame` måste finnas).
-- Lägger till knappen "Anpassa" i sidhuvudet bredvid säsongsväljaren.
+1. **`TacticsLayout`-typ**: lägg till `canvasWidth: number` och `canvasHeight: number`. Vid `handleSaveLayout` skriv in nuvarande `canvasSize`.
+2. **`handleLoadLayout`**: räkna ut `sx = canvasSize.width / layout.canvasWidth`, `sy = canvasSize.height / layout.canvasHeight` (fallback 1 om saknas → bakåtkompatibelt med gamla sparade layouts, men varna i toast att de kan se förskjutna ut). Skala alla `players`, `zones`, `keyframes`, `curveControlPoints` innan de sätts i state.
+3. **`updateSize`-effekten**: använd en ref för `prevCanvasSize`. När ny storlek beräknas, om den skiljer sig: skala alla state-positioner med samma `sx`/`sy` innan `setCanvasSize`.
+4. **Ritcanvasen (`drawingCanvasRef`)**: free-hand-teckningen är också i pixelkoordinater. Enklaste lösningen: vid resize, rita om innehållet på en temporär canvas i ny storlek via `drawImage(src, 0, 0, newW, newH)`. Acceptabel kvalitet för taktikpilar.
+5. **Aspect ratio**: behåll nuvarande `height = width * 0.625` så att rinkens proportioner är konstanta — det är skalfaktorerna `sx`/`sy` som hanterar resten.
 
-### Ny komponent `src/components/dashboard/DashboardCustomizer.tsx`
-- Sheet/dialog med en lista över alla kort.
-- Per rad: kortets namn, switch för visa/dölj, upp/ned-pilar för ordning.
-- Knappar: "Återställ standard", "Avbryt", "Spara".
-- Sparar via hooken till databasen.
+## Vad detta INTE ändrar
 
-### Inga andra sidor påverkas
-Övriga sidor, rutter, RLS, edge-funktioner och befintliga komponenter förblir oförändrade.
+- Inga databasändringar (taktiklayouter ligger fortfarande i `localStorage`).
+- Inget förändras visuellt om man bara står still i ett läge.
+- Befintliga sparade layouter laddas fortfarande, men gamla utan `canvasWidth/Height` kan se något förskjutna ut första gången tills de sparas om.
 
-## Vad användaren märker
+## Test efter implementation
 
-1. Öppnar Översikt → ser sin senaste sparade layout (eller rollens default om inget sparats).
-2. Klickar "Anpassa" → kan dra på/av kort och ändra ordning.
-3. Sparar → nästa gång hen loggar in på samma lag (även från annan enhet) ser hen samma layout.
-4. Byter till annat lag → varje lag har sin egen sparade layout.
+Öppna samma layout i porträtt och landskap (preview-viewport) och verifiera att spelarnas position relativt mittlinjen, målburar och rinkkanter är identisk.
