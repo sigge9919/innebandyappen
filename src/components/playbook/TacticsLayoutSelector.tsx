@@ -1,12 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { CheckCircle, Circle, Film, Layout } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface TacticsLayout {
-  id: string;
-  name: string;
-  hasAnimation: boolean;
-}
+import { useTeam } from '@/contexts/TeamContext';
+import { useTacticsLayouts } from '@/hooks/useTacticsLayouts';
 
 interface TacticsLayoutSelectorProps {
   selectedIds: string[];
@@ -14,24 +10,16 @@ interface TacticsLayoutSelectorProps {
 }
 
 export function TacticsLayoutSelector({ selectedIds, onSelect }: TacticsLayoutSelectorProps) {
-  const [layouts, setLayouts] = useState<TacticsLayout[]>([]);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('tactics-layouts');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        const layoutList = parsed.map((layout: any) => ({
-          id: layout.id,
-          name: layout.name,
-          hasAnimation: layout.keyframes && layout.keyframes.length > 1,
-        }));
-        setLayouts(layoutList);
-      } catch (e) {
-        console.error('Failed to parse tactics layouts:', e);
-      }
-    }
-  }, []);
+  const { activeTeam } = useTeam();
+  const { layouts: cloudLayouts } = useTacticsLayouts(activeTeam?.id ?? null);
+  const layouts = useMemo(
+    () => cloudLayouts.map(l => ({
+      id: l.id,
+      name: l.name,
+      hasAnimation: !!(l.keyframes && l.keyframes.length > 1),
+    })),
+    [cloudLayouts]
+  );
 
   if (layouts.length === 0) {
     return (

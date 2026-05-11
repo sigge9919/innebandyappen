@@ -1,34 +1,66 @@
 ## Problem
 
-Spelarpositioner, bollar, skuggzoner och kurvkontrollpunkter sparas i taktiktavlan som **absoluta pixelkoordinater** kopplade till canvasens aktuella storlek. När tabletten roteras (eller fönsterbredden ändras) räknas canvasens bredd/höjd om i `updateSize` (`src/components/tactics/TacticsBoardCanvas.tsx`, rad ~335–348), men de sparade koordinaterna gör det inte. Resultat: rinken ritas om i ny storlek, men spelarna sitter kvar på sina gamla pixelvärden och hamnar därmed på fel ställen relativt planen — precis det du ser i porträtt vs landskap.
+Taktiklayouterna (spelarpositioner, ritningar, keyframes, skuggzoner) sparas idag i webbläsarens `localStorage` under nyckeln `tactics-layouts`. Det betyder:
 
-Samma problem uppstår vid Spara/Ladda mellan enheter med olika skärmstorlek.
+- Layouter syns bara på den enhet/webbläsare där de skapades.
+- Andra tränare och spelare i laget kan inte se eller använda dem.
+- De försvinner om man rensar cachen, byter dator eller använder ett annat konto.
+- Kopplingen från träningsövningar (`drills.linked_layout_ids`) och spelmoment (`plays.linked_layout_ids`) pekar på lokala id:n som inte finns hos någon annan användare.
 
-## Lösning (översikt)
+Det här ska bytas så att taktiklayouter, precis som allt annat lagdata, sparas i Lovable Cloud kopplat till `team_id`.
 
-Gör alla positionsdata **proportionella** mot canvasstorleken i stället för absoluta pixlar. Två steg:
+## Lösning
 
-1. **Skalning vid storleksändring** — när `canvasSize` ändras, multiplicera alla existerande `x`/`y` med `newWidth/oldWidth` respektive `newHeight/oldHeight`. Gäller `players`, `zones`, `keyframes[].players`, `keyframes[].curveControlPoints`.
-2. **Skalning vid Ladda** — spara `canvasWidth`/`canvasHeight` tillsammans med en layout. Vid laddning, skala om alla koordinater från sparad storlek till aktuell canvasstorlek.
+### 1. Ny tabell `tactics_layouts` i Lovable Cloud
 
-Detta gör att samma spelmönster ser identiskt ut i porträtt, landskap, telefon, surfplatta och desktop.
+Kolumner (utöver standard `id`, `created_at`, `updated_at`):
+- `team_id` — vilket lag layouten tillhör
+- `name` — namnet tränaren ger
+- `players` (jsonb) — spelarmarkörer
+- `drawing_data` (text) — sparad ritning (data URL)
+- `keyframes` (jsonb) — animationsnycklar
+- `zones` (jsonb) — skuggzoner
+- `home_player_count`, `opponent_player_count` (int)
+- `is_animation` (bool)
+- `canvas_width`, `canvas_height` (int) — för proportionell skalning vid laddning på annan skärm
+- `created_by` — vilken användare som skapade
 
-## Tekniska detaljer
+RLS-policys i linje med övriga lagtabeller:
+- Alla lagmedlemmar kan läsa.
+- Lagmedlemmar kan skapa/ändra/ta bort layouter för sitt lag (samma mönster som `drills` och `plays`).
 
-Fil: `src/components/tactics/TacticsBoardCanvas.tsx`
+### 2. Ny hook `useTacticsLayouts(teamId)`
 
-1. **`TacticsLayout`-typ**: lägg till `canvasWidth: number` och `canvasHeight: number`. Vid `handleSaveLayout` skriv in nuvarande `canvasSize`.
-2. **`handleLoadLayout`**: räkna ut `sx = canvasSize.width / layout.canvasWidth`, `sy = canvasSize.height / layout.canvasHeight` (fallback 1 om saknas → bakåtkompatibelt med gamla sparade layouts, men varna i toast att de kan se förskjutna ut). Skala alla `players`, `zones`, `keyframes`, `curveControlPoints` innan de sätts i state.
-3. **`updateSize`-effekten**: använd en ref för `prevCanvasSize`. När ny storlek beräknas, om den skiljer sig: skala alla state-positioner med samma `sx`/`sy` innan `setCanvasSize`.
-4. **Ritcanvasen (`drawingCanvasRef`)**: free-hand-teckningen är också i pixelkoordinater. Enklaste lösningen: vid resize, rita om innehållet på en temporär canvas i ny storlek via `drawImage(src, 0, 0, newW, newH)`. Acceptabel kvalitet för taktikpilar.
-5. **Aspect ratio**: behåll nuvarande `height = width * 0.625` så att rinkens proportioner är konstanta — det är skalfaktorerna `sx`/`sy` som hanterar resten.
+Centraliserar all hämtning, sparning, uppdatering och borttagning mot Cloud, så att `TacticsBoardCanvas`, `TacticsBoardPreview`, `TacticsBoardFullscreen` och `TacticsLayoutSelector` alla läser från samma källa.
+
+### 3. Komponenter som ska skrivas om från localStorage → hook
+
+- `src/components/tactics/TacticsBoardCanvas.tsx` — `getSavedLayouts`, `saveLayoutToStorage`, `handleSaveLayout`, `handleLoadLayout`, ladda lista i `useEffect`.
+- `src/components/playbook/TacticsLayoutSelector.tsx` — lista layouter för aktivt lag.
+- `src/components/playbook/TacticsBoardPreview.tsx` — slå upp layout via id.
+- `src/components/playbook/TacticsBoardFullscreen.tsx` — slå upp layout via id.
+
+Den `STORAGE_KEY`-konstanten och hjälparna i `TacticsBoardCanvas` tas bort.
+
+### 4. Engångsmigrering av befintliga lokala layouter (valfritt men rekommenderat)
+
+För att inte tappa redan ritade layouter: när `TacticsBoardCanvas` mountas och hittar layouter i `localStorage`, men användaren inte har några i Cloud för sitt aktiva lag, visa en toast "Importera lokala taktiklayouter till laget?" och flytta över dem vid bekräftelse. När de är överförda rensas `localStorage`-nyckeln.
+
+Detta är frivilligt — säg till om du hellre vill att gamla lokala layouter bara försvinner.
+
+### 5. Kopplingar (`linked_layout_ids`)
+
+`drills.linked_layout_ids` och `plays.linked_layout_ids` är redan textarrayer och fungerar oförändrat — de kommer bara att innehålla de nya Cloud-id:na framåt. Eventuella gamla id:n från `localStorage` blir döda referenser; migreringssteget ovan löser detta om man vill behålla dem.
 
 ## Vad detta INTE ändrar
 
-- Inga databasändringar (taktiklayouter ligger fortfarande i `localStorage`).
-- Inget förändras visuellt om man bara står still i ett läge.
-- Befintliga sparade layouter laddas fortfarande, men gamla utan `canvasWidth/Height` kan se något förskjutna ut första gången tills de sparas om.
+- Designen och funktionen av själva taktiktavlan är identisk.
+- Den proportionella skalningen vid rotation (förra ändringen) påverkas inte — `canvas_width`/`canvas_height` finns nu i Cloud istället för i `localStorage`-objektet.
+- Inga andra delar av appen.
 
 ## Test efter implementation
 
-Öppna samma layout i porträtt och landskap (preview-viewport) och verifiera att spelarnas position relativt mittlinjen, målburar och rinkkanter är identisk.
+1. Skapa en layout som tränare A → logga in som tränare B i samma lag → layouten syns.
+2. Koppla en layout till en övning → en spelare i laget öppnar övningen → ser layouten i förhandsvisning.
+3. Radera en layout → den försvinner direkt för alla.
+4. Byt enhet/webbläsare → layouter finns kvar.

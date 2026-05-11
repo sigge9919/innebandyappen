@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, SkipBack, SkipForward, X, Film, ExternalLink } from 'lucide-react';
 import { TacticsBoardRenderer } from './TacticsBoardRenderer';
+import { fetchTacticsLayoutById } from '@/hooks/useTacticsLayouts';
 
 interface PlayerMarker {
   id: string;
@@ -60,13 +61,11 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
 
   useEffect(() => {
     if (!open) return;
-    
-    const stored = localStorage.getItem('tactics-layouts');
-    if (stored) {
+    let cancelled = false;
+    (async () => {
+      const found = await fetchTacticsLayoutById(layoutId);
+      if (cancelled || !found) return;
       try {
-        const parsed = JSON.parse(stored);
-        const found = parsed.find((l: any) => l.id === layoutId);
-        if (found) {
           // Convert player format: TacticsBoardCanvas uses 'type', renderer uses 'team'
           const convertedPlayers = found.players.map((p: any) => ({
             id: p.id,
@@ -112,11 +111,11 @@ export function TacticsBoardFullscreen({ open, onOpenChange, layoutId }: Tactics
           setDisplayPositions(initial);
           setCurrentTime(0);
           setIsPlaying(false);
-        }
       } catch (e) {
         console.error('Failed to load layout:', e);
       }
-    }
+    })();
+    return () => { cancelled = true; };
   }, [layoutId, open]);
 
   // Animation loop
