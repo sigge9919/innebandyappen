@@ -56,6 +56,9 @@ interface TacticsLayout {
   isAnimation?: boolean;
   // Shadow zones
   zones?: ShadowZone[];
+  // Canvas dimensions when saved — used to scale positions on load
+  canvasWidth?: number;
+  canvasHeight?: number;
 }
 
 type Tool = 'select' | 'addHome' | 'addOpponent' | 'addBall' | 'draw' | 'erase' | 'addZone' | 'delete';
