@@ -1079,7 +1079,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
                   savedLayouts.map((layout) => (
                     <div
                       key={layout.id}
-                      onClick={() => handleLoadLayout(layout)}
+                      onClick={() => handleLoadLayout(layout as unknown as TacticsLayout)}
                       className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
