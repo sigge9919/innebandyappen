@@ -930,27 +930,61 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
 
   // Load a saved layout
   const handleLoadLayout = (layout: TacticsLayout) => {
-    setPlayers(layout.players);
+    // Scale all positions from the layout's saved canvas size to the
+    // current one so patterns look identical across orientations / devices.
+    const sx =
+      layout.canvasWidth && layout.canvasWidth > 0
+        ? canvasSize.width / layout.canvasWidth
+        : 1;
+    const sy =
+      layout.canvasHeight && layout.canvasHeight > 0
+        ? canvasSize.height / layout.canvasHeight
+        : 1;
+
+    setPlayers(
+      layout.players.map(p => ({ ...p, x: p.x * sx, y: p.y * sy }))
+    );
     setHomePlayerCount(layout.homePlayerCount);
     setOpponentPlayerCount(layout.opponentPlayerCount);
-    setZones(layout.zones || []);
+    setZones(
+      (layout.zones || []).map(z => ({
+        ...z,
+        x: z.x * sx,
+        y: z.y * sy,
+        width: z.width * sx,
+        height: z.height * sy,
+      }))
+    );
 
-    // Restore drawing
+    // Restore drawing, stretched to the current canvas size
     if (layout.drawingData) {
       const drawCtx = drawingCanvasRef.current?.getContext('2d');
       if (drawCtx) {
         const img = new Image();
         img.onload = () => {
           drawCtx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-          drawCtx.drawImage(img, 0, 0);
+          drawCtx.drawImage(img, 0, 0, canvasSize.width, canvasSize.height);
         };
         img.src = layout.drawingData;
       }
     }
 
-    // Restore animation keyframes
+    // Restore animation keyframes, scaled the same way
     if (layout.keyframes && layout.keyframes.length > 0) {
-      setKeyframes(layout.keyframes);
+      setKeyframes(
+        layout.keyframes.map(kf => ({
+          ...kf,
+          players: kf.players.map(p => ({ ...p, x: p.x * sx, y: p.y * sy })),
+          curveControlPoints: kf.curveControlPoints
+            ? Object.fromEntries(
+                Object.entries(kf.curveControlPoints).map(([id, pt]) => [
+                  id,
+                  { x: pt.x * sx, y: pt.y * sy },
+                ])
+              )
+            : undefined,
+        }))
+      );
       setCurrentKeyframeIndex(0);
       setMode('animate');
     } else {
