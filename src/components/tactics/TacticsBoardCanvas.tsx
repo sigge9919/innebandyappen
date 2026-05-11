@@ -916,6 +916,8 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
       keyframes: keyframes.length > 0 ? keyframes : undefined,
       isAnimation: keyframes.length > 1,
       zones: zones.length > 0 ? zones : undefined,
+      canvasWidth: canvasSize.width,
+      canvasHeight: canvasSize.height,
     };
 
     const updatedLayouts = [...savedLayouts, newLayout];
