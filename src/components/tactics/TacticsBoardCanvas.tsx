@@ -337,12 +337,65 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   // Initialize and resize canvas
   useEffect(() => {
     const updateSize = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const width = Math.min(rect.width, 1000);
-        const height = Math.min(width * 0.625, 600);
-        setCanvasSize({ width, height });
-      }
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const width = Math.min(rect.width, 1000);
+      const height = Math.min(width * 0.625, 600);
+
+      setCanvasSize(prev => {
+        if (prev.width === width && prev.height === height) return prev;
+        const sx = width / prev.width;
+        const sy = height / prev.height;
+
+        // Capture current drawing before the canvas resize wipes its bitmap
+        const drawCanvas = drawingCanvasRef.current;
+        const oldData =
+          drawCanvas && drawCanvas.width > 0 && drawCanvas.height > 0
+            ? drawCanvas.toDataURL()
+            : '';
+
+        // Scale all positional state proportionally so play patterns
+        // stay in the same spot relative to the rink across orientations.
+        setPlayers(ps => ps.map(p => ({ ...p, x: p.x * sx, y: p.y * sy })));
+        setZones(zs =>
+          zs.map(z => ({
+            ...z,
+            x: z.x * sx,
+            y: z.y * sy,
+            width: z.width * sx,
+            height: z.height * sy,
+          }))
+        );
+        setKeyframes(kfs =>
+          kfs.map(kf => ({
+            ...kf,
+            players: kf.players.map(p => ({ ...p, x: p.x * sx, y: p.y * sy })),
+            curveControlPoints: kf.curveControlPoints
+              ? Object.fromEntries(
+                  Object.entries(kf.curveControlPoints).map(([id, pt]) => [
+                    id,
+                    { x: pt.x * sx, y: pt.y * sy },
+                  ])
+                )
+              : undefined,
+          }))
+        );
+
+        // Restore drawing scaled to the new canvas size
+        if (oldData) {
+          const img = new Image();
+          img.onload = () => {
+            const ctx = drawingCanvasRef.current?.getContext('2d');
+            if (ctx) {
+              ctx.clearRect(0, 0, width, height);
+              ctx.drawImage(img, 0, 0, width, height);
+            }
+          };
+          img.src = oldData;
+        }
+
+        return { width, height };
+      });
     };
     
     updateSize();
