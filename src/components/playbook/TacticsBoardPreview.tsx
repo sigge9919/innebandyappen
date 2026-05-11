@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { TacticsBoardFullscreen } from './TacticsBoardFullscreen';
 import { TacticsBoardRenderer } from './TacticsBoardRenderer';
+import { fetchTacticsLayoutById } from '@/hooks/useTacticsLayouts';
 
 interface PlayerMarker {
   id: string;
@@ -54,12 +55,11 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
   const hasAnimation = layout?.keyframes && layout.keyframes.length > 1;
 
   useEffect(() => {
-    const stored = localStorage.getItem('tactics-layouts');
-    if (stored) {
+    let cancelled = false;
+    (async () => {
+      const found = await fetchTacticsLayoutById(layoutId);
+      if (cancelled || !found) return;
       try {
-        const parsed = JSON.parse(stored);
-        const found = parsed.find((l: any) => l.id === layoutId);
-        if (found) {
           // Convert player format: TacticsBoardCanvas uses 'type', renderer uses 'team'
           const convertedPlayers = found.players.map((p: any) => ({
             id: p.id,
@@ -103,11 +103,11 @@ export function TacticsBoardPreview({ layoutId, className }: TacticsBoardPreview
             initial[p.id] = { x: p.x, y: p.y };
           });
           setDisplayPositions(initial);
-        }
       } catch (e) {
         console.error('Failed to load layout:', e);
       }
-    }
+    })();
+    return () => { cancelled = true; };
   }, [layoutId]);
 
   // Animation loop
