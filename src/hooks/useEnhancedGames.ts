@@ -14,6 +14,7 @@ import {
   PenaltyEvent,
   SpecialTeamsStats,
   createEmptyPlayerStats,
+  GameMedia,
 } from '@/types/game';
 import {
   calculateTeamStats,
@@ -226,6 +227,20 @@ export function useGameDetail(gameId: string) {
 
   const updateNotes = useCallback((notes: EnhancedGame['notes']) => saveGame({ notes }), [saveGame]);
 
+  const addGameMedia = useCallback((media: GameMedia) => {
+    const g = gameRef.current;
+    if (!g) return;
+    const mediaFiles = [...(g.mediaFiles || []), media];
+    saveGame({ mediaFiles });
+  }, [saveGame]);
+
+  const removeGameMedia = useCallback((mediaId: string) => {
+    const g = gameRef.current;
+    if (!g) return;
+    const mediaFiles = (g.mediaFiles || []).filter(m => m.id !== mediaId);
+    saveGame({ mediaFiles });
+  }, [saveGame]);
+
   const updatePlayerStat = useCallback((playerId: string, field: keyof Omit<PlayerGameStats, 'playerId'>, value: number) => {
     const g = gameRef.current;
     if (!g) return;
@@ -324,5 +339,6 @@ export function useGameDetail(gameId: string) {
     getPeriodStats, getLineStats, getSpecialTeamsStats,
     updateNotes, updatePlayerStat, assignBlockedShot,
     updateGoalDetails, assignPenaltyPlayer, updateTeamPeriodStats,
+    addGameMedia, removeGameMedia,
   };
 }
