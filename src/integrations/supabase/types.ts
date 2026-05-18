@@ -82,6 +82,7 @@ export type Database = {
           id: string
           lines: Json | null
           location: string
+          media_files: Json
           notes: Json | null
           opponent: string
           opponent_score: number | null
@@ -105,6 +106,7 @@ export type Database = {
           id?: string
           lines?: Json | null
           location?: string
+          media_files?: Json
           notes?: Json | null
           opponent: string
           opponent_score?: number | null
@@ -128,6 +130,7 @@ export type Database = {
           id?: string
           lines?: Json | null
           location?: string
+          media_files?: Json
           notes?: Json | null
           opponent?: string
           opponent_score?: number | null
