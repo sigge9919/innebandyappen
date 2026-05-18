@@ -29,10 +29,11 @@ import { PenaltyEditor } from '@/components/games/PenaltyEditor';
 import { SpecialTeamsSummary } from '@/components/games/SpecialTeamsSummary';
 import { CollapsibleSection } from '@/components/games/CollapsibleSection';
 import { GoalieSelector } from '@/components/games/GoalieSelector';
+import { GameMediaSection } from '@/components/games/GameMediaSection';
 import { Period, Team, TeamStats, GameSituation } from '@/types/game';
 import { format } from 'date-fns';
 import { sv } from 'date-fns/locale';
-import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText, ChevronRight, Square, Shield, Settings, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, Play, MapPin, Calendar, Trophy, BarChart3, Zap, CircleDot, AlertOctagon, User, TrendingUp, FileText, ChevronRight, Square, Shield, Settings, LayoutGrid, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function GameDetail() {
@@ -69,6 +70,8 @@ export default function GameDetail() {
     updateGoalDetails,
     assignPenaltyPlayer,
     updateTeamPeriodStats,
+    addGameMedia,
+    removeGameMedia,
   } = useGameDetail(gameId || '');
 
   if (!game) {
@@ -464,6 +467,14 @@ export default function GameDetail() {
                 penalties={game.penalties || []}
                 squadPlayers={squadPlayers}
                 onAssignPenaltyPlayer={assignPenaltyPlayer}
+              />
+            </CollapsibleSection>
+
+            <CollapsibleSection title="Media" icon={<ImageIcon className="h-5 w-5" />} defaultOpen={false}>
+              <GameMediaSection
+                media={game.mediaFiles || []}
+                onAdd={addGameMedia}
+                onRemove={removeGameMedia}
               />
             </CollapsibleSection>
           </div>
