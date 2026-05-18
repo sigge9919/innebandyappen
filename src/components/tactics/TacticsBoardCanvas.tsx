@@ -99,6 +99,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   
   const [players, setPlayers] = useState<PlayerMarker[]>([]);
   const [selectedTool, setSelectedTool] = useState<Tool>('select');
+  const [drawColor, setDrawColor] = useState<'home' | 'opponent' | 'ball'>('home');
   const [draggedPlayer, setDraggedPlayer] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [homePlayerCount, setHomePlayerCount] = useState(1);
@@ -679,7 +680,12 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
       const drawCtx = drawingCanvasRef.current?.getContext('2d');
       if (drawCtx) {
         if (selectedTool === 'draw') {
-          drawCtx.strokeStyle = getCssColor('--accent');
+          drawCtx.strokeStyle =
+            drawColor === 'home'
+              ? getCssColor('--primary')
+              : drawColor === 'opponent'
+                ? getCssColor('--destructive')
+                : '#f97316';
           drawCtx.lineWidth = 3;
           drawCtx.lineCap = 'round';
           drawCtx.lineJoin = 'round';
@@ -1170,6 +1176,40 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               <Pencil className="h-4 w-4 mr-2" />
               Rita
             </Button>
+            {selectedTool === 'draw' && (
+              <div className="flex items-center gap-1 px-1">
+                <button
+                  type="button"
+                  aria-label="Hemmalag färg"
+                  onClick={() => setDrawColor('home')}
+                  className={cn(
+                    'h-6 w-6 rounded-full border-2 transition-transform',
+                    'bg-primary',
+                    drawColor === 'home' ? 'border-foreground scale-110' : 'border-transparent'
+                  )}
+                />
+                <button
+                  type="button"
+                  aria-label="Bortalag färg"
+                  onClick={() => setDrawColor('opponent')}
+                  className={cn(
+                    'h-6 w-6 rounded-full border-2 transition-transform',
+                    'bg-destructive',
+                    drawColor === 'opponent' ? 'border-foreground scale-110' : 'border-transparent'
+                  )}
+                />
+                <button
+                  type="button"
+                  aria-label="Boll färg"
+                  onClick={() => setDrawColor('ball')}
+                  style={{ backgroundColor: '#f97316' }}
+                  className={cn(
+                    'h-6 w-6 rounded-full border-2 transition-transform',
+                    drawColor === 'ball' ? 'border-foreground scale-110' : 'border-transparent'
+                  )}
+                />
+              </div>
+            )}
             <Button
               variant={selectedTool === 'erase' ? 'default' : 'outline'}
               size="sm"
