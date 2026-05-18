@@ -99,6 +99,7 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
   
   const [players, setPlayers] = useState<PlayerMarker[]>([]);
   const [selectedTool, setSelectedTool] = useState<Tool>('select');
+  const [drawColor, setDrawColor] = useState<'home' | 'opponent' | 'ball'>('home');
   const [draggedPlayer, setDraggedPlayer] = useState<string | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [homePlayerCount, setHomePlayerCount] = useState(1);
@@ -679,7 +680,12 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
       const drawCtx = drawingCanvasRef.current?.getContext('2d');
       if (drawCtx) {
         if (selectedTool === 'draw') {
-          drawCtx.strokeStyle = getCssColor('--accent');
+          drawCtx.strokeStyle =
+            drawColor === 'home'
+              ? getCssColor('--primary')
+              : drawColor === 'opponent'
+                ? getCssColor('--destructive')
+                : '#f97316';
           drawCtx.lineWidth = 3;
           drawCtx.lineCap = 'round';
           drawCtx.lineJoin = 'round';
