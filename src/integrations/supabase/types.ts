@@ -798,6 +798,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_pending_invites: { Args: never; Returns: undefined }
       create_team: { Args: { _name: string }; Returns: string }
       get_player_id_for_user: { Args: { _team_id: string }; Returns: string }
       get_user_team_role: {
