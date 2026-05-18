@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
-import { EnhancedGame, GameEvent, GameLine } from '@/types/game';
+import { useMemo, useState } from 'react';
+import { EnhancedGame, GameEvent, GameLine, GameSituation } from '@/types/game';
 import { Player } from '@/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
 
 interface LineCombinationStatsProps {
@@ -19,6 +20,17 @@ interface ComboStats {
 }
 
 export function LineCombinationStats({ games, players }: LineCombinationStatsProps) {
+  const [situationFilter, setSituationFilter] = useState<GameSituation | 'all'>('all');
+
+  const situationOptions: { value: GameSituation | 'all'; label: string }[] = [
+    { value: 'all', label: 'Alla' },
+    { value: '5v5', label: '5v5' },
+    { value: '5v4', label: '5v4 (PP)' },
+    { value: '4v5', label: '4v5 (PK)' },
+    { value: '6v5', label: '6v5' },
+    { value: '5v6', label: '5v6' },
+  ];
+
   const playerMap = useMemo(() => {
     const map = new Map<string, Player>();
     players.forEach(p => map.set(p.id, p));
@@ -27,6 +39,8 @@ export function LineCombinationStats({ games, players }: LineCombinationStatsPro
 
   const combos = useMemo(() => {
     const comboMap = new Map<string, ComboStats>();
+    // Track which gameIds each combo appeared in (situation-aware when filtered)
+    const comboGameIds = new Map<string, Set<string>>();
 
     for (const game of games) {
       if (game.status !== 'Finished' || !game.lines || !game.events) continue;
@@ -34,13 +48,9 @@ export function LineCombinationStats({ games, players }: LineCombinationStatsPro
       const lines = game.lines as GameLine[];
       const events = game.events as GameEvent[];
 
-      // Track which combos appeared in this game
-      const gameComboKeys = new Set<string>();
-
       for (const line of lines) {
         if (!line.playerIds || line.playerIds.length < 2) continue;
         const key = [...line.playerIds].sort().join('-');
-        gameComboKeys.add(key);
 
         if (!comboMap.has(key)) {
           comboMap.set(key, {
@@ -50,19 +60,20 @@ export function LineCombinationStats({ games, players }: LineCombinationStatsPro
             goalsAgainst: 0,
             plusMinus: 0,
           });
+          comboGameIds.set(key, new Set());
         }
-      }
 
-      // Count games played per combo
-      for (const key of gameComboKeys) {
-        const combo = comboMap.get(key)!;
-        combo.gamesPlayed += 1;
+        // When no situation filter, count every line that was set up in this game.
+        if (situationFilter === 'all') {
+          comboGameIds.get(key)!.add(game.id);
+        }
       }
 
       // Attribute goals to combos based on lineId
       for (const event of events) {
         if (event.type !== 'goal') continue;
         if (event.situation === 'PS') continue; // Exclude penalty shots
+        if (situationFilter !== 'all' && event.situation !== situationFilter) continue;
 
         if (event.team === 'home' && event.lineId) {
           const line = lines.find(l => l.id === event.lineId);
@@ -72,6 +83,7 @@ export function LineCombinationStats({ games, players }: LineCombinationStatsPro
             if (combo) {
               combo.goalsFor += 1;
               combo.plusMinus += 1;
+              comboGameIds.get(key)!.add(game.id);
             }
           }
         } else if (event.team === 'opponent' && event.lineId) {
@@ -83,19 +95,25 @@ export function LineCombinationStats({ games, players }: LineCombinationStatsPro
             if (combo) {
               combo.goalsAgainst += 1;
               combo.plusMinus -= 1;
+              comboGameIds.get(key)!.add(game.id);
             }
           }
         } else if (event.team === 'opponent' && event.onIcePlayerIds && event.onIcePlayerIds.length >= 2) {
           // Opponent goal with on-ice snapshot — find matching combo
           for (const [key, combo] of comboMap) {
-            const comboPlayerSet = new Set(combo.playerIds);
             if (combo.playerIds.every(pid => event.onIcePlayerIds!.includes(pid))) {
               combo.goalsAgainst += 1;
               combo.plusMinus -= 1;
+              comboGameIds.get(key)!.add(game.id);
             }
           }
         }
       }
+    }
+
+    // Finalize gamesPlayed from the collected sets
+    for (const [key, combo] of comboMap) {
+      combo.gamesPlayed = comboGameIds.get(key)?.size ?? 0;
     }
 
     return Array.from(comboMap.values())
@@ -105,7 +123,7 @@ export function LineCombinationStats({ games, players }: LineCombinationStatsPro
         const avgB = b.gamesPlayed > 0 ? b.plusMinus / b.gamesPlayed : 0;
         return avgB - avgA;
       });
-  }, [games]);
+  }, [games, situationFilter]);
 
   const getPlayerNames = (playerIds: string[]) => {
     return playerIds
@@ -116,24 +134,48 @@ export function LineCombinationStats({ games, players }: LineCombinationStatsPro
       .join(', ');
   };
 
+  const filterButtons = (
+    <div className="flex flex-wrap gap-2 mb-4">
+      {situationOptions.map(opt => (
+        <Button
+          key={opt.value}
+          variant={situationFilter === opt.value ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setSituationFilter(opt.value)}
+        >
+          {opt.label}
+        </Button>
+      ))}
+    </div>
+  );
+
   if (combos.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-        <p className="text-muted-foreground">Inga kedjedata att analysera</p>
-        <p className="text-sm text-muted-foreground mt-1">
-          Sätt upp kedjor i matcher och spela klart för att se kombinationsstatistik
-        </p>
+      <div>
+        {filterButtons}
+        <div className="text-center py-12">
+          <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+          <p className="text-muted-foreground">
+            {situationFilter === 'all'
+              ? 'Inga kedjedata att analysera'
+              : `Inga kombinationer i ${situationFilter}`}
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Sätt upp kedjor i matcher och spela klart för att se kombinationsstatistik
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <Card>
+    <div>
+      {filterButtons}
+      <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-4 w-4" />
-          Bästa kombinationer
+          Bästa kombinationer{situationFilter !== 'all' ? ` — ${situationFilter}` : ''}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -168,6 +210,7 @@ export function LineCombinationStats({ games, players }: LineCombinationStatsPro
           </TableBody>
         </Table>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 }
