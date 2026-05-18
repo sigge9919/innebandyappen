@@ -1176,6 +1176,40 @@ export function TacticsBoardCanvas({ initialLayoutId }: TacticsBoardCanvasProps)
               <Pencil className="h-4 w-4 mr-2" />
               Rita
             </Button>
+            {selectedTool === 'draw' && (
+              <div className="flex items-center gap-1 px-1">
+                <button
+                  type="button"
+                  aria-label="Hemmalag färg"
+                  onClick={() => setDrawColor('home')}
+                  className={cn(
+                    'h-6 w-6 rounded-full border-2 transition-transform',
+                    'bg-primary',
+                    drawColor === 'home' ? 'border-foreground scale-110' : 'border-transparent'
+                  )}
+                />
+                <button
+                  type="button"
+                  aria-label="Bortalag färg"
+                  onClick={() => setDrawColor('opponent')}
+                  className={cn(
+                    'h-6 w-6 rounded-full border-2 transition-transform',
+                    'bg-destructive',
+                    drawColor === 'opponent' ? 'border-foreground scale-110' : 'border-transparent'
+                  )}
+                />
+                <button
+                  type="button"
+                  aria-label="Boll färg"
+                  onClick={() => setDrawColor('ball')}
+                  style={{ backgroundColor: '#f97316' }}
+                  className={cn(
+                    'h-6 w-6 rounded-full border-2 transition-transform',
+                    drawColor === 'ball' ? 'border-foreground scale-110' : 'border-transparent'
+                  )}
+                />
+              </div>
+            )}
             <Button
               variant={selectedTool === 'erase' ? 'default' : 'outline'}
               size="sm"
