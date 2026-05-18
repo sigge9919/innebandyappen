@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './AuthContext';
-import { useSeasons, Season } from '@/hooks/useSeasons';
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./AuthContext";
+import { useSeasons, Season } from "@/hooks/useSeasons";
 
-export type TeamRole = 'head_coach' | 'assistant_coach' | 'stats_coach' | 'viewer' | 'player';
+export type TeamRole = "head_coach" | "assistant_coach" | "stats_coach" | "viewer" | "player";
 
 export interface Team {
   id: string;
@@ -57,18 +57,29 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const [pendingSetup, setPendingSetup] = useState(false);
 
   const {
-    seasons, activeSeason, selectedSeason, selectedSeasonId,
-    setSelectedSeasonId, startNewSeason, loading: seasonsLoading, refresh: refreshSeasons,
+    seasons,
+    activeSeason,
+    selectedSeason,
+    selectedSeasonId,
+    setSelectedSeasonId,
+    startNewSeason,
+    loading: seasonsLoading,
+    refresh: refreshSeasons,
   } = useSeasons(activeTeam?.id);
 
   const refreshTeams = useCallback(async () => {
-    if (!user) { setTeams([]); setLoading(false); return; }
-    const { data } = await supabase.from('teams').select('*');
+    if (!user) {
+      setTeams([]);
+      setLoading(false);
+      return;
+    }
+    await supabase.rpc("claim_pending_invites");
+    const { data } = await supabase.from("teams").select("*");
     const teamList = (data ?? []) as Team[];
     setTeams(teamList);
 
-    const storedId = localStorage.getItem('coachOS_activeTeamId');
-    const stored = teamList.find(t => t.id === storedId);
+    const storedId = localStorage.getItem("coachOS_activeTeamId");
+    const stored = teamList.find((t) => t.id === storedId);
     if (pendingSetup) {
       // Don't auto-select while drill picker is showing
       setActiveTeamState(null);
@@ -76,7 +87,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       setActiveTeamState(stored);
     } else if (teamList.length === 1) {
       setActiveTeamState(teamList[0]);
-      localStorage.setItem('coachOS_activeTeamId', teamList[0].id);
+      localStorage.setItem("coachOS_activeTeamId", teamList[0].id);
     } else {
       setActiveTeamState(null);
     }
@@ -88,11 +99,15 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   }, [refreshTeams]);
 
   const refreshMembers = useCallback(async () => {
-    if (!activeTeam) { setMembers([]); setActiveRole(null); return; }
-    const { data } = await supabase.from('team_members').select('*').eq('team_id', activeTeam.id);
+    if (!activeTeam) {
+      setMembers([]);
+      setActiveRole(null);
+      return;
+    }
+    const { data } = await supabase.from("team_members").select("*").eq("team_id", activeTeam.id);
     const memberList = (data ?? []) as TeamMember[];
     setMembers(memberList);
-    const me = memberList.find(m => m.user_id === user?.id);
+    const me = memberList.find((m) => m.user_id === user?.id);
     setActiveRole(me?.role ?? null);
   }, [activeTeam, user]);
 
@@ -103,12 +118,12 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const setActiveTeam = (team: Team) => {
     setPendingSetup(false);
     setActiveTeamState(team);
-    localStorage.setItem('coachOS_activeTeamId', team.id);
+    localStorage.setItem("coachOS_activeTeamId", team.id);
   };
 
   const createTeam = async (name: string): Promise<{ error: Error | null; teamId?: string }> => {
-    if (!user) return { error: new Error('Not authenticated') };
-    const { data: teamId, error } = await supabase.rpc('create_team', { _name: name });
+    if (!user) return { error: new Error("Not authenticated") };
+    const { data: teamId, error } = await supabase.rpc("create_team", { _name: name });
     if (error) return { error: error as unknown as Error };
 
     // Don't set active team yet — TeamSetup will do it after drill selection
@@ -118,19 +133,19 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   };
 
   const inviteCoach = async (email: string, role: TeamRole) => {
-    if (!activeTeam) return { error: new Error('No active team') };
-    const { error } = await supabase.from('team_members').insert({
+    if (!activeTeam) return { error: new Error("No active team") };
+    const { error } = await supabase.from("team_members").insert({
       team_id: activeTeam.id,
       invite_email: email.toLowerCase(),
       role,
     });
     if (error) return { error: error as unknown as Error };
 
-    console.log('Försöker anropa Edge Function...');
+    console.log("Försöker anropa Edge Function...");
 
     // Send invite email via edge function
-    const inviterName = user?.email ?? 'En tränare';
-    const { data, error: fnError } = await supabase.functions.invoke('send-invite', {
+    const inviterName = user?.email ?? "En tränare";
+    const { data, error: fnError } = await supabase.functions.invoke("send-invite", {
       body: {
         email: email.toLowerCase(),
         teamName: activeTeam.name,
@@ -138,26 +153,57 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         inviterName,
       },
     });
-    console.log('Edge function svar:', JSON.stringify({ data, error: fnError, errorMessage: fnError?.message, errorStatus: fnError?.status, errorContext: fnError?.context }, null, 2));
+    console.log(
+      "Edge function svar:",
+      JSON.stringify(
+        {
+          data,
+          error: fnError,
+          errorMessage: fnError?.message,
+          errorStatus: fnError?.status,
+          errorContext: fnError?.context,
+        },
+        null,
+        2,
+      ),
+    );
 
     await refreshMembers();
     return { error: null };
   };
 
   const removeMember = async (memberId: string) => {
-    const { error } = await supabase.from('team_members').delete().eq('id', memberId);
+    const { error } = await supabase.from("team_members").delete().eq("id", memberId);
     if (error) return { error: error as unknown as Error };
     await refreshMembers();
     return { error: null };
   };
 
   return (
-    <TeamContext.Provider value={{
-      teams, activeTeam, activeRole, members, loading, pendingSetup,
-      setActiveTeam, createTeam, inviteCoach, removeMember, refreshTeams, refreshMembers,
-      seasons, activeSeason, selectedSeason, selectedSeasonId,
-      setSelectedSeasonId, startNewSeason, seasonsLoading, refreshSeasons,
-    }}>
+    <TeamContext.Provider
+      value={{
+        teams,
+        activeTeam,
+        activeRole,
+        members,
+        loading,
+        pendingSetup,
+        setActiveTeam,
+        createTeam,
+        inviteCoach,
+        removeMember,
+        refreshTeams,
+        refreshMembers,
+        seasons,
+        activeSeason,
+        selectedSeason,
+        selectedSeasonId,
+        setSelectedSeasonId,
+        startNewSeason,
+        seasonsLoading,
+        refreshSeasons,
+      }}
+    >
       {children}
     </TeamContext.Provider>
   );
@@ -165,6 +211,6 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
 export function useTeam() {
   const ctx = useContext(TeamContext);
-  if (!ctx) throw new Error('useTeam must be used within TeamProvider');
+  if (!ctx) throw new Error("useTeam must be used within TeamProvider");
   return ctx;
 }
