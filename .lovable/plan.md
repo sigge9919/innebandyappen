@@ -1,27 +1,27 @@
 ## Mål
+Byt ut det fasta filtret "Senaste 3 matcherna" på `/stats` mot en flexibel väljare där användaren själv markerar vilka avslutade matcher som ska ingå i statistiken.
 
-Gör det möjligt att i efterhand ladda upp och spara bilder/videor som dokumenterar en match. Allt sparas i lagets molnbackend så att alla med åtkomst till laget kan se materialet.
+## Ändringar
 
-## Vad användaren får
+**`src/pages/Stats.tsx`**
+- Ta bort `statsPeriod`-state (`'season' | 'last3'`) och de två knapparna.
+- Inför istället:
+  - `selectedGameIds: string[]` — tomt = alla avslutade matcher (hela säsongen).
+  - Två knappar: `Hela säsongen` (rensar urvalet) och `Välj matcher…` (öppnar dialog).
+- `statsGames` = om urvalet är tomt → alla avslutade; annars filtrera `getFinishedGames(games)` på valda id:n (behåll kronologisk ordning).
+- Visa en liten sammanfattning: "Visar statistik från X av Y matcher" + chips/badges för valda matcher med kryss för att ta bort enskild match snabbt.
 
-- En ny sektion **"Media"** på matchsidan (`/games/:gameId`) som syns för matcher som är spelade (status `Played`/`Finished`).
-- Knapp för att ladda upp foto/video (samma uppladdningsflöde som finns i övningar och spelmoment idag).
-- Galleri som visar uppladdade filer (samma `PlayMediaGallery`-komponent som redan används).
-- Möjlighet att ta bort enskilda mediafiler.
-- Allt sparas direkt — inga "Spara"-knappar behövs.
+**Ny komponent `src/components/stats/GameFilterDialog.tsx`**
+- Dialog med lista över alla avslutade matcher i säsongen, nyast först.
+- Varje rad: checkbox + datum, motståndare, hemma/borta, resultat.
+- Topprad: "Markera alla" / "Avmarkera alla".
+- Knappar: `Avbryt` och `Använd urval`.
+- Props: `games`, `selectedIds`, `onConfirm(ids)`, `open`, `onOpenChange`.
 
-## Tekniskt
+## Beteende
+- Urvalet lever bara i komponentstate (ingen persistens) — nollställs vid sidbyte/säsongbyte.
+- Vid säsongsbyte rensas `selectedGameIds` automatiskt via effekt på `selectedSeasonId`.
+- Alla underliggande vyer (Spelar-, Lag-, Trender-, Kombinationer) tar redan emot `statsGames` och behöver inga ändringar.
 
-1. **Databas:** Lägg till kolumnen `media_files jsonb default '[]'` på tabellen `games`. Inga RLS-ändringar behövs eftersom befintliga policys på `games` redan ger laget åtkomst.
-2. **Typer:** Utöka `EnhancedGame` (`src/types/game.ts`) med `mediaFiles?: PlayMedia[]`. Mappa i `dbToEnhancedGame`/`enhancedGameToDb`/`enhancedGameUpdatesToDb` i `src/lib/gameStorage.ts`.
-3. **Hook:** Lägg till `addGameMedia(file)` och `removeGameMedia(mediaId)` i `useGameDetail` (`src/hooks/useEnhancedGames.ts`) som uppdaterar `media_files`-kolumnen.
-4. **UI:** Ny komponent `GameMediaSection` i `src/components/games/`, renderad i `GameDetail.tsx` när matchen är spelad. Återanvänder `PlayMediaGallery` och samma upload-mönster (FileReader → data-URL) som `EditPlayDialog.tsx`.
-
-## Att tänka på
-
-Befintlig media (övningar/spelmoment) lagras som base64 data-URL:er direkt i JSONB. Det fungerar bra för bilder men blir tungt för längre videor (varje rad kan bli flera MB och hämtas alltid med matchen). Två alternativ:
-
-- **A. Följ samma mönster** (snabbt, konsekvent med övrig app, men inte idealiskt för stora videor).
-- **B. Ladda upp till Lovable Cloud Storage** (skalbar lösning, kräver ny storage bucket + RLS-policys, lite mer kod, men hanterar stora videor utan att blåsa upp databasraden).
-
-Förslag: börja med **A** för att hålla appen konsekvent. Vi kan migrera till **B** senare om videostorleken blir ett problem.
+## Inga backend-ändringar
+Rent UI/state-arbete i frontend.

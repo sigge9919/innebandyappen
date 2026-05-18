@@ -1,20 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useEnhancedGames } from '@/hooks/useEnhancedGames';
 import { usePlayers } from '@/hooks/useLocalStorage';
 import { useTeam } from '@/contexts/TeamContext';
 import { SeasonSelector } from '@/components/SeasonSelector';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Users, TrendingUp, Link2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { BarChart3, Users, TrendingUp, Link2, Filter, X } from 'lucide-react';
 import { getFinishedGames } from '@/lib/seasonStats';
 import { SeasonPlayerStats } from '@/components/stats/SeasonPlayerStats';
 import { SeasonTeamStats } from '@/components/stats/SeasonTeamStats';
 import { TeamTrends } from '@/components/stats/TeamTrends';
 import { PlayerTrends } from '@/components/stats/PlayerTrends';
 import { LineCombinationStats } from '@/components/stats/LineCombinationStats';
+import { GameFilterDialog } from '@/components/stats/GameFilterDialog';
 
 type StatsViewType = 'player' | 'team' | 'trends' | 'combos';
-type StatsPeriodType = 'season' | 'last3';
 type TrendsSubView = 'team' | 'player';
 
 export default function Stats() {
@@ -22,14 +23,22 @@ export default function Stats() {
   const { players } = usePlayers();
   const { seasons, selectedSeasonId, setSelectedSeasonId, selectedSeason } = useTeam();
   const [statsView, setStatsView] = useState<StatsViewType>('player');
-  const [statsPeriod, setStatsPeriod] = useState<StatsPeriodType>('season');
   const [trendsSubView, setTrendsSubView] = useState<TrendsSubView>('team');
+  const [selectedGameIds, setSelectedGameIds] = useState<string[]>([]);
+  const [filterOpen, setFilterOpen] = useState(false);
 
-  const finishedGamesCount = games.filter(g => g.status === 'Finished').length;
+  useEffect(() => {
+    setSelectedGameIds([]);
+  }, [selectedSeasonId]);
 
-  const statsGames = statsPeriod === 'last3'
-    ? getFinishedGames(games, 3)
-    : getFinishedGames(games);
+  const allFinished = useMemo(() => getFinishedGames(games), [games]);
+  const finishedGamesCount = allFinished.length;
+
+  const statsGames = selectedGameIds.length === 0
+    ? allFinished
+    : allFinished.filter(g => selectedGameIds.includes(g.id));
+
+  const selectedGames = allFinished.filter(g => selectedGameIds.includes(g.id));
 
   return (
     <AppLayout>
@@ -76,18 +85,46 @@ export default function Stats() {
               </div>
 
               <div className="flex gap-2">
-                <Button variant={statsPeriod === 'season' ? 'default' : 'outline'} size="sm" onClick={() => setStatsPeriod('season')}>
+                <Button
+                  variant={selectedGameIds.length === 0 ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedGameIds([])}
+                >
                   Hela säsongen
                 </Button>
-                <Button variant={statsPeriod === 'last3' ? 'default' : 'outline'} size="sm" onClick={() => setStatsPeriod('last3')}>
-                  Senaste 3 matcherna
+                <Button
+                  variant={selectedGameIds.length > 0 ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterOpen(true)}
+                  className="gap-2"
+                >
+                  <Filter className="h-4 w-4" />
+                  Välj matcher{selectedGameIds.length > 0 ? ` (${selectedGameIds.length})` : '…'}
                 </Button>
               </div>
             </div>
 
             <p className="text-sm text-muted-foreground">
               Visar statistik från {statsGames.length} avslutad{statsGames.length !== 1 ? 'e' : ''} match{statsGames.length !== 1 ? 'er' : ''}
+              {selectedGameIds.length > 0 ? ` av ${finishedGamesCount}` : ''}
             </p>
+
+            {selectedGames.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {selectedGames.map(g => (
+                  <Badge key={g.id} variant="secondary" className="gap-1.5 pr-1">
+                    <span>{g.location === 'Home' ? 'vs' : '@'} {g.opponent} ({g.date})</span>
+                    <button
+                      onClick={() => setSelectedGameIds(prev => prev.filter(id => id !== g.id))}
+                      className="hover:bg-muted-foreground/20 rounded-sm p-0.5"
+                      aria-label="Ta bort"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
 
             {statsView === 'player' ? (
               <SeasonPlayerStats games={statsGames} players={players} />
@@ -115,6 +152,14 @@ export default function Stats() {
           </div>
         )}
       </div>
+
+      <GameFilterDialog
+        open={filterOpen}
+        onOpenChange={setFilterOpen}
+        games={allFinished}
+        selectedIds={selectedGameIds}
+        onConfirm={setSelectedGameIds}
+      />
     </AppLayout>
   );
 }
