@@ -7,6 +7,13 @@ export type EventType = 'goal' | 'shot_on_goal' | 'shot_off_goal' | 'shot_blocke
 export type Team = 'home' | 'opponent';
 export type GameSituation = '5v5' | '5v4' | '4v5' | '6v5' | '5v6' | 'PS';
 
+export interface GameMedia {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  name: string;
+}
+
 export interface GameLine {
   id: string;
   name: string;
@@ -123,6 +130,9 @@ export interface EnhancedGame {
     whatDidnt: string;
     focusNextWeek: string;
   };
+
+  // Post-game media (photos/videos)
+  mediaFiles?: GameMedia[];
 }
 
 // Helper to create empty team stats
