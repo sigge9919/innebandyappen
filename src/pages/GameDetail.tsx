@@ -18,6 +18,7 @@ import { useGameDetail } from '@/hooks/useEnhancedGames';
 import { usePlayers } from '@/hooks/useLocalStorage';
 import { SquadSelection } from '@/components/games/SquadSelection';
 import { LineSetup } from '@/components/games/LineSetup';
+import { GameCategoryPicker } from '@/components/games/GameCategoryPicker';
 import { LiveTracking } from '@/components/games/LiveTracking';
 import { PostGameNotes } from '@/components/games/PostGameNotes';
 import { GameStatsCard } from '@/components/games/GameStatsCard';
@@ -45,6 +46,7 @@ export default function GameDetail() {
   
   const {
     game,
+    updateGame,
     updateSquad,
     updateLine,
     startGame,
@@ -147,6 +149,12 @@ export default function GameDetail() {
                 <MapPin className="h-4 w-4" />
                 {game.location}
               </span>
+            </div>
+            <div className="mt-2">
+              <GameCategoryPicker
+                value={game.categories ?? []}
+                onChange={(next) => updateGame({ categories: next })}
+              />
             </div>
           </div>
           {/* Live game controls in header */}
