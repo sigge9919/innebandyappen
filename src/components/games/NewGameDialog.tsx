@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { createEnhancedGame, EnhancedGame } from '@/types/game';
 import { format } from 'date-fns';
 import { GameCategoryPicker } from './GameCategoryPicker';
-import { Label as L } from '@/components/ui/label';
 
 interface NewGameDialogProps {
   open: boolean;
@@ -80,7 +79,7 @@ export function NewGameDialog({ open, onOpenChange, onSave }: NewGameDialogProps
           </div>
 
           <div className="space-y-2">
-            <L>Kategorier</L>
+            <Label>Kategorier</Label>
             <GameCategoryPicker value={categories} onChange={setCategories} />
           </div>
 
