@@ -108,6 +108,9 @@ export interface EnhancedGame {
   ourScore: number;
   opponentScore: number;
   
+  // Tags/categories for filtering (e.g. "Serie", "Cup", "Träningsmatch")
+  categories?: string[];
+
   // Pre-game setup
   squadPlayerIds: string[];
   lines: GameLine[];
@@ -175,6 +178,7 @@ export function createEnhancedGame(opponent: string, date: string, location: 'Ho
     status: 'Not Started',
     ourScore: 0,
     opponentScore: 0,
+    categories: [],
     squadPlayerIds: [],
     lines: createDefaultLines(),
     startingGoalieId: undefined,
