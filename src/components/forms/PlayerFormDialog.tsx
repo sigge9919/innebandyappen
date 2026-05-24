@@ -59,20 +59,34 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
     const currentPositions = formData.positions || [];
     if (currentPositions.includes(position)) {
       if (currentPositions.length > 1) {
-        setFormData({ ...formData, positions: currentPositions.filter(p => p !== position) });
+        const newPositions = currentPositions.filter(p => p !== position);
+        const isOnlyGoalie = newPositions.length === 1 && newPositions[0] === 'Goalkeeper';
+        setFormData({
+          ...formData,
+          positions: newPositions,
+          stickSide: isOnlyGoalie ? undefined : (formData.stickSide || 'Right'),
+        });
       }
     } else {
-      setFormData({ ...formData, positions: [...currentPositions, position] });
+      const newPositions = [...currentPositions, position];
+      const isOnlyGoalie = newPositions.length === 1 && newPositions[0] === 'Goalkeeper';
+      setFormData({
+        ...formData,
+        positions: newPositions,
+        stickSide: isOnlyGoalie ? undefined : (formData.stickSide || 'Right'),
+      });
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const positions = formData.positions || ['Forward'];
+    const isOnlyGoalie = positions.length === 1 && positions[0] === 'Goalkeeper';
     const newPlayer: Player = {
       id: player?.id || crypto.randomUUID(),
       name: formData.name || '',
-      positions: formData.positions || ['Forward'],
-      stickSide: formData.stickSide as Player['stickSide'],
+      positions,
+      stickSide: isOnlyGoalie ? (undefined as any) : (formData.stickSide as Player['stickSide']),
       jerseyNumber: formData.jerseyNumber || 1,
       status: formData.status as Player['status'],
       notes: formData.notes || '',
