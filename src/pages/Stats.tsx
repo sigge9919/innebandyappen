@@ -6,7 +6,7 @@ import { useTeam } from '@/contexts/TeamContext';
 import { SeasonSelector } from '@/components/SeasonSelector';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, Users, TrendingUp, Link2, Filter, X } from 'lucide-react';
+import { BarChart3, Users, TrendingUp, Link2, Filter, X, ClipboardList } from 'lucide-react';
 import { getFinishedGames } from '@/lib/seasonStats';
 import { SeasonPlayerStats } from '@/components/stats/SeasonPlayerStats';
 import { SeasonTeamStats } from '@/components/stats/SeasonTeamStats';
@@ -14,8 +14,9 @@ import { TeamTrends } from '@/components/stats/TeamTrends';
 import { PlayerTrends } from '@/components/stats/PlayerTrends';
 import { LineCombinationStats } from '@/components/stats/LineCombinationStats';
 import { GameFilterDialog } from '@/components/stats/GameFilterDialog';
+import { TestStats } from '@/components/stats/TestStats';
 
-type StatsViewType = 'player' | 'team' | 'trends' | 'combos';
+type StatsViewType = 'player' | 'team' | 'trends' | 'combos' | 'tests';
 type TrendsSubView = 'team' | 'player';
 
 export default function Stats() {
@@ -82,9 +83,13 @@ export default function Stats() {
                   <Link2 className="h-4 w-4" />
                   Kombinationer
                 </Button>
+                <Button variant={statsView === 'tests' ? 'default' : 'outline'} size="sm" onClick={() => setStatsView('tests')} className="gap-2">
+                  <ClipboardList className="h-4 w-4" />
+                  Tester
+                </Button>
               </div>
 
-              <div className="flex gap-2">
+              {statsView !== 'tests' && <div className="flex gap-2">
                 <Button
                   variant={selectedGameIds.length === 0 ? 'default' : 'outline'}
                   size="sm"
@@ -101,15 +106,15 @@ export default function Stats() {
                   <Filter className="h-4 w-4" />
                   Välj matcher{selectedGameIds.length > 0 ? ` (${selectedGameIds.length})` : '…'}
                 </Button>
-              </div>
+              </div>}
             </div>
 
-            <p className="text-sm text-muted-foreground">
+            {statsView !== 'tests' && <p className="text-sm text-muted-foreground">
               Visar statistik från {statsGames.length} avslutad{statsGames.length !== 1 ? 'e' : ''} match{statsGames.length !== 1 ? 'er' : ''}
               {selectedGameIds.length > 0 ? ` av ${finishedGamesCount}` : ''}
-            </p>
+            </p>}
 
-            {selectedGames.length > 0 && (
+            {statsView !== 'tests' && selectedGames.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {selectedGames.map(g => (
                   <Badge key={g.id} variant="secondary" className="gap-1.5 pr-1">
@@ -132,6 +137,8 @@ export default function Stats() {
               <SeasonTeamStats games={statsGames} />
             ) : statsView === 'combos' ? (
               <LineCombinationStats games={statsGames} players={players} />
+            ) : statsView === 'tests' ? (
+              <TestStats players={players} />
             ) : (
               <div className="space-y-4">
                 <div className="flex gap-2">
