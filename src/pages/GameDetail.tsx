@@ -45,6 +45,7 @@ export default function GameDetail() {
   
   const {
     game,
+    updateGame,
     updateSquad,
     updateLine,
     startGame,
