@@ -126,6 +126,7 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
                   required
                 />
               </div>
+              {!(formData.positions?.length === 1 && formData.positions[0] === 'Goalkeeper') && (
               <div className="grid gap-2">
                 <Label htmlFor="stickSide">Klubbsida</Label>
                 <Select
@@ -141,6 +142,7 @@ export function PlayerFormDialog({ open, onOpenChange, player, onSave, onDelete 
                   </SelectContent>
                 </Select>
               </div>
+              )}
             </div>
 
             <div className="grid gap-2">
