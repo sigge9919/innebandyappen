@@ -148,6 +148,12 @@ export default function GameDetail() {
                 {game.location}
               </span>
             </div>
+            <div className="mt-2">
+              <GameCategoryPicker
+                value={game.categories ?? []}
+                onChange={(next) => updateGame({ categories: next })}
+              />
+            </div>
           </div>
           {/* Live game controls in header */}
           {game.status === 'Live' && (
