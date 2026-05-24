@@ -1,16 +1,38 @@
 ## Mål
-Dela upp kombinationsstatistiken på `/stats` → "Kombinationer" efter spelsätt (`5v5`, `5v4`, `4v5`, `6v5`, `5v6`).
+Lägg till en ny vy "Tester" i Statistik där tränaren väljer **testtyp** (och valfritt specifikt test) och får upp en tabell med varje spelares **senaste resultat** + **datum**.
 
-## Ändringar
+## UI
 
-**`src/components/stats/LineCombinationStats.tsx`**
-- Lägg till knapprad överst för spelsätt-filter: `Alla`, `5v5`, `5v4` (PP), `4v5` (PK), `6v5`, `5v6`. Penalty shots (`PS`) ingår aldrig (redan exkluderat).
-- Ny state: `situationFilter: GameSituation | 'all'`, default `'all'`.
-- I `useMemo`-beräkningen: när filter ≠ `'all'`, räkna endast events vars `event.situation` matchar filtret. För opponent-mål utan `lineId` (snapshot-fallback) används samma situation-check.
-- "Matcher"-räkningen ändras till antal matcher där kombinationen var på isen i något event med vald situation (för `'all'` = nuvarande beteende: matcher där kedjan satts upp).
-  - Konkret: när filter ≠ `'all'`, samla per kombination de `gameId` där minst ett event med rätt situation matchar kombinationens spelare (via `lineId`→line eller `onIcePlayerIds`-superset).
-- Tomt-tillstånd-text uppdateras dynamiskt: "Inga kombinationer i {situation}".
-- Resten av tabellen (MF, ME, +/−, +/− per match) är oförändrad logik, bara filtrerad indata.
+I `src/pages/Stats.tsx`:
+- Lägg till en femte knapp i vyväljaren: **Tester** (ikon: `ClipboardList`).
+- När vyn är aktiv döljs "Välj matcher"/säsongsfilter-raden (testdata är inte matchberoende) — säsongsväljaren högst upp behålls men används inte för filtrering här (tester saknar säsongskoppling i databasen).
 
-## Inga andra filer
-Rent inom `LineCombinationStats.tsx`. Inga DB- eller typändringar — `GameSituation` finns redan i `src/types/game.ts`.
+## Ny komponent: `src/components/stats/TestStats.tsx`
+
+Props: `players: Player[]`.
+
+Internt:
+- Använder `useTestResults()` för att hämta lagets test_results.
+- **Testtyp-filter**: knappar för varje unik `testType` i resultaten (vanligen `Fitness`/`Skill`) + "Alla".
+- **Testnamn-väljare**: `Select` med alla unika `testName` som matchar vald typ. Standardval: "Alla tester".
+- **Tabell** (en rad per spelare i aktiv trupp):
+  - Spelare (namn + tröjnr)
+  - Test (om "Alla tester" valt — visa testnamnet på den senaste posten)
+  - Senaste resultat
+  - Datum
+  - Trend-indikator (`trend` från TestResult, pil upp/ner/=)
+- Logik: gruppera resultat per `playerId` (+ `testName` om specifikt test valt), sortera efter `date` desc, ta första.
+- Spelare utan resultat visas med "—".
+- Tom state om inga tester finns: meddelande "Inga testresultat registrerade ännu" med länk till Spelare-sidan.
+- Sortering: tabell sorterbar på resultat (numeriskt om möjligt) och datum.
+
+## Integration
+
+I `Stats.tsx`:
+- `statsView` utökas med `'tests'`.
+- Rendera `<TestStats players={players} />` när aktiv.
+- Räknaren "X avslutade matcher" göms i testvyn.
+
+## Inga DB-ändringar
+
+Använder befintlig `test_results`-tabell och `useTestResults`-hook.

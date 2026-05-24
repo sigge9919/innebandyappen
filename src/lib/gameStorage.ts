@@ -41,6 +41,7 @@ export function dbToEnhancedGame(row: any): EnhancedGame {
     playerStats: row.player_stats ?? [],
     notes: row.notes,
     mediaFiles: row.media_files ?? [],
+    categories: row.categories ?? [],
   };
 }
 
@@ -66,6 +67,7 @@ export function enhancedGameToDb(g: EnhancedGame, teamId: string) {
     player_stats: g.playerStats as any,
     notes: g.notes as any,
     media_files: (g.mediaFiles ?? []) as any,
+    categories: g.categories ?? [],
   };
 }
 
@@ -89,6 +91,7 @@ export function enhancedGameUpdatesToDb(u: Partial<EnhancedGame>) {
   if (u.playerStats !== undefined) r.player_stats = u.playerStats;
   if (u.notes !== undefined) r.notes = u.notes;
   if (u.mediaFiles !== undefined) r.media_files = u.mediaFiles;
+  if (u.categories !== undefined) r.categories = u.categories;
   return r;
 }
 

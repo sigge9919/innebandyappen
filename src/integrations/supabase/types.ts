@@ -74,6 +74,7 @@ export type Database = {
         Row: {
           active_goalie_id: string | null
           active_line_id: string | null
+          categories: string[]
           created_at: string
           current_period: string | null
           current_situation: string | null
@@ -98,6 +99,7 @@ export type Database = {
         Insert: {
           active_goalie_id?: string | null
           active_line_id?: string | null
+          categories?: string[]
           created_at?: string
           current_period?: string | null
           current_situation?: string | null
@@ -122,6 +124,7 @@ export type Database = {
         Update: {
           active_goalie_id?: string | null
           active_line_id?: string | null
+          categories?: string[]
           created_at?: string
           current_period?: string | null
           current_situation?: string | null
@@ -589,6 +592,7 @@ export type Database = {
       team_settings: {
         Row: {
           coach_notes: string | null
+          game_categories: string[]
           id: string
           permissions: Json | null
           play_categories: string[] | null
@@ -599,6 +603,7 @@ export type Database = {
         }
         Insert: {
           coach_notes?: string | null
+          game_categories?: string[]
           id?: string
           permissions?: Json | null
           play_categories?: string[] | null
@@ -609,6 +614,7 @@ export type Database = {
         }
         Update: {
           coach_notes?: string | null
+          game_categories?: string[]
           id?: string
           permissions?: Json | null
           play_categories?: string[] | null

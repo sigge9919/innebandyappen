@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createEnhancedGame, EnhancedGame } from '@/types/game';
 import { format } from 'date-fns';
+import { GameCategoryPicker } from './GameCategoryPicker';
 
 interface NewGameDialogProps {
   open: boolean;
@@ -17,17 +18,20 @@ export function NewGameDialog({ open, onOpenChange, onSave }: NewGameDialogProps
   const [opponent, setOpponent] = useState('');
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [location, setLocation] = useState<'Home' | 'Away'>('Home');
+  const [categories, setCategories] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!opponent.trim()) return;
     
     const game = createEnhancedGame(opponent.trim(), date, location);
+    game.categories = categories;
     onSave(game);
     
     setOpponent('');
     setDate(format(new Date(), 'yyyy-MM-dd'));
     setLocation('Home');
+    setCategories([]);
     onOpenChange(false);
   };
 
@@ -72,6 +76,11 @@ export function NewGameDialog({ open, onOpenChange, onSave }: NewGameDialogProps
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Kategorier</Label>
+            <GameCategoryPicker value={categories} onChange={setCategories} />
           </div>
 
           <DialogFooter>

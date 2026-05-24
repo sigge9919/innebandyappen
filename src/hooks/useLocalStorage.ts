@@ -340,6 +340,37 @@ export function useTestTypes() {
   return { testTypes, addTestType, deleteTestType };
 }
 
+export function useGameCategories() {
+  const [categories, setCategories] = useState<string[]>([]);
+  const { activeTeam } = useTeam();
+
+  const refresh = useCallback(async () => {
+    if (!activeTeam) return;
+    const { data } = await supabase.from('team_settings').select('game_categories').eq('team_id', activeTeam.id).single();
+    setCategories(((data as any)?.game_categories ?? []) as string[]);
+  }, [activeTeam]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const addCategory = useCallback(async (category: string) => {
+    if (!activeTeam) return;
+    const trimmed = category.trim();
+    if (!trimmed || categories.includes(trimmed)) return;
+    const updated = [...categories, trimmed];
+    await supabase.from('team_settings').update({ game_categories: updated } as any).eq('team_id', activeTeam.id);
+    setCategories(updated);
+  }, [activeTeam, categories]);
+
+  const deleteCategory = useCallback(async (category: string) => {
+    if (!activeTeam) return;
+    const updated = categories.filter(c => c !== category);
+    await supabase.from('team_settings').update({ game_categories: updated } as any).eq('team_id', activeTeam.id);
+    setCategories(updated);
+  }, [activeTeam, categories]);
+
+  return { categories, addCategory, deleteCategory, refresh };
+}
+
 // --- DB mapping helpers ---
 
 function dbToPlayer(row: any): Player {
