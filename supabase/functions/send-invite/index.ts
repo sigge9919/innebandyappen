@@ -44,11 +44,61 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Log the invite (actual email sending can be wired up later with an email provider)
-    console.log(`Invite requested: ${email} to team "${teamName}" as ${role} by ${inviterName}`)
+    const resendApiKey = Deno.env.get('RESEND_API_KEY')
+    if (!resendApiKey) {
+      console.error('send-invite: RESEND_API_KEY is not configured')
+      return new Response(
+        JSON.stringify({ error: 'Email sending is not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const roleLabels: Record<string, string> = {
+      head_coach: 'Huvudtränare',
+      assistant_coach: 'Assisterande tränare',
+      stats_coach: 'Statistikansvarig',
+      viewer: 'Åskådare',
+      player: 'Spelare',
+    }
+    const roleLabel = roleLabels[role] ?? role
+
+    const escapeHtml = (value: string) =>
+      value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+    const appUrl = Deno.env.get('APP_URL') ?? 'https://floorballtactix.se'
+
+    const resendRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Floorball Tactix <noreply@floorballtactix.com>',
+        to: [email],
+        subject: `${escapeHtml(inviterName)} har bjudit in dig till "${escapeHtml(teamName)}" på Floorball Tactix`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+            <h2>Du har blivit inbjuden!</h2>
+            <p><strong>${escapeHtml(inviterName)}</strong> har bjudit in dig att gå med i laget <strong>${escapeHtml(teamName)}</strong> på Floorball Tactix, som <strong>${escapeHtml(roleLabel)}</strong>.</p>
+            <p>Skapa ett konto med den här e-postadressen (${escapeHtml(email)}) för att automatiskt kopplas till laget.</p>
+            <p><a href="${appUrl}" style="display: inline-block; padding: 10px 20px; background: #0d7d6f; color: #fff; text-decoration: none; border-radius: 6px;">Gå till Floorball Tactix</a></p>
+          </div>
+        `,
+      }),
+    })
+
+    if (!resendRes.ok) {
+      const errText = await resendRes.text()
+      console.error('send-invite: Resend API error:', resendRes.status, errText)
+      return new Response(
+        JSON.stringify({ error: 'Failed to send invite email' }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     return new Response(
-      JSON.stringify({ success: true, message: `Invite logged for ${email}` }),
+      JSON.stringify({ success: true, message: `Invite sent to ${email}` }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {

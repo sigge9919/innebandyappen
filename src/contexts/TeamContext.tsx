@@ -141,11 +141,9 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     });
     if (error) return { error: error as unknown as Error };
 
-    console.log("Försöker anropa Edge Function...");
-
     // Send invite email via edge function
     const inviterName = user?.email ?? "En tränare";
-    const { data, error: fnError } = await supabase.functions.invoke("send-invite", {
+    const { error: fnError } = await supabase.functions.invoke("send-invite", {
       body: {
         email: email.toLowerCase(),
         teamName: activeTeam.name,
@@ -153,20 +151,9 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         inviterName,
       },
     });
-    console.log(
-      "Edge function svar:",
-      JSON.stringify(
-        {
-          data,
-          error: fnError,
-          errorMessage: fnError?.message,
-          errorStatus: fnError?.status,
-          errorContext: fnError?.context,
-        },
-        null,
-        2,
-      ),
-    );
+    if (fnError) {
+      console.error("Kunde inte skicka inbjudningsmail:", fnError.message);
+    }
 
     await refreshMembers();
     return { error: null };
