@@ -38,8 +38,8 @@ export default function ResetPassword() {
       toast({ title: 'Fel', description: 'Lösenorden matchar inte.', variant: 'destructive' });
       return;
     }
-    if (password.length < 6) {
-      toast({ title: 'Fel', description: 'Lösenordet måste vara minst 6 tecken.', variant: 'destructive' });
+    if (password.length < 8) {
+      toast({ title: 'Fel', description: 'Lösenordet måste vara minst 8 tecken.', variant: 'destructive' });
       return;
     }
 
@@ -95,7 +95,7 @@ export default function ResetPassword() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
                 placeholder="••••••••"
               />
             </div>
@@ -107,7 +107,7 @@ export default function ResetPassword() {
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
                 placeholder="••••••••"
               />
             </div>
