@@ -16,7 +16,7 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  _role public.team_role;
+  _role text;
   _level text;
   _perms jsonb;
 BEGIN
@@ -24,7 +24,7 @@ BEGIN
     RETURN true;
   END IF;
 
-  SELECT role INTO _role FROM public.team_members
+  SELECT role::text INTO _role FROM public.team_members
   WHERE team_id = _team_id AND user_id = auth.uid()
   LIMIT 1;
 
@@ -33,12 +33,12 @@ BEGIN
   END IF;
 
   SELECT permissions INTO _perms FROM public.team_settings WHERE team_id = _team_id LIMIT 1;
-  _level := _perms #>> ARRAY[_role::text, _section];
+  _level := _perms #>> ARRAY[_role, _section];
 
   -- Fall back to the same defaults hardcoded in src/hooks/usePermissions.ts (DEFAULT_PERMISSIONS)
   -- when a team hasn't customized its permission matrix yet.
   IF _level IS NULL THEN
-    _level := CASE _role::text || ':' || _section
+    _level := CASE _role || ':' || _section
       WHEN 'assistant_coach:team' THEN 'edit'
       WHEN 'assistant_coach:games' THEN 'edit'
       WHEN 'assistant_coach:stats' THEN 'view'
