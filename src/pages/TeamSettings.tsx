@@ -21,6 +21,7 @@ import {
   PermissionsMap,
   AppSection,
 } from '@/hooks/usePermissions';
+import { TrainingSegmentsCard } from '@/components/settings/TrainingSegmentsCard';
 
 const ROLE_LABELS: Record<TeamRole, string> = {
   head_coach: 'Huvudtränare',
@@ -50,6 +51,7 @@ export default function TeamSettings() {
   const [seasonConfirmOpen, setSeasonConfirmOpen] = useState(false);
   const [seasonPlayerIds, setSeasonPlayerIds] = useState<string[]>([]);
   const isHeadCoach = activeRole === 'head_coach';
+  const isCoach = activeRole === 'head_coach' || activeRole === 'assistant_coach';
   const currentActiveSeason = seasons.find(s => s.isActive);
 
   // Pre-select all non-archived players when dialog opens
@@ -261,6 +263,9 @@ export default function TeamSettings() {
               </CardContent>
             </Card>
           )}
+
+          {/* Training segments */}
+          <TrainingSegmentsCard canEdit={isCoach} />
 
           {/* Season Management */}
           {isHeadCoach && (
