@@ -244,7 +244,7 @@ export default function TrainingSessionForm() {
                                        sIndex === 1 ? 'hsl(var(--primary))' :
                                        sIndex === 2 ? 'hsl(var(--accent-foreground))' : 'hsl(var(--muted-foreground))'
                     }} />
-                    <span className="text-sm font-medium flex-1">{SECTION_LABELS[section.type] || section.type}</span>
+                    <span className="text-sm font-medium flex-1">{section.type}</span>
                     <div className="flex items-center gap-1.5">
                       <Input
                         type="number"
