@@ -15,6 +15,7 @@ import {
   Check,
   Plus,
   Activity,
+  CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,7 @@ const navItems = [
   { to: '/development', icon: TrendingUp, label: 'Utveckling' },
   { to: '/tactics', icon: PenTool, label: 'Taktiktavla' },
   { to: '/settings', icon: Settings, label: 'Inställningar' },
+  { to: '/billing', icon: CreditCard, label: 'Prenumeration' },
 ];
 
 function NavItem({ to, icon: Icon, label, onClick }: { to: string; icon: React.ElementType; label: string; onClick?: () => void }) {
