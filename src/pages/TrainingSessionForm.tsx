@@ -8,17 +8,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { TrainingSession, Player, Drill, TrainingSection, TrainingTeam } from '@/types';
 import { useTrainingSessions, usePlayers, useDrills } from '@/hooks/useLocalStorage';
+import { useTrainingSegments, defaultDurationForIndex } from '@/hooks/useTrainingSegments';
 import { format } from 'date-fns';
 import { Plus, X, Clock, Shuffle, Users, ArrowLeft, Trash2 } from 'lucide-react';
 
-const DEFAULT_SECTIONS: { type: TrainingSection['type']; duration: number }[] = [
-  { type: 'Warm-up', duration: 15 },
-  { type: 'Main drills', duration: 40 },
-  { type: 'Game-like drills', duration: 25 },
-  { type: 'Cool-down', duration: 10 },
-];
-
-const SECTION_LABELS: Record<string, string> = {
+// Legacy hardcoded section types (sessions created before segments existed)
+const LEGACY_SECTION_LABELS: Record<string, string> = {
   'Warm-up': 'Uppvärmning',
   'Main drills': 'Huvudövningar',
   'Game-like drills': 'Spelövningar',
@@ -26,7 +21,8 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 interface SectionFormData {
-  type: TrainingSection['type'];
+  type: string;
+  segmentId?: string;
   duration: number;
   drillIds: string[];
 }
@@ -37,6 +33,7 @@ export default function TrainingSessionForm() {
   const { sessions, addSession, updateSession, deleteSession } = useTrainingSessions();
   const { players } = usePlayers();
   const { drills } = useDrills();
+  const { segments, isLoading: segmentsLoading } = useTrainingSegments();
 
   const isEditing = sessionId && sessionId !== 'new';
   const existingSession = isEditing ? sessions.find(s => s.id === sessionId) : null;
@@ -47,9 +44,7 @@ export default function TrainingSessionForm() {
     playerIds: [] as string[],
   });
 
-  const [sections, setSections] = useState<SectionFormData[]>(
-    DEFAULT_SECTIONS.map(s => ({ ...s, drillIds: [] }))
-  );
+  const [sections, setSections] = useState<SectionFormData[]>([]);
 
   const [teams, setTeams] = useState<TrainingTeam[]>([]);
   const [teamCount, setTeamCount] = useState(2);
@@ -62,13 +57,25 @@ export default function TrainingSessionForm() {
         playerIds: existingSession.playerIds,
       });
       setSections(existingSession.sections.map(s => ({
-        type: s.type,
+        type: LEGACY_SECTION_LABELS[s.type] || s.type,
+        segmentId: s.segmentId,
         duration: s.duration,
         drillIds: s.drillIds || [],
       })));
       setTeams(existingSession.teams || []);
     }
   }, [existingSession]);
+
+  // New sessions: build the section list from the team's segments (sort_order)
+  useEffect(() => {
+    if (existingSession || segmentsLoading) return;
+    setSections(segments.map((seg, i) => ({
+      type: seg.name,
+      segmentId: seg.id,
+      duration: defaultDurationForIndex(i),
+      drillIds: [],
+    })));
+  }, [existingSession, segments, segmentsLoading]);
 
   const totalDuration = sections.reduce((sum, s) => sum + s.duration, 0);
 
@@ -82,6 +89,7 @@ export default function TrainingSessionForm() {
       playerIds: formData.playerIds,
       sections: sections.map(s => ({
         type: s.type,
+        segmentId: s.segmentId,
         duration: s.duration,
         drillIds: s.drillIds,
       })),
@@ -236,7 +244,7 @@ export default function TrainingSessionForm() {
                                        sIndex === 1 ? 'hsl(var(--primary))' :
                                        sIndex === 2 ? 'hsl(var(--accent-foreground))' : 'hsl(var(--muted-foreground))'
                     }} />
-                    <span className="text-sm font-medium flex-1">{SECTION_LABELS[section.type] || section.type}</span>
+                    <span className="text-sm font-medium flex-1">{section.type}</span>
                     <div className="flex items-center gap-1.5">
                       <Input
                         type="number"
