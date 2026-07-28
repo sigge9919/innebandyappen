@@ -6,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrainingSession, Player, Drill, TrainingSection, TrainingTeam } from '@/types';
 import { useTrainingSessions, usePlayers, useDrills } from '@/hooks/useLocalStorage';
 import { useTrainingSegments, defaultDurationForIndex } from '@/hooks/useTrainingSegments';
 import { format } from 'date-fns';
-import { Plus, X, Clock, Shuffle, Users, ArrowLeft, Trash2 } from 'lucide-react';
+import { Plus, X, Clock, Shuffle, Users, ArrowLeft, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 
 // Legacy hardcoded section types (sessions created before segments existed)
 const LEGACY_SECTION_LABELS: Record<string, string> = {
@@ -131,6 +132,33 @@ export default function TrainingSessionForm() {
   const updateSectionDuration = (index: number, duration: number) => {
     setSections(prev => prev.map((s, i) => i === index ? { ...s, duration: Math.max(0, duration) } : s));
   };
+
+  const addSectionFromSegment = (segmentId: string) => {
+    const seg = segments.find(s => s.id === segmentId);
+    if (!seg) return;
+    setSections(prev => [...prev, {
+      type: seg.name,
+      segmentId: seg.id,
+      duration: defaultDurationForIndex(prev.length),
+      drillIds: [],
+    }]);
+  };
+
+  const removeSection = (index: number) => {
+    setSections(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const moveSection = (index: number, direction: -1 | 1) => {
+    setSections(prev => {
+      const target = index + direction;
+      if (target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  };
+
+  const availableSegments = segments.filter(seg => !sections.some(s => s.segmentId === seg.id));
 
   const toggleDrillInSection = (sectionIndex: number, drillId: string) => {
     setSections(prev => prev.map((s, i) => {
@@ -255,6 +283,18 @@ export default function TrainingSessionForm() {
                         className="w-16 h-8 text-center text-sm"
                       />
                       <span className="text-xs text-muted-foreground">min</span>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8"
+                        disabled={sIndex === 0} onClick={() => moveSection(sIndex, -1)}>
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8"
+                        disabled={sIndex === sections.length - 1} onClick={() => moveSection(sIndex, 1)}>
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive"
+                        onClick={() => removeSection(sIndex)}>
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
 
@@ -315,6 +355,22 @@ export default function TrainingSessionForm() {
                 </div>
               ))}
             </div>
+
+            {availableSegments.length > 0 && (
+              <Select value="" onValueChange={addSectionFromSegment}>
+                <SelectTrigger className="w-full sm:w-64">
+                  <SelectValue placeholder="Lägg till segment" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableSegments.map(seg => (
+                    <SelectItem key={seg.id} value={seg.id}>{seg.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {sections.length === 0 && (
+              <p className="text-xs text-muted-foreground">Inga segment valda för detta pass.</p>
+            )}
           </div>
 
           {/* Players Attending */}
