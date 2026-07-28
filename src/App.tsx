@@ -27,6 +27,10 @@ import NotFound from "./pages/NotFound";
 import RPETrends from "./pages/RPETrends";
 import ResetPassword from "./pages/ResetPassword";
 import Landing from "./pages/Landing";
+import Pricing from "./pages/Pricing";
+import Billing from "./pages/Billing";
+import BillingSuccess from "./pages/BillingSuccess";
+import BillingCancel from "./pages/BillingCancel";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +63,10 @@ const App = () => (
                     <Route path="/development" element={<Development />} />
                     <Route path="/tactics" element={<TacticsBoard />} />
                     <Route path="/settings" element={<TeamSettings />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/billing" element={<Billing />} />
+                    <Route path="/billing/success" element={<BillingSuccess />} />
+                    <Route path="/billing/cancel" element={<BillingCancel />} />
                     <Route path="/rpe" element={<RPETrends />} />
                     <Route path="/player-portal" element={<PlayerPortal />} />
                     <Route path="/team-setup" element={<TeamSetup />} />
