@@ -1,3 +1,4 @@
+import { sectionLabel } from '@/lib/utils';
 import { TrainingSession } from '@/types';
 import { format } from 'date-fns';
 import { Calendar, Clock, Users, Activity, User } from 'lucide-react';
@@ -85,7 +86,7 @@ export function TrainingCard({ session, playerNames, avgRPE, rpeCount, onClick }
                                index === 1 ? 'hsl(var(--primary))' :
                                index === 2 ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))'
               }} />
-              <span className="text-sm text-muted-foreground flex-1">{section.type}</span>
+              <span className="text-sm text-muted-foreground flex-1">{sectionLabel(section.type)}</span>
               <span className="text-sm font-medium text-foreground">{section.duration} min</span>
             </div>
           ))}

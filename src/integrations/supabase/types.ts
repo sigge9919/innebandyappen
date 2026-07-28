@@ -708,6 +708,41 @@ export type Database = {
           },
         ]
       }
+      training_segments: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          sort_order: number
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          sort_order?: number
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          sort_order?: number
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_segments_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_sessions: {
         Row: {
           created_at: string
@@ -814,6 +849,7 @@ export type Database = {
         Args: { _team_id: string }
         Returns: Database["public"]["Enums"]["team_role"]
       }
+      is_coach: { Args: { _team_id: string }; Returns: boolean }
       is_head_coach: { Args: { _team_id: string }; Returns: boolean }
       is_team_member: { Args: { _team_id: string }; Returns: boolean }
       seed_default_drills: { Args: { _team_id: string }; Returns: undefined }

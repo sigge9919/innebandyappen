@@ -83,7 +83,10 @@ export interface TrainingTeam {
 }
 
 export interface TrainingSection {
-  type: 'Warm-up' | 'Main drills' | 'Game-like drills' | 'Cool-down';
+  /** Display name of the segment (kept for legacy sessions and rendering) */
+  type: string;
+  /** Reference to public.training_segments.id */
+  segmentId?: string;
   duration: number;
   drillIds: string[];
 }

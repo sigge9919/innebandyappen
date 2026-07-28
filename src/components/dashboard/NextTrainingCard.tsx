@@ -1,3 +1,4 @@
+import { sectionLabel } from '@/lib/utils';
 import { TrainingSession } from '@/types';
 import { format } from 'date-fns';
 import { sv } from 'date-fns/locale';
@@ -31,7 +32,7 @@ export function NextTrainingCard({ session, playerCount }: NextTrainingCardProps
               backgroundColor: index === 1 ? 'hsl(var(--primary))' :
                              index === 2 ? 'hsl(var(--warning))' : undefined
             }}
-            title={`${section.type}: ${section.duration}min`}
+            title={`${sectionLabel(section.type)}: ${section.duration}min`}
           />
         ))}
       </div>
