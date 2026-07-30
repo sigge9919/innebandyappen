@@ -10,6 +10,7 @@ import { useTeam } from '@/contexts/TeamContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { CreditCard, Users } from 'lucide-react';
+import { getEdgeFunctionErrorMessage } from '@/lib/edgeFunctionError';
 
 const STATUS_LABELS: Record<string, string> = {
   active: 'Aktiv',
@@ -67,7 +68,7 @@ export default function Billing() {
     if (error || !data?.url) {
       toast({
         title: 'Kunde inte öppna prenumerationsportalen',
-        description: error?.message ?? 'Försök igen om en stund.',
+        description: error ? await getEdgeFunctionErrorMessage(error) : 'Försök igen om en stund.',
         variant: 'destructive',
       });
       return;
@@ -90,7 +91,7 @@ export default function Billing() {
     if (error) {
       toast({
         title: 'Kunde inte uppdatera antalet spelare',
-        description: error.message,
+        description: await getEdgeFunctionErrorMessage(error),
         variant: 'destructive',
       });
       return;
