@@ -1,10 +1,12 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { useTeam } from '@/contexts/TeamContext';
+import { useTeam, hasActiveAccess } from '@/contexts/TeamContext';
 import Login from '@/pages/Login';
 import TeamSetup from '@/pages/TeamSetup';
 import PlayerPortal from '@/pages/PlayerPortal';
 import { useLocation, Navigate } from 'react-router-dom';
 import { usePermissions, routeToSection } from '@/hooks/usePermissions';
+
+const BILLING_PATHS = ['/pricing', '/billing', '/billing/success', '/billing/cancel'];
 
 export function AppGuard({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
@@ -25,8 +27,17 @@ export function AppGuard({ children }: { children: React.ReactNode }) {
   if (!user) return <Login />;
   if (!activeTeam && location.pathname !== '/team-setup') return <TeamSetup />;
 
+  // Subscription gate — applies to every role equally
+  if (
+    activeTeam &&
+    !hasActiveAccess(activeTeam) &&
+    !BILLING_PATHS.includes(location.pathname)
+  ) {
+    return <Navigate to="/pricing" replace />;
+  }
+
   // Players get their own portal — they can't access coach pages
-  if (activeRole === 'player' && location.pathname !== '/player-portal') {
+  if (activeRole === 'player' && location.pathname !== '/player-portal' && !BILLING_PATHS.includes(location.pathname)) {
     return <PlayerPortal />;
   }
 
