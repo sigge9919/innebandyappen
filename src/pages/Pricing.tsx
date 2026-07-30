@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Check, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getEdgeFunctionErrorMessage } from '@/lib/edgeFunctionError';
 
 const PLANS = {
   month: { label: 'Månad', price: '149 kr', suffix: '/mån', priceId: 'price_1TReftA08PKlI3sL2YFBm2Sr' },
@@ -43,7 +44,7 @@ export default function Pricing() {
     if (error || !data?.url) {
       toast({
         title: 'Kunde inte starta betalning',
-        description: error?.message ?? 'Försök igen om en stund.',
+        description: error ? await getEdgeFunctionErrorMessage(error) : 'Försök igen om en stund.',
         variant: 'destructive',
       });
       return;
