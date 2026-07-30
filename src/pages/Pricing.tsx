@@ -25,7 +25,8 @@ const FEATURES = [
 ];
 
 export default function Pricing() {
-  const { activeTeam } = useTeam();
+  const { activeTeam, activeRole } = useTeam();
+  const isHeadCoach = activeRole === 'head_coach';
   const { toast } = useToast();
   const [interval, setInterval] = useState<Interval>('month');
   const [loading, setLoading] = useState(false);
@@ -100,9 +101,15 @@ export default function Pricing() {
               ))}
             </ul>
 
-            <Button onClick={handleCheckout} disabled={loading || !activeTeam} className="w-full">
-              {loading ? 'Öppnar kassan…' : 'Köp'}
-            </Button>
+            {isHeadCoach ? (
+              <Button onClick={handleCheckout} disabled={loading || !activeTeam} className="w-full">
+                {loading ? 'Öppnar kassan…' : 'Köp'}
+              </Button>
+            ) : (
+              <p className="text-sm text-muted-foreground border border-border rounded-sm p-3">
+                Endast huvudtränaren kan aktivera lagets prenumeration. Be din huvudtränare logga in och slutföra köpet.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
