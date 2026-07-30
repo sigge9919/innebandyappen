@@ -10,6 +10,19 @@ export interface Team {
   name: string;
   created_by: string;
   created_at: string;
+  subscription_status: string;
+  max_players: number;
+  extra_players: number;
+  trial_ends_at: string | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+}
+
+export function hasActiveAccess(team: Team | null): boolean {
+  if (!team) return false;
+  if (team.subscription_status === "active" || team.subscription_status === "trialing") return true;
+  if (team.trial_ends_at && new Date(team.trial_ends_at) > new Date()) return true;
+  return false;
 }
 
 export interface TeamMember {

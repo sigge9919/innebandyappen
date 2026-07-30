@@ -637,20 +637,38 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          extra_players: number
           id: string
+          max_players: number
           name: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string
+          trial_ends_at: string | null
         }
         Insert: {
           created_at?: string
           created_by: string
+          extra_players?: number
           id?: string
+          max_players?: number
           name: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string
+          trial_ends_at?: string | null
         }
         Update: {
           created_at?: string
           created_by?: string
+          extra_players?: number
           id?: string
+          max_players?: number
           name?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string
+          trial_ends_at?: string | null
         }
         Relationships: []
       }
