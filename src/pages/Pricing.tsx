@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Check, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getEdgeFunctionErrorMessage } from '@/lib/edgeFunctionError';
+import { isInstalledApp } from '@/lib/platform';
+import { OpenWebsiteNotice } from '@/components/billing/OpenWebsiteNotice';
 
 const PLANS = {
   month: { label: 'Månad', price: '149 kr', suffix: '/mån', priceId: 'price_1TReftA08PKlI3sL2YFBm2Sr' },
@@ -33,6 +35,14 @@ export default function Pricing() {
   const [loading, setLoading] = useState(false);
 
   const plan = PLANS[interval];
+
+  if (isInstalledApp()) {
+    return (
+      <AppLayout>
+        <OpenWebsiteNotice path="/pricing" />
+      </AppLayout>
+    );
+  }
 
   const handleCheckout = async () => {
     if (!activeTeam) return;
