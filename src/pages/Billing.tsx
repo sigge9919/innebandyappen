@@ -11,6 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { CreditCard, Users } from 'lucide-react';
 import { getEdgeFunctionErrorMessage } from '@/lib/edgeFunctionError';
+import { isInstalledApp } from '@/lib/platform';
+import { OpenWebsiteNotice } from '@/components/billing/OpenWebsiteNotice';
 
 const STATUS_LABELS: Record<string, string> = {
   active: 'Aktiv',
@@ -57,6 +59,14 @@ export default function Billing() {
   }, [load]);
 
   const hasSubscription = status !== 'inactive' && status !== 'canceled';
+
+  if (isInstalledApp()) {
+    return (
+      <AppLayout>
+        <OpenWebsiteNotice path="/billing" />
+      </AppLayout>
+    );
+  }
 
   const openPortal = async () => {
     if (!activeTeam) return;
